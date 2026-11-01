@@ -42,10 +42,12 @@ PR ownership and touched paths at this snapshot:
    vaults. Prove total-fee conservation and per-recipient authorization in
    host and validator tests. Enforce the user's 42/5/3-bps
    community/treasury/founder split while
-   preserving inherited creator fees and creator-selected payout wallets.
+   preserving creator payouts and creator-selected payout wallets. Creator
+   funding from the community share versus an additional charge is undecided;
+   do not hard-code either interpretation or present 50 bps as all-in.
    Treat `beam_economics.rs` as proposed arithmetic, not a live 50-bps fee.
-   Keep creator, Raydium pool, and inherited migration fees separate in quotes
-   and receipts.
+   Disclose each applicable creator, Raydium pool, and inherited migration fee
+   in quotes and receipts.
 2. **Raydium AMM v4 graduation, principal and fee rights.** Replace the gated
    CPMM candidate with a verified AMM v4 adapter. Specify who can withdraw
    principal and collect ongoing fees, then test those permissions. Current
@@ -62,9 +64,10 @@ PR ownership and touched paths at this snapshot:
    create/buy/sell and gated-migration fixtures against the real Anchor
    accounts/events. Test retained instruction encodings and each intentional
    difference. Retained dependency IDLs are references, not a usable Beam SDK.
-5. **Community allocation policy.** The user's direction is to split the
-   community share between holder rewards and flagship buybacks. A 50/50
-   division within that share is a provisional test setting. Holder
+5. **Community allocation policy.** The user's direction is to fund holder
+   rewards and flagship buybacks from the available community allocation.
+   If creator payouts use that allocation, divide only its remainder. A 50/50
+   division of the available amount is a provisional test setting. Holder
    eligibility, flagship mint, recipients, and execution policy remain to be
    specified. Do not add automatic market orders or claim perpetual revenue.
 6. **Feature parity outside the contract.** Use the [feature matrix](FEATURES.md)
