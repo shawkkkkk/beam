@@ -1,0 +1,415 @@
+pub mod curve;
+pub mod error;
+pub mod instructions;
+pub mod states;
+pub mod utils;
+use crate::curve::fees::FEE_RATE_DENOMINATOR_VALUE;
+use anchor_lang::prelude::*;
+use instructions::*;
+pub use states::CreatorFeeOn;
+
+#[cfg(not(feature = "no-entrypoint"))]
+solana_security_txt::security_txt! {
+    name: "raydium-cp-swap",
+    project_url: "https://raydium.io",
+    contacts: "link:https://immunefi.com/bounty/raydium",
+    policy: "https://immunefi.com/bounty/raydium",
+    source_code: "https://github.com/raydium-io/raydium-cp-swap",
+    preferred_languages: "en",
+    auditors: "https://github.com/raydium-io/raydium-docs/blob/master/audit/MadShield%20Q1%202024/raydium-cp-swap-v-1.0.0.pdf"
+}
+
+#[cfg(feature = "devnet")]
+declare_id!("DRaycpLY18LhpbydsBWbVJtxpNv9oXPgjRSfpF2bWpYb");
+#[cfg(not(feature = "devnet"))]
+declare_id!("CPMMoo8L3F4NbTegBCKVNunggL7H1ZpdTHKxQB5qKP1C");
+
+pub mod admin {
+    #[cfg(not(feature = "localnet"))]
+    use super::pubkey;
+    use super::Pubkey;
+    #[cfg(feature = "localnet")]
+    pub const ID: Pubkey = Pubkey::from_str_const(env!(
+        "CPSWAP_LOCALNET_ADMIN",
+        "the `localnet` feature needs CPSWAP_LOCALNET_ADMIN=<admin pubkey> at build time (run `yarn test:local-admin`)"
+    ));
+    #[cfg(feature = "devnet")]
+    pub const ID: Pubkey = pubkey!("DRayqG9RXYi8WHgWEmRQGrUWRWbhjYWYkCRJDd6JBBak");
+    #[cfg(all(not(feature = "devnet"), not(feature = "localnet")))]
+    pub const ID: Pubkey = pubkey!("GThUX1Atko4tqhN2NaiTazWSeFWMuiUvfFnyJyUghFMJ");
+}
+
+pub mod create_pool_fee_reveiver {
+    use super::{pubkey, Pubkey};
+    #[cfg(feature = "devnet")]
+    pub const ID: Pubkey = pubkey!("3oE58BKVt8KuYkGxx8zBojugnymWmBiyafWgMrnb6eYy");
+    #[cfg(not(feature = "devnet"))]
+    pub const ID: Pubkey = pubkey!("DNXgeM9EiiaAbaWvwjHj9fQQLAX5ZsfHyvmYUNRAdNC8");
+}
+
+pub mod collect_lamports {
+    use super::{pubkey, Pubkey};
+    #[cfg(feature = "devnet")]
+    pub const ID: Pubkey = pubkey!("DRaydJNq54dSDHUqYCE3G8YySgaXfZucbh7dTXw9fBMs");
+    #[cfg(not(feature = "devnet"))]
+    pub const ID: Pubkey = pubkey!("RayGkhY93thaTgCv98sx1pNLgBHhJDxWUeZXp4bjmnp");
+}
+
+pub mod fund_fee_owner {
+    use super::{pubkey, Pubkey};
+    #[cfg(feature = "devnet")]
+    pub const ID: Pubkey = pubkey!("DRay33UmULQCeawH3dVpJfN3uqLj6Qtq4ymSRx2pAgGK");
+    #[cfg(not(feature = "devnet"))]
+    pub const ID: Pubkey = pubkey!("FUNDduJTA7XcckKHKfAoEnnhuSud2JUCUZv6opWEjrBU");
+}
+
+pub mod protocol_fee_owner {
+    use super::{pubkey, Pubkey};
+    #[cfg(feature = "devnet")]
+    pub const ID: Pubkey = pubkey!("DRay33UmULQCeawH3dVpJfN3uqLj6Qtq4ymSRx2pAgGK");
+    #[cfg(not(feature = "devnet"))]
+    pub const ID: Pubkey = pubkey!("ProCXqRcXJjoUd1RNoo28bSizAA6EEqt9wURZYPDc5u");
+}
+
+pub mod shared_creator_fee_owner {
+    use super::{pubkey, Pubkey};
+    #[cfg(feature = "devnet")]
+    pub const ID: Pubkey = pubkey!("DRay2aRSqmGVMkcvsQNU4iskM1ztX31EP7pyrtrntqBQ");
+    #[cfg(not(feature = "devnet"))]
+    pub const ID: Pubkey = pubkey!("RayRrPVNAg3hTPa1yfZiR49FqCpkmiLaP4yWsVBnoBZ");
+}
+
+pub const AUTH_SEED: &str = "vault_and_lp_mint_auth_seed";
+
+#[program]
+pub mod raydium_cp_swap {
+    use super::*;
+
+    // The configuration of AMM protocol, include trade fee and protocol fee
+    /// # Arguments
+    ///
+    /// * `ctx`- The accounts needed by instruction.
+    /// * `index` - The index of amm config, there may be multiple config.
+    /// * `trade_fee_rate` - Trade fee rate, can be changed.
+    /// * `protocol_fee_rate` - The rate of protocol fee within trade fee.
+    /// * `fund_fee_rate` - The rate of fund fee within trade fee.
+    ///
+    pub fn create_amm_config(
+        ctx: Context<CreateAmmConfig>,
+        index: u16,
+        trade_fee_rate: u64,
+        protocol_fee_rate: u64,
+        fund_fee_rate: u64,
+        create_pool_fee: u64,
+        creator_fee_rate: u64,
+    ) -> Result<()> {
+        assert!(trade_fee_rate + creator_fee_rate < FEE_RATE_DENOMINATOR_VALUE);
+        assert!(protocol_fee_rate <= FEE_RATE_DENOMINATOR_VALUE);
+        assert!(fund_fee_rate <= FEE_RATE_DENOMINATOR_VALUE);
+        assert!(fund_fee_rate + protocol_fee_rate <= FEE_RATE_DENOMINATOR_VALUE);
+        instructions::create_amm_config(
+            ctx,
+            index,
+            trade_fee_rate,
+            protocol_fee_rate,
+            fund_fee_rate,
+            create_pool_fee,
+            creator_fee_rate,
+        )
+    }
+
+    /// Updates the owner of the amm config
+    /// Must be called by the current owner or admin
+    ///
+    /// # Arguments
+    ///
+    /// * `ctx`- The context of accounts
+    /// * `trade_fee_rate`- The new trade fee rate of amm config, be set when `param` is 0
+    /// * `protocol_fee_rate`- The new protocol fee rate of amm config, be set when `param` is 1
+    /// * `fund_fee_rate`- The new fund fee rate of amm config, be set when `param` is 2
+    /// * `new_owner`- The config's new owner, be set when `param` is 3
+    /// * `new_fund_owner`- The config's new fund owner, be set when `param` is 4
+    /// * `creator_fee_rate`- The new creator fee rate of amm config, be set when `param` is 7
+    /// * `creator_fee_share_rate`- The new share of the creator fee retained by the
+    ///   protocol, be set when `param` is 8
+    /// * `param`- The value can be 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8, otherwise will report a error
+    ///
+    pub fn update_amm_config(ctx: Context<UpdateAmmConfig>, param: u8, value: u64) -> Result<()> {
+        instructions::update_amm_config(ctx, param, value)
+    }
+
+    /// Update pool status for given value
+    ///
+    /// # Arguments
+    ///
+    /// * `ctx`- The context of accounts
+    /// * `status` - The value of status
+    ///
+    pub fn update_pool_status(ctx: Context<UpdatePoolStatus>, status: u8) -> Result<()> {
+        instructions::update_pool_status(ctx, status)
+    }
+
+    /// Collect the protocol fee accrued to the pool
+    ///
+    /// # Arguments
+    ///
+    /// * `ctx` - The context of accounts
+    /// * `amount_0_requested` - The maximum amount of token_0 to send, can be 0 to collect fees in only token_1
+    /// * `amount_1_requested` - The maximum amount of token_1 to send, can be 0 to collect fees in only token_0
+    ///
+    pub fn collect_protocol_fee(
+        ctx: Context<CollectProtocolFee>,
+        amount_0_requested: u64,
+        amount_1_requested: u64,
+    ) -> Result<()> {
+        instructions::collect_protocol_fee(ctx, amount_0_requested, amount_1_requested)
+    }
+
+    /// Collect the fund fee accrued to the pool
+    ///
+    /// # Arguments
+    ///
+    /// * `ctx` - The context of accounts
+    /// * `amount_0_requested` - The maximum amount of token_0 to send, can be 0 to collect fees in only token_1
+    /// * `amount_1_requested` - The maximum amount of token_1 to send, can be 0 to collect fees in only token_0
+    ///
+    pub fn collect_fund_fee(
+        ctx: Context<CollectFundFee>,
+        amount_0_requested: u64,
+        amount_1_requested: u64,
+    ) -> Result<()> {
+        instructions::collect_fund_fee(ctx, amount_0_requested, amount_1_requested)
+    }
+
+    /// Collect the creator fee
+    ///
+    /// # Arguments
+    ///
+    /// * `ctx` - The context of accounts
+    ///
+    pub fn collect_creator_fee(ctx: Context<CollectCreatorFee>) -> Result<()> {
+        instructions::collect_creator_fee(ctx)
+    }
+
+    /// Collect the creator fee, anyone can call it since the fee is always sent to the
+    /// pool creator, the payer only funds the creation of the creator's token accounts.
+    ///
+    /// # Arguments
+    ///
+    /// * `ctx` - The context of accounts
+    ///
+    pub fn collect_creator_fee_permissionless(
+        ctx: Context<CollectCreatorFeePermissionless>,
+    ) -> Result<()> {
+        instructions::collect_creator_fee_permissionless(ctx)
+    }
+
+    /// Create a permission account
+    ///
+    /// # Arguments
+    ///
+    /// * `ctx`- The context of accounts
+    ///
+    pub fn create_permission_pda(ctx: Context<CreatePermissionPda>) -> Result<()> {
+        instructions::create_permission_pda(ctx)
+    }
+
+    /// Close a permission account
+    ///
+    /// # Arguments
+    ///
+    /// * `ctx`- The context of accounts
+    ///
+    pub fn close_permission_pda(ctx: Context<ClosePermissionPda>) -> Result<()> {
+        instructions::close_permission_pda(ctx)
+    }
+
+    /// Create a custom creator fee share account for a (creator, amm_config) pair.
+    /// While it exists it overrides `AmmConfig::creator_fee_share_rate` when the
+    /// creator fee of a pool created by `creator` on `amm_config` is collected.
+    /// Must be called by the admin or the creator fee share owner.
+    ///
+    /// # Arguments
+    ///
+    /// * `ctx`- The context of accounts
+    /// * `share_rate` - The share of the creator fee retained by the protocol,
+    ///   denominated in hundredths of a bip (10^-6)
+    ///
+    pub fn create_creator_fee_share(
+        ctx: Context<CreateCreatorFeeShare>,
+        share_rate: u64,
+    ) -> Result<()> {
+        instructions::create_creator_fee_share(ctx, share_rate)
+    }
+
+    /// Close a custom creator fee share account, the creator fee split falls back to the
+    /// rate configured on the amm config afterwards.
+    /// Must be called by the admin or the creator fee share owner.
+    ///
+    /// # Arguments
+    ///
+    /// * `ctx`- The context of accounts
+    ///
+    pub fn close_creator_fee_share(ctx: Context<CloseCreatorFeeShare>) -> Result<()> {
+        instructions::close_creator_fee_share(ctx)
+    }
+
+    /// Creates a pool for the given token pair and the initial price
+    ///
+    /// # Arguments
+    ///
+    /// * `ctx`- The context of accounts
+    /// * `init_amount_0` - the initial amount_0 to deposit
+    /// * `init_amount_1` - the initial amount_1 to deposit
+    /// * `open_time` - the timestamp allowed for swap
+    ///
+    pub fn initialize<'info>(
+        ctx: Context<'info, Initialize<'info>>,
+        init_amount_0: u64,
+        init_amount_1: u64,
+        open_time: u64,
+    ) -> Result<()> {
+        instructions::initialize(ctx, init_amount_0, init_amount_1, open_time)
+    }
+
+    /// Creates a pool for the given token pair with creator fee settings chosen by the creator.
+    ///
+    /// Same flow as `initialize` (and the same accounts minus the unused `rent` sysvar);
+    /// with `creator_fee_on` set, swaps charge `amm_config.creator_fee_rate` to the pool
+    /// creator on the selected side.
+    ///
+    /// # Arguments
+    ///
+    /// * `ctx`- The context of accounts
+    /// * `init_amount_0` - the initial amount_0 to deposit
+    /// * `init_amount_1` - the initial amount_1 to deposit
+    /// * `open_time` - the timestamp allowed for swap
+    /// * `creator_fee_on` - `None` disables the creator fee; otherwise the creator fee model, 0：both token0 and token1 (depends on the input), 1: only token0, 2: only token1
+    ///
+    pub fn initialize_v2<'info>(
+        ctx: Context<'info, InitializeV2<'info>>,
+        init_amount_0: u64,
+        init_amount_1: u64,
+        open_time: u64,
+        creator_fee_on: Option<CreatorFeeOn>,
+    ) -> Result<()> {
+        instructions::initialize_v2(ctx, init_amount_0, init_amount_1, open_time, creator_fee_on)
+    }
+
+    /// Create a pool with permission
+    ///
+    /// # Arguments
+    ///
+    /// * `ctx`- The context of accounts
+    /// * `init_amount_0` - the initial amount_0 to deposit
+    /// * `init_amount_1` - the initial amount_1 to deposit
+    /// * `open_time` - the timestamp allowed for swap
+    /// * `creator_fee_on` - creator fee model, 0：both token0 and token1 (depends on the input), 1: only token0, 2: only token1
+    ///
+    pub fn initialize_with_permission<'info>(
+        ctx: Context<'info, InitializeWithPermission<'info>>,
+        init_amount_0: u64,
+        init_amount_1: u64,
+        open_time: u64,
+        creator_fee_on: CreatorFeeOn,
+    ) -> Result<()> {
+        instructions::initialize_with_permission(
+            ctx,
+            init_amount_0,
+            init_amount_1,
+            open_time,
+            creator_fee_on,
+        )
+    }
+
+    /// Deposit lp token to the pool
+    ///
+    /// # Arguments
+    ///
+    /// * `ctx`- The context of accounts
+    /// * `lp_token_amount` - Increased number of LPs
+    /// * `maximum_token_0_amount` -  Maximum token 0 amount to deposit, prevents excessive slippage
+    /// * `maximum_token_1_amount` - Maximum token 1 amount to deposit, prevents excessive slippage
+    ///
+    pub fn deposit(
+        ctx: Context<Deposit>,
+        lp_token_amount: u64,
+        maximum_token_0_amount: u64,
+        maximum_token_1_amount: u64,
+    ) -> Result<()> {
+        instructions::deposit(
+            ctx,
+            lp_token_amount,
+            maximum_token_0_amount,
+            maximum_token_1_amount,
+        )
+    }
+
+    /// Withdraw lp for token0 and token1
+    ///
+    /// # Arguments
+    ///
+    /// * `ctx`- The context of accounts
+    /// * `lp_token_amount` - Amount of pool tokens to burn. User receives an output of token a and b based on the percentage of the pool tokens that are returned.
+    /// * `minimum_token_0_amount` -  Minimum amount of token 0 to receive, prevents excessive slippage
+    /// * `minimum_token_1_amount` -  Minimum amount of token 1 to receive, prevents excessive slippage
+    ///
+    pub fn withdraw(
+        ctx: Context<Withdraw>,
+        lp_token_amount: u64,
+        minimum_token_0_amount: u64,
+        minimum_token_1_amount: u64,
+    ) -> Result<()> {
+        instructions::withdraw(
+            ctx,
+            lp_token_amount,
+            minimum_token_0_amount,
+            minimum_token_1_amount,
+        )
+    }
+
+    /// Swap the tokens in the pool base input amount
+    ///
+    /// # Arguments
+    ///
+    /// * `ctx`- The context of accounts
+    /// * `amount_in` -  input amount to transfer, output to DESTINATION is based on the exchange rate
+    /// * `minimum_amount_out` -  Minimum amount of output token, prevents excessive slippage
+    ///
+    pub fn swap_base_input(
+        ctx: Context<Swap>,
+        amount_in: u64,
+        minimum_amount_out: u64,
+    ) -> Result<()> {
+        instructions::swap_base_input(ctx, amount_in, minimum_amount_out)
+    }
+
+    /// Swap the tokens in the pool base output amount
+    ///
+    /// # Arguments
+    ///
+    /// * `ctx`- The context of accounts
+    /// * `max_amount_in` -  input amount prevents excessive slippage
+    /// * `amount_out` -  amount of output token
+    ///
+    pub fn swap_base_output(ctx: Context<Swap>, max_amount_in: u64, amount_out: u64) -> Result<()> {
+        instructions::swap_base_output(ctx, max_amount_in, amount_out)
+    }
+
+    /// Create support token22 mint account which can create pool and send rewards while ignoring unsupported extensions.
+    pub fn create_support_mint_associated(ctx: Context<CreateSupportMintAssociated>) -> Result<()> {
+        instructions::create_support_mint_associated(ctx)
+    }
+
+    /// Close support token22 mint account which can create pool and send rewards while ignoring unsupported extensions.
+    pub fn close_support_mint_associated(ctx: Context<CloseSupportMintAssociated>) -> Result<()> {
+        instructions::close_support_mint_associated(ctx)
+    }
+
+    /// Collect excess lamports, including accounts for SPL tokens owned by authority and Program PDA accounts.
+    pub fn collect_excess_lamports<'info>(
+        ctx: Context<'info, CollectExcessLamports<'info>>,
+    ) -> Result<()> {
+        instructions::collect_excess_lamports(ctx)
+    }
+}

@@ -1,0 +1,79 @@
+{
+  "address": "pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA",
+  "metadata": {
+    "name": "pump_amm",
+    "version": "0.1.0",
+    "spec": "0.1.0"
+  },
+  "instructions": [],
+  "accounts": [
+    {
+      "name": "GlobalConfig",
+      "discriminator": [
+        149,
+        8,
+        156,
+        202,
+        160,
+        252,
+        176,
+        217
+      ]
+    }
+  ],
+  "types": [
+    {
+      "name": "GlobalConfig",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "admin",
+            "type": "pubkey"
+          },
+          {
+            "name": "lp_fee_basis_points",
+            "type": "u64"
+          },
+          {
+            "name": "protocol_fee_basis_points",
+            "type": "u64"
+          },
+          {
+            "name": "disable_flags",
+            "type": "u8"
+          },
+          {
+            "name": "protocol_fee_recipients",
+            "type": {
+              "array": [
+                "pubkey",
+                8
+              ]
+            }
+          },
+          {
+            "name": "coin_creator_fee_basis_points",
+            "type": "u64"
+          },
+          {
+            "name": "admin_set_coin_creator_authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "whitelist_pda",
+            "type": "pubkey"
+          },
+          {
+            "name": "reserved_fee_recipient",
+            "type": "pubkey"
+          },
+          {
+            "name": "mayhem_mode_enabled",
+            "type": "bool"
+          }
+        ]
+      }
+    }
+  ]
+}
