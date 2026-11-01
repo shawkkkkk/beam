@@ -5,7 +5,7 @@ The user selected a **50-basis-point Beam allocation**: 42 nominal bps for a com
 ## Rounding
 
 1. Compute the Beam allocation fee once with Pump's retained ceiling-fee routine at 50 bps.
-2. Compute the founder share as `floor(total_fee × 6 / 100)` and the treasury share as `floor(total_fee × 10 / 100)`.
+2. Cap the founder share at `floor(trade_notional × 3 / 10,000)` and the treasury share at `floor(trade_notional × 5 / 10,000)`.
 3. Give the remainder to the community.
 
 As an illustration of the allocation math alone, on 100 SOL notional this component is 0.5 SOL: 0.42 community, 0.05 treasury, and 0.03 founder. This is **not an all-in trade quote** while creator payout funding remains undecided. On a one-lamport trade, the rounded component is one lamport, all assigned to the community. Quotes must disclose effective fees on dust trades and every applicable fee component.
