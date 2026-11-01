@@ -34,7 +34,8 @@
     "src/beam_amm_v4.rs",
     "src/beam_amm_v4_funding.rs",
     "tests/amm_v4_funding.rs",
-    "src/beam_amm_v4_settlement.rs"
+    "src/beam_amm_v4_settlement.rs",
+    "src/beam_amm_v4_snapshot.rs"
   ],
   "deployment_status": "not deployed"
 }
