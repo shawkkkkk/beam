@@ -1,21 +1,22 @@
 # Community-first economics
 
-The user selected a **50-basis-point Beam fee component**: 42 nominal bps for community holder rewards and flagship buybacks, 5 bps for treasury, and 3 bps for founder. Existing Pump creator fees and creator-selected payout-wallet behavior are separate obligations; this design does not remove or count them inside the Beam component. The quoted competitor fee split has not been independently verified.
+The user selected a **50-basis-point Beam allocation**: 42 nominal bps for a community allocation, 5 bps for treasury, and 3 bps for founder. Preserve the creator payout and creator-selected wallet system. The funding choice is still open: creator payouts might come from the 42-bps community share or an additional charge. Neither treatment is approved yet. The quoted competitor fee split has not been independently verified.
 
 ## Rounding
 
-1. Compute the combined fee once with Pump's retained ceiling-fee routine at 50 bps.
+1. Compute the Beam allocation fee once with Pump's retained ceiling-fee routine at 50 bps.
 2. Compute the founder share as `floor(total_fee × 6 / 100)` and the treasury share as `floor(total_fee × 10 / 100)`.
 3. Give the remainder to the community.
 
-On 100 SOL notional, the Beam component is 0.5 SOL: 0.42 community, 0.05 treasury, and 0.03 founder, **plus any separately applicable creator fee**. On a one-lamport trade, the rounded Beam component is one lamport, all assigned to the community. Quotes must disclose effective fees on dust trades and every applicable fee component.
+As an illustration of the allocation math alone, on 100 SOL notional this component is 0.5 SOL: 0.42 community, 0.05 treasury, and 0.03 founder. This is **not an all-in trade quote** while creator payout funding remains undecided. On a one-lamport trade, the rounded component is one lamport, all assigned to the community. Quotes must disclose effective fees on dust trades and every applicable fee component.
 
-`beam_economics.rs` implements only Beam component allocation arithmetic. It is not yet wired into the recovered fee-program CPI, recipient routing or an executable keeper. Inherited Pump fee machinery and creator-fee behavior remain until Beam-controlled configuration/vaults can preserve and test those semantics. The 42/5/3 split is a requirement for the future Beam implementation, not an enforced live trading fee today.
+`beam_economics.rs` implements only Beam component allocation arithmetic. It is not yet wired into the recovered fee-program CPI, recipient routing or an executable keeper. The current inherited trade code calculates creator fees separately; that describes the present source, **not approval to double-charge in Beam's final policy**. Beam-controlled configuration/vaults must preserve and test creator payout semantics after the funding choice is made. The 42/5/3 split is a requirement for the future Beam implementation, not an enforced live trading fee today.
 
-The requested direction splits the community share between holder rewards and
-flagship buybacks. A 50/50 split within that share is a provisional test setting,
-not deployed economics. Holder eligibility, the flagship mint, recipient vaults,
-and execution rules have not been selected.
+The requested direction uses the community allocation for holder rewards and
+flagship buybacks. If creator payouts are funded from that allocation, those
+uses draw from its remainder. A 50/50 split of the available amount is a
+provisional test setting, not deployed economics. Holder eligibility, the
+flagship mint, recipient vaults, and execution rules have not been selected.
 
 ## After graduation
 
