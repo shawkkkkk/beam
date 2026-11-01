@@ -126,9 +126,10 @@ tests, not recovered proprietary web/backend bytes.
 | Callouts | Product contract for identity, moderation, permission and display timing; no on-chain callout ABI is evidenced. | Authenticated mock request, abuse/error handling and accessible UI tests; no paid or live callout action. |
 | Livestreaming and moderation | Media-provider contract, creator identity, permissions, moderation and retention policy; no on-chain stream ABI is evidenced. | Local mock player/broadcast states, permission denial, moderation and accessibility tests; no live stream or provider account creation. |
 
-The [Slop listing](https://slop.cash/projects/beam) is registered but paused
-while its security scan is queued. A maintainer must verify clearance, the
-repository-root license/contribution terms, task scope and any reward funding
+The [Slop listing](https://slop.cash/projects/beam) was paused with its
+security scan queued at the last maintainer check. A maintainer must verify
+scan clearance, repository-root license and contribution terms, task scope,
+and any reward funding
 before inviting external submissions. This repo currently has no root
 `LICENSE`; archived MIT/third-party notices do not decide Beam's new-code
 license. Closed PR #3 proposed a root license but it was not merged or adopted.
