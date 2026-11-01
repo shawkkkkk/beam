@@ -1197,6 +1197,28 @@ textarea:focus-visible {
 .detail-description {
   margin: 20px 0 16px;
 }
+.amm-v4-status {
+  margin: 0 0 16px;
+  padding: 12px;
+  border: 1px solid #313e6b;
+  border-radius: 9px;
+  background: #151b35;
+  color: #c5d0ed;
+  font-size: 11px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.amm-v4-status h3 {
+  color: #eef2ff;
+  font-size: 12px;
+  margin: 0 0 6px;
+}
+.amm-v4-status p {
+  margin: 0;
+}
+.amm-v4-status p + p {
+  margin-top: 6px;
+}
 .detail-chart {
   height: 140px;
   background: #11162b;

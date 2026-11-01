@@ -24,6 +24,8 @@ import {
   Zap,
 } from "lucide-react";
 import { sampleTokens, type Token } from "./data";
+import { AMM_V4_BUILD_CAPABILITY, presentAmmV4 } from "./ammV4Presentation";
+import { sampleState } from "./indexerAdapter";
 import { localFeaturePlans } from "./localFeaturePresentation";
 import {
   getBrowserStorage,
@@ -74,6 +76,7 @@ function draftToken(draft: DraftRecord): Token {
 
 const chartPoints =
   "0,72 25,68 44,78 65,56 86,62 103,44 123,52 145,34 162,39 180,25 205,36 228,12 252,20";
+const previewLifecycle = sampleState(sampleTokens);
 
 function TokenArt({
   token,
@@ -264,6 +267,9 @@ function App() {
     ? drafts.find((draft) => draft.id === selected.id)
     : undefined;
   const selectedPlans = selectedDraft ? localFeaturePlans(selectedDraft) : [];
+  const selectedLifecycle = selected
+    ? presentAmmV4(previewLifecycle, selected.id)
+    : null;
 
   useEffect(() => {
     const storage = getBrowserStorage();
@@ -777,6 +783,25 @@ function App() {
                   </div>
                 </div>
                 <p className="detail-description">{selected.description}</p>
+                {selectedLifecycle && (
+                  <section
+                    className="amm-v4-status"
+                    role="region"
+                    aria-labelledby="amm-v4-status-heading"
+                  >
+                    <h3 id="amm-v4-status-heading">Curve and AMM v4 status</h3>
+                    <p>
+                      {selected.isDraft
+                        ? "Local draft — no token or bonding curve has been created."
+                        : selectedLifecycle.label}
+                    </p>
+                    <p>
+                      Migration in this build:{" "}
+                      {AMM_V4_BUILD_CAPABILITY.migration}. Verified AMM v4
+                      liquidity: unavailable (no authenticated source).
+                    </p>
+                  </section>
+                )}
                 {selectedPlans.length > 0 && (
                   <section
                     className="draft-options"
