@@ -37,7 +37,7 @@ dependency. No percentage can honestly describe whole-product parity yet.
 | --- | --- | --- |
 | Pump-style experience with Beam branding | **Preview merged** | [PR #6](https://github.com/shawkkkkk/beam/pull/6) merged a responsive **sample-data preview** selected from the closed, unmerged alternate [PR #3](https://github.com/shawkkkkk/beam/pull/3). It is not a live Pump clone or canonical client. |
 | Create, wallet and trade flows | **Blocked** | The preview saves local drafts; it does not upload metadata, connect wallets, sign or trade. A Beam IDL, client and verified chain data are required. |
-| Creator wallet, charity, callouts and livestream screens | **Local plans merged; services in review** | PR #6 has draft fields only. Separate draft [charity PR #14](https://github.com/shawkkkkk/beam/pull/14) and [callouts PR #15](https://github.com/shawkkkkk/beam/pull/15) provide local backend mocks, not authorized providers or live actions. Livestreaming remains unimplemented. |
+| Creator wallet, charity, callouts and livestream screens | **Local plans merged; services in review** | PR #6 has draft fields only. Separate draft [charity PR #14](https://github.com/shawkkkkk/beam/pull/14), [callouts PR #15](https://github.com/shawkkkkk/beam/pull/15) and [livestream PR #21](https://github.com/shawkkkkk/beam/pull/21) provide local backend mocks, not authorized providers, live actions or playable streams. |
 | Client and frontend data | **Native-SOL fixtures merged; drafts in review** | [PR #7](https://github.com/shawkkkkk/beam/pull/7) merged create/buy/sell ABI fixtures. Draft [creator PR #13](https://github.com/shawkkkkk/beam/pull/13), [CreateV2 PR #18](https://github.com/shawkkkkk/beam/pull/18), and [raw event PR #20](https://github.com/shawkkkkk/beam/pull/20) own distinct SDK files. There is no deployed Beam ID or complete SDK. |
 
 ### Backend and integrations
@@ -47,7 +47,7 @@ dependency. No percentage can honestly describe whole-product parity yet.
 | Read-only market/indexer API | **Local drafts in review** | [PR #16](https://github.com/shawkkkkk/beam/pull/16) owns a fixture backend under `backend/indexer/`; [PR #17](https://github.com/shawkkkkk/beam/pull/17) owns a read-only `web/` adapter. Their schema must be reconciled. Neither is a live chain feed; preview charts are fixtures. |
 | Creator fee, wallet and sharing service | **Blocked** | On-chain source retains creator vault/collection paths, but Beam still depends on inherited Pump fee configuration. No Beam-controlled payout integration is verified. |
 | Donate.gg charity donations | **Local draft in review; live use blocked** | [PR #14](https://github.com/shawkkkkk/beam/pull/14) owns a disabled local charity mock. There is no authorized provider or settlement service; no real donations occur. |
-| Callouts and livestreaming | **Callouts draft in review; streams blocked** | [PR #15](https://github.com/shawkkkkk/beam/pull/15) owns a local callout service with mock adapters. No live provider integration or livestream service is present. |
+| Callouts and livestreaming | **Local drafts in review; live use blocked** | [PR #15](https://github.com/shawkkkkk/beam/pull/15) owns a local callout service; [PR #21](https://github.com/shawkkkkk/beam/pull/21) owns a mock livestream lifecycle. Neither is on main or connected to a live provider. |
 
 See [implementation status](docs/STATUS.md) and [contributor tasks](docs/TASKS.md)
 for evidence and bounded ways to help with the website, frontend and backend.
@@ -117,7 +117,7 @@ which includes bounded website/backend lanes. [PR #1](https://github.com/shawkkk
 introduced the pinned contract baseline; [PR #2](https://github.com/shawkkkkk/beam/pull/2)
 added migration-accounting guards to its development branch. Check current PR
 heads before starting a task. [PR #12](https://github.com/shawkkkkk/beam/pull/12)
-merged the nested quote guard. Draft PRs #13–#20 own separate SDK, backend,
+merged the nested quote guard. Draft PRs #13–#21 own separate SDK, backend,
 web-adapter and documentation slices listed in the [task ledger](docs/TASKS.md).
 Beam is
 [registered on Slop](https://slop.cash/projects/beam), but its listing was

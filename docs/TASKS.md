@@ -28,6 +28,7 @@ or claim clearance or reward funding from this ledger.
 | [CreateV2 SDK, PR #18](https://github.com/shawkkkkk/beam/pull/18), open draft | Local CreateV2 encoder and account builder in `sdk/beam-native.mjs`. | No RPC, signing or live CreateV2; PR #20 owns raw Create/Trade event decoding. |
 | [Progress docs, PR #19](https://github.com/shawkkkkk/beam/pull/19), open draft | README, CONTRIBUTING, STATUS and TASKS contributor progress sync. | Documentation only; reflects current main `4e32d30` plus separate draft ownership. |
 | [Raw event SDK, PR #20](https://github.com/shawkkkkk/beam/pull/20), open draft | Strict CreateEvent and TradeEvent decoders under `sdk/beam-events.mjs`. | No live indexer or client state; coordinate event schema with PR #16. |
+| [Livestream backend, PR #21](https://github.com/shawkkkkk/beam/pull/21), open draft | Local authorization, moderation and retention lifecycle under `backend/livestream/` with mock provider. | No media provider, playable stream, live account, durable moderation or website player. |
 
 PR ownership and touched paths at this snapshot:
 
@@ -64,6 +65,8 @@ PR ownership and touched paths at this snapshot:
   README, CONTRIBUTING and contributor progress documentation only.
 - Open PR #20 — `@shawkkkkk`, `codex/beam-sdk-events-20261101`:
   `sdk/beam-events.mjs`, raw Create/Trade fixtures, tests and SDK CI.
+- Open PR #21 — `@shawkkkkk`, `codex/beam-livestream-20261101`:
+  `backend/livestream/` local lifecycle and tests only; no playable stream.
 
 ## Nonoverlapping next slices
 
@@ -71,6 +74,7 @@ PR ownership and touched paths at this snapshot:
 | --- | --- | --- |
 | PR #13 owner: `sdk/beam-creator*` | Confirm final contract account/event ABI and selected creator-payout semantics; do not duplicate the active draft. | Node fixtures and exact Anchor producer receipt; reject stale or missing account observations. |
 | PR #14 / #15 owners: `backend/charity/` / `backend/callouts/` | External authorization and provider policy remain separate; no live integration from local mocks. | Mock registry/reconciliation and moderation/permission tests, including failures. |
+| PR #21 owner: `backend/livestream/` | Local authorization and moderation lifecycle only; real media integration and player UI are separate work. | Mock permission, start/stop/ban race, cleanup and retention tests; no live provider. |
 | PR #16 / #17 owners: `backend/indexer/` / `web/src/indexerAdapter.ts` | Agree on a versioned response schema, slot/finality and unavailable states before connecting them. | Replay/rollback and bounded backend queries; web stale/malformed data tests. |
 | PR #18 / #20 owners: CreateV2 builder / raw Create/Trade decoder in separate `sdk/` files | Keep fixture ownership distinct; PR #20 owns CreateEvent decoding. | Exact Anchor fixture bytes, rejection paths and Node test receipts. |
 | Unassigned: AMM v4 execution adapter in a new `programs/beam/src/` module | Source-only ABI on main; decide SPL-only graduation, LP custody/fee rights and setup fee bounds first. Keep the retired CPMM path disabled. | Host ABI tests plus isolated local-program CPI, rollback, account substitution, donation and replay cases before activation. |
@@ -138,7 +142,7 @@ precise specification and isolated adversarial tests.
 ## Website and backend contribution lanes
 
 The lanes below describe **development scope and ownership**, not working Beam
-services. PRs #14–#18 and #20 already own the noted draft slices; check their
+services. PRs #14–#18 and #20–#21 already own the noted draft slices; check their
 heads before starting adjacent work. Mock wallets, APIs and providers locally;
 no real financial or media actions are part of acceptance. Contribute observable
 behavior and interface tests, not recovered proprietary web/backend bytes.
@@ -151,7 +155,7 @@ behavior and interface tests, not recovered proprietary web/backend bytes.
 | Creator wallet and fee sharing | Curve creator, fee vault and sharing-config interfaces; retained Pump fee program is not yet rehosted for Beam. | Selection at creation, recipient/authority validation, claim preview and failure cases; local payout tests without real transfers; no implied arbitrary later wallet change. |
 | Charity registry and donation adapter | PR #14 owns local `backend/charity/` mocks; authorized Donate.gg relay/settlement and Beam fee configuration are still missing. | Registry provenance, consent and attribution tests; mocked donation/settlement/retry receipts; feature disabled without verified provider and recipient. |
 | Callouts | PR #15 owns local `backend/callouts/` service; no on-chain callout ABI or live provider is evidenced. | Authenticated mock request, abuse/error handling and accessible UI tests; no paid or live callout action. |
-| Livestreaming and moderation | Media-provider contract, creator identity, permissions, moderation and retention policy; no on-chain stream ABI is evidenced. | Local mock player/broadcast states, permission denial, moderation and accessibility tests; no live stream or provider account creation. |
+| Livestreaming and moderation | PR #21 owns the local `backend/livestream/` lifecycle; media provider, durable identity/moderation and player UI remain separate. No on-chain stream ABI is evidenced. | Local permission, lifecycle and retention tests; future mock player/accessibility tests; no live stream or provider account creation. |
 
 The [Slop listing](https://slop.cash/projects/beam) was paused with its
 security scan queued at the last maintainer check. A maintainer must verify
