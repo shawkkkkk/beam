@@ -173,7 +173,13 @@ fn supported_mint(mint: &AccountInfo) -> Result<()> {
     Ok(())
 }
 
+fn distinct_accounts(from: &Pubkey, to: &Pubkey) -> Result<()> {
+    require!(from != to, BeamError::InvalidRaydiumAccount);
+    Ok(())
+}
+
 fn checked_move(from: &AccountInfo, to: &AccountInfo, amount: u64) -> Result<()> {
+    distinct_accounts(from.key, to.key)?;
     let left = from.lamports().checked_sub(amount).ok_or(BeamError::InvalidMigrationBalance)?;
     let right = to.lamports().checked_add(amount).ok_or(PumpError::Overflow)?;
     **from.try_borrow_mut_lamports()? = left;
@@ -181,11 +187,32 @@ fn checked_move(from: &AccountInfo, to: &AccountInfo, amount: u64) -> Result<()>
     Ok(())
 }
 
+/// Post-completion buys can add quote to the curve after real reserves stop
+/// changing. Include that quote in the Raydium pool, as the retained Pump
+/// migration does, while charging the migration fee only once.
+fn migration_quote(real_quote: u64, post_complete_quote_in: u64, migration_fee: u64) -> Result<(u64, u64)> {
+    let total = real_quote.checked_add(post_complete_quote_in).ok_or(PumpError::Overflow)?;
+    let pool_quote = total.checked_sub(migration_fee).ok_or(BeamError::InvalidMigrationBalance)?;
+    require!(pool_quote > 0, BeamError::InvalidMigrationBalance);
+    Ok((total, pool_quote))
+}
+
+/// Fee counters are separate claims on the curve's lamports, not deductions
+/// from its recorded liquidity reserves. Extra lamports are left in place.
+fn protected_curve_floor(curve_lamports: u64, rent: u64, creator_fee: u64, protocol_fees: u64, owned_quote: u64) -> Result<u64> {
+    let floor = rent.checked_add(creator_fee).and_then(|v| v.checked_add(protocol_fees)).ok_or(PumpError::Overflow)?;
+    let required = floor.checked_add(owned_quote).ok_or(PumpError::Overflow)?;
+    require!(curve_lamports >= required, BeamError::InvalidMigrationBalance);
+    Ok(floor)
+}
+
 pub fn execute<'info>(ctx: Context<'_, '_, '_, 'info, MigrateRaydium<'info>>, setup_budget: u64) -> Result<()> {
     require!(cfg!(feature = "experimental-raydium"), BeamError::MigrationNotEnabled);
     let a = &ctx.accounts;
     require!(a.global.enable_migrate, BeamError::MigrationNotEnabled);
     require_keys_eq!(a.config.raydium_program, RAYDIUM_ID, BeamError::InvalidRaydiumAccount);
+    distinct_accounts(&a.withdraw_authority.key(), &a.bonding_curve.key())?;
+    distinct_accounts(&a.withdraw_authority.key(), &a.migration_authority.key())?;
     require!(a.bonding_curve.complete && a.bonding_curve.real_token_reserves == 0, PumpError::BondingCurveNotComplete);
     crate::beam_policy::mayhem(a.bonding_curve.is_mayhem_mode)?;
     require_keys_eq!(a.bonding_curve.quote_mint, Pubkey::default(), PumpError::UnsupportedQuoteMint);
@@ -205,14 +232,22 @@ pub fn execute<'info>(ctx: Context<'_, '_, '_, 'info, MigrateRaydium<'info>>, se
     pda(&a.observation.to_account_info(), &[b"observation", pool.as_ref()])?;
     let expected_lp = anchor_spl::associated_token::get_associated_token_address_with_program_id(&a.migration_authority.key(), &a.lp_mint.key(), &token::ID);
     require_keys_eq!(a.authority_lp.key(), expected_lp, BeamError::InvalidRaydiumAccount);
-    let total_quote = a.bonding_curve.real_quote_reserves;
     let migration_fee = a.global.pool_migration_fee;
-    let quote = total_quote.checked_sub(migration_fee).ok_or(BeamError::InvalidMigrationBalance)?;
+    let (total_quote, quote) = migration_quote(
+        a.bonding_curve.real_quote_reserves,
+        a.bonding_curve.post_complete_quote_in,
+        migration_fee,
+    )?;
     let base = a.curve_token_vault.amount;
-    require!(base > 0 && base <= a.bonding_curve.token_total_supply && quote > 0 && setup_budget > 0, BeamError::InvalidMigrationBalance);
+    require!(base > 0 && base <= a.bonding_curve.token_total_supply && setup_budget > 0, BeamError::InvalidMigrationBalance);
     let curve_info = a.bonding_curve.to_account_info();
-    let required = Rent::get()?.minimum_balance(curve_info.data_len()).checked_add(total_quote).ok_or(PumpError::Overflow)?;
-    require!(curve_info.lamports() >= required, BeamError::InvalidMigrationBalance);
+    let protected_floor = protected_curve_floor(
+        curve_info.lamports(),
+        Rent::get()?.minimum_balance(curve_info.data_len()),
+        a.bonding_curve.creator_fee,
+        a.bonding_curve.protocol_fees,
+        total_quote,
+    )?;
     let authority_before = a.migration_authority.lamports();
     let curve_bump = [ctx.bumps.bonding_curve]; let curve_seeds: &[&[u8]] = &[b"bonding-curve", mint.as_ref(), &curve_bump];
     let authority_bump = [ctx.bumps.migration_authority]; let authority_seeds: &[&[u8]] = &[b"pool-authority", mint.as_ref(), &authority_bump];
@@ -240,6 +275,7 @@ pub fn execute<'info>(ctx: Context<'_, '_, '_, 'info, MigrateRaydium<'info>>, se
     token::burn(CpiContext::new_with_signer(a.token_program.to_account_info(), token::Burn { mint: a.lp_mint.to_account_info(), from: a.authority_lp.to_account_info(), authority: a.migration_authority.to_account_info() }, &[authority_seeds]), lp.amount)?;
     require!(token::spl_token::state::Account::unpack(&a.authority_lp.try_borrow_data()?)?.amount == 0, BeamError::InvalidMigrationResult);
     checked_move(&curve_info, &a.withdraw_authority.to_account_info(), migration_fee)?;
+    require!(curve_info.lamports() >= protected_floor, BeamError::InvalidMigrationBalance);
     // Return only this caller's unspent setup contribution, never prior donations.
     let refund = a.migration_authority.lamports().saturating_sub(authority_before).min(setup_budget);
     if refund > 0 {
@@ -264,6 +300,44 @@ pub struct BeamRaydiumMigration {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn migration_includes_post_completion_quote_and_charges_fee_once() {
+        assert_eq!(migration_quote(100, 25, 10).unwrap(), (125, 115));
+        assert_eq!(migration_quote(100, 0, 10).unwrap(), (100, 90));
+        assert_eq!(migration_quote(0, 25, 0).unwrap(), (25, 25));
+        assert_eq!(migration_quote(u64::MAX, 0, 0).unwrap(), (u64::MAX, u64::MAX));
+        assert!(migration_quote(0, 0, 0).is_err());
+        assert!(migration_quote(100, 25, 125).is_err());
+        assert!(migration_quote(u64::MAX, 1, 0).is_err());
+        assert!(migration_quote(100, 25, 126).is_err());
+    }
+    #[test]
+    fn migration_preserves_fee_liabilities_and_donor_surplus() {
+        assert_eq!(protected_curve_floor(0, 0, 0, 0, 0).unwrap(), 0);
+        assert_eq!(protected_curve_floor(u64::MAX, 0, 0, 0, u64::MAX).unwrap(), 0);
+        let (owned, pool) = migration_quote(100, 25, 10).unwrap();
+        let floor = protected_curve_floor(150, 10, 5, 10, owned).unwrap();
+        assert_eq!((owned, pool, floor), (125, 115, 25));
+        assert_eq!(150 - pool - 10, floor);
+        assert!(protected_curve_floor(149, 10, 5, 10, owned).is_err());
+        let donor_surplus = 42;
+        let funded = 150 + donor_surplus;
+        assert_eq!(protected_curve_floor(funded, 10, 5, 10, owned).unwrap(), floor);
+        assert_eq!(funded - pool - 10, floor + donor_surplus);
+        assert!(protected_curve_floor(u64::MAX, u64::MAX, 1, 0, 0).is_err());
+        assert!(protected_curve_floor(u64::MAX, 0, u64::MAX, 1, 0).is_err());
+        assert!(protected_curve_floor(u64::MAX, 1, 0, 0, u64::MAX).is_err());
+    }
+    #[test]
+    fn migration_rejects_aliases_that_could_mutate_a_balance_twice_or_refund_a_fee() {
+        let curve = Pubkey::new_unique();
+        let setup_authority = Pubkey::new_unique();
+        let withdraw_authority = Pubkey::new_unique();
+        assert!(distinct_accounts(&curve, &withdraw_authority).is_ok());
+        assert!(distinct_accounts(&setup_authority, &withdraw_authority).is_ok());
+        assert!(distinct_accounts(&curve, &curve).is_err());
+        assert!(distinct_accounts(&setup_authority, &setup_authority).is_err());
+    }
     #[test]
     fn initialize_abi_has_exact_discriminator_arguments_and_privileges() {
         let keys = std::array::from_fn(|_| Pubkey::new_unique());
