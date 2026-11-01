@@ -1,0 +1,18 @@
+[package]
+name = "beam-runtime-harness"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[features]
+default = []
+experimental-raydium = ["beam-program/experimental-raydium"]
+
+[dependencies]
+anchor-lang = "=0.31.1"
+beam-program = { path = "../../programs/beam" }
+solana-program-test = "=2.2.1"
+solana-sdk = "=2.2.1"
+tokio = { version = "=1.43.0", features = ["macros", "rt-multi-thread"] }
+
+[workspace]

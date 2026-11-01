@@ -1,0 +1,13 @@
+name: Local bank gate checks
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  retired-cpmm-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo test --locked --manifest-path tests/runtime-harness/Cargo.toml
+      - run: cargo test --locked --manifest-path tests/runtime-harness/Cargo.toml --features experimental-raydium
