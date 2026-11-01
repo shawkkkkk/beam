@@ -150,6 +150,17 @@ test("migration requires distinct completed and migrated state with a pool", () 
   assert.throws(() => parseIndexerPage(page, options), /lifecycle/);
 });
 
+test("empty name and symbol remain chain-valid even if a product UI would reject them", () => {
+  const page = fixture();
+  page.tokens[0].name = "";
+  page.tokens[0].symbol = "";
+  page.tokens[0].metadataUri = "";
+  const result = parseIndexerPage(page, options);
+  assert.equal(result.page.tokens[0].name, "");
+  assert.equal(result.page.tokens[0].symbol, "");
+  assert.equal(result.page.tokens[0].metadataUri, "");
+});
+
 test("rejects wrong program, account owner, duplicate events, overflow and future slots", () => {
   const wrongProgram = fixture();
   wrongProgram.source.programId = otherProgram;

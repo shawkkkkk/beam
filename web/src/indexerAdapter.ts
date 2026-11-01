@@ -343,8 +343,10 @@ export function parseIndexerPage(
           raw.quoteMint === null
             ? null
             : base58(raw.quoteMint, "token.quoteMint", 32),
-        name: boundedText(raw.name, "token.name", 32),
-        symbol: boundedText(raw.symbol, "token.symbol", 13),
+        // CreateV2 bounds UTF-8 bytes but has no nonempty requirement.
+        // Any product moderation rule belongs above this chain-data parser.
+        name: boundedText(raw.name, "token.name", 32, true),
+        symbol: boundedText(raw.symbol, "token.symbol", 13, true),
         metadataUri: boundedText(
           raw.metadataUri,
           "token.metadataUri",
