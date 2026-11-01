@@ -29,8 +29,9 @@ post-completion quote accounting, fee/rent liability protection, and
 account-alias guards to the development branch. Those host-tested guards do
 not establish CPI success or fee-sweep/rollback safety.
 [The separate root-model PR #3](https://github.com/shawkkkkk/beam/pull/3)
-has different venue and economic assumptions and is not the current
-`programs/beam` contract; its website uses sample data.
+was closed because its contract and fee policy conflict with the current
+`programs/beam` baseline. Its sample-data website is carried separately in
+[PR #6](https://github.com/shawkkkkk/beam/pull/6).
 
 ## Meaning of checks
 
