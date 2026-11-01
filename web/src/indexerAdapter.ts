@@ -1,8 +1,8 @@
 /**
  * Read-only boundary for a future Beam indexer. This module performs no I/O.
  * Valid JSON from an API is still an unverified candidate: a trusted indexer
- * service and chain/replay checks must establish provenance before display as
- * verified chain data. Sample fixtures never acquire a slot or finality.
+ * service and chain/replay checks would be needed before any verified display.
+ * This frontend has no verified state. Sample fixtures have no slot or finality.
  */
 
 export const NO_TRANSACTION_CAPABILITIES = Object.freeze({
@@ -15,10 +15,11 @@ export const NO_TRANSACTION_CAPABILITIES = Object.freeze({
 } as const);
 
 export type Finality = "processed" | "confirmed" | "finalized";
-export type Freshness = "fresh" | "stale";
+export type IndexerTimestampAge = "recent" | "old";
 export type UInt64Decimal = string;
 export type TokenLifecycle = "on_curve" | "curve_complete" | "migrated";
 
+/** Claimed by an API response; this frontend does not prove chain provenance. */
 export type SourceProvenance = Readonly<{
   chain: "solana";
   indexerId: string;
@@ -34,6 +35,8 @@ export type IndexedToken = Readonly<{
   tokenProgram: "spl_token" | "token_2022";
   creator: string;
   curveAccount: string;
+  /** null means native SOL quote; otherwise a quote mint address. */
+  quoteMint: string | null;
   name: string;
   symbol: string;
   metadataUri: string;
@@ -45,8 +48,10 @@ export type IndexedCurveAccount = Readonly<{
   address: string;
   ownerProgram: string;
   mint: string;
+  quoteMint: string | null;
   realTokenReserves: UInt64Decimal;
-  realSolReserves: UInt64Decimal;
+  /** Raw minor units of quoteMint, or lamports when quoteMint is null. */
+  realQuoteReserves: UInt64Decimal;
   complete: boolean;
   migrated: boolean;
 }>;
@@ -78,27 +83,15 @@ export type SampleState<T> = Readonly<{
 export type CandidateState = Readonly<{
   kind: "unverified_indexer";
   page: IndexedPage;
-  freshness: Freshness;
+  /** Age of the API-provided timestamp only; says nothing about chain tip lag. */
+  indexerTimestampAge: IndexerTimestampAge;
   checkedAtMs: number;
   capabilities: typeof NO_TRANSACTION_CAPABILITIES;
-}>;
-
-// Reserved for a separately reviewed trusted backend. This parser cannot
-// construct this state or promote untrusted JSON into it.
-declare const verifiedByTrustedService: unique symbol;
-export type VerifiedState = Readonly<{
-  kind: "verified";
-  page: IndexedPage;
-  freshness: Freshness;
-  checkedAtMs: number;
-  capabilities: typeof NO_TRANSACTION_CAPABILITIES;
-  [verifiedByTrustedService]: true;
 }>;
 
 export type ReadOnlyState<T> =
   | SampleState<T>
   | CandidateState
-  | VerifiedState
   | Readonly<{
       kind: "unavailable";
       reason: string;
@@ -114,12 +107,12 @@ export function sampleState<T>(records: readonly T[]): SampleState<T> {
   });
 }
 
-/** Recompute freshness when rendering; a previously fresh page can age out. */
-export function freshnessAt(
+/** API timestamp age is not chain-tip freshness or source verification. */
+export function indexerTimestampAgeAt(
   source: Pick<SourceProvenance, "indexedAtMs">,
   nowMs: number,
   maxAgeMs: number,
-): Freshness {
+): IndexerTimestampAge {
   if (
     !Number.isSafeInteger(nowMs) ||
     nowMs < 0 ||
@@ -129,7 +122,7 @@ export function freshnessAt(
     throw new TypeError("Invalid freshness policy");
   }
   const age = nowMs - source.indexedAtMs;
-  return age >= 0 && age <= maxAgeMs ? "fresh" : "stale";
+  return age >= 0 && age <= maxAgeMs ? "recent" : "old";
 }
 
 export function dataLabel<T>(
@@ -141,24 +134,12 @@ export function dataLabel<T>(
     case "sample":
       return "Sample data — no chain source";
     case "unverified_indexer":
-      return `Unverified indexer data — ${freshnessAt(state.page.source, nowMs, maxAgeMs)}, ${state.page.source.finality} slot ${state.page.source.slot}`;
-    case "verified":
-      return `Verified chain data — ${freshnessAt(state.page.source, nowMs, maxAgeMs)}, ${state.page.source.finality} slot ${state.page.source.slot}`;
+      return `Unverified indexer payload — ${indexerTimestampAgeAt(state.page.source, nowMs, maxAgeMs)} API timestamp; claims ${state.page.source.finality} slot ${state.page.source.slot}; chain tip unverified`;
     case "unavailable":
       return "Chain data unavailable";
+    default:
+      return "Unsupported data state";
   }
-}
-
-export function canDisplayAsVerified<T>(
-  state: ReadOnlyState<T>,
-  nowMs: number,
-  maxAgeMs: number,
-): state is VerifiedState {
-  return (
-    state.kind === "verified" &&
-    freshnessAt(state.page.source, nowMs, maxAgeMs) === "fresh" &&
-    state.page.source.finality === "finalized"
-  );
 }
 
 const U64_MAX = 18_446_744_073_709_551_615n;
@@ -308,11 +289,18 @@ export function parseIndexerPage(
         address: base58(raw.address, "account.address", 32),
         ownerProgram: base58(raw.ownerProgram, "account.ownerProgram", 32),
         mint: base58(raw.mint, "account.mint", 32),
+        quoteMint:
+          raw.quoteMint === null
+            ? null
+            : base58(raw.quoteMint, "account.quoteMint", 32),
         realTokenReserves: u64(
           raw.realTokenReserves,
           "account.realTokenReserves",
         ),
-        realSolReserves: u64(raw.realSolReserves, "account.realSolReserves"),
+        realQuoteReserves: u64(
+          raw.realQuoteReserves,
+          "account.realQuoteReserves",
+        ),
         complete: boolean(raw.complete, "account.complete"),
         migrated: boolean(raw.migrated, "account.migrated"),
       };
@@ -351,6 +339,10 @@ export function parseIndexerPage(
         tokenProgram: raw.tokenProgram,
         creator: base58(raw.creator, "token.creator", 32),
         curveAccount: base58(raw.curveAccount, "token.curveAccount", 32),
+        quoteMint:
+          raw.quoteMint === null
+            ? null
+            : base58(raw.quoteMint, "token.quoteMint", 32),
         name: boundedText(raw.name, "token.name", 32),
         symbol: boundedText(raw.symbol, "token.symbol", 13),
         metadataUri: boundedText(
@@ -369,6 +361,7 @@ export function parseIndexerPage(
       if (
         !account ||
         account.mint !== token.mint ||
+        account.quoteMint !== token.quoteMint ||
         account.complete !== (lifecycle !== "on_curve") ||
         account.migrated !== (lifecycle === "migrated") ||
         (token.ammV4Pool !== null) !== (lifecycle === "migrated") ||
@@ -433,7 +426,11 @@ export function parseIndexerPage(
   return Object.freeze({
     kind: "unverified_indexer",
     page,
-    freshness: freshnessAt(source, options.nowMs, options.maxAgeMs),
+    indexerTimestampAge: indexerTimestampAgeAt(
+      source,
+      options.nowMs,
+      options.maxAgeMs,
+    ),
     checkedAtMs: options.nowMs,
     capabilities: NO_TRANSACTION_CAPABILITIES,
   });

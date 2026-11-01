@@ -2,9 +2,8 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
   NO_TRANSACTION_CAPABILITIES,
-  canDisplayAsVerified,
   dataLabel,
-  freshnessAt,
+  indexerTimestampAgeAt,
   parseIndexerPage,
   sampleState,
 } from "../src/indexerAdapter.ts";
@@ -38,6 +37,7 @@ function fixture() {
         tokenProgram: "spl_token",
         creator,
         curveAccount: curve,
+        quoteMint: null,
         name: "Beam test",
         symbol: "BEAM",
         metadataUri: "https://example.invalid/token.json",
@@ -52,8 +52,9 @@ function fixture() {
         address: curve,
         ownerProgram: programId,
         mint,
+        quoteMint: null,
         realTokenReserves: "18446744073709551615",
-        realSolReserves: "0",
+        realQuoteReserves: "0",
         complete: false,
         migrated: false,
         wallet: "fabricated",
@@ -69,6 +70,7 @@ function fixture() {
         volume: "$999B",
       },
     ],
+    kind: "verified",
     canTrade: true,
   };
 }
@@ -81,7 +83,7 @@ test("sample fixtures carry no chain provenance or transaction capability", () =
     dataLabel(state, nowMs, 30_000),
     /Sample data — no chain source/,
   );
-  assert.equal(canDisplayAsVerified(state, nowMs, 30_000), false);
+  assert.notEqual(state.kind, "verified");
   assert.deepEqual(state.capabilities, NO_TRANSACTION_CAPABILITIES);
   assert.equal(Object.values(state.capabilities).some(Boolean), false);
 });
@@ -89,19 +91,23 @@ test("sample fixtures carry no chain provenance or transaction capability", () =
 test("valid API shape stays unverified and strips fabricated metrics/actions", () => {
   const result = parseIndexerPage(fixture(), options);
   assert.equal(result.kind, "unverified_indexer");
-  assert.equal(result.freshness, "fresh");
   assert.equal(
-    freshnessAt(result.page.source, nowMs + 31_000, 30_000),
-    "stale",
+    dataLabel({ kind: "verified" } as never, nowMs, 30_000),
+    "Unsupported data state",
+  );
+  assert.equal(result.indexerTimestampAge, "recent");
+  assert.equal(
+    indexerTimestampAgeAt(result.page.source, nowMs + 31_000, 30_000),
+    "old",
   );
   assert.equal(result.page.source.slot, "9007199254740993");
   assert.equal(result.page.source.finality, "confirmed");
   assert.equal(result.page.events[0].id, `${signature}:0`);
-  assert.equal(canDisplayAsVerified(result, nowMs, 30_000), false);
   assert.match(
     dataLabel(result, nowMs, 30_000),
-    /Unverified indexer data — fresh, confirmed slot/,
+    /Unverified indexer payload — recent API timestamp; claims confirmed slot/,
   );
+  assert.match(dataLabel(result, nowMs, 30_000), /chain tip unverified/);
   assert.equal("marketCap" in result.page.tokens[0], false);
   assert.equal("sendTransaction" in result.page.tokens[0], false);
   assert.equal("volume" in result.page.events[0], false);
@@ -117,9 +123,11 @@ test("finalized data is still only an indexer candidate; freshness is explicit",
   page.source.finality = "finalized";
   page.source.indexedAtMs = nowMs - 90_000;
   const result = parseIndexerPage(page, options);
-  assert.equal(result.freshness, "stale");
-  assert.equal(canDisplayAsVerified(result, nowMs, 30_000), false);
-  assert.match(dataLabel(result, nowMs, 30_000), /stale, finalized/);
+  assert.equal(result.indexerTimestampAge, "old");
+  assert.match(
+    dataLabel(result, nowMs, 30_000),
+    /old API timestamp; claims finalized/,
+  );
 });
 
 test("migration requires distinct completed and migrated state with a pool", () => {
@@ -153,11 +161,24 @@ test("rejects wrong program, account owner, duplicate events, overflow and futur
   duplicate.events.push({ ...duplicate.events[0] });
   assert.throws(() => parseIndexerPage(duplicate, options), /Duplicate event/);
   const overflow = fixture();
-  overflow.accounts[0].realSolReserves = "18446744073709551616";
+  overflow.accounts[0].realQuoteReserves = "18446744073709551616";
   assert.throws(() => parseIndexerPage(overflow, options), /canonical u64/);
   const future = fixture();
   future.events[0].slot = "9007199254740994";
   assert.throws(() => parseIndexerPage(future, options), /outside the page/);
+});
+
+test("non-SOL quote reserves stay labeled as quote units and must match token", () => {
+  const page = fixture();
+  page.tokens[0].quoteMint = otherProgram;
+  page.accounts[0].quoteMint = otherProgram;
+  page.accounts[0].realQuoteReserves = "123456";
+  const result = parseIndexerPage(page, options);
+  assert.equal(result.page.accounts[0].quoteMint, otherProgram);
+  assert.equal(result.page.accounts[0].realQuoteReserves, "123456");
+  assert.equal("realSolReserves" in result.page.accounts[0], false);
+  page.tokens[0].quoteMint = null;
+  assert.throws(() => parseIndexerPage(page, options), /lifecycle or mint/);
 });
 
 test("rejects malformed metadata, base58, oversized pages and future timestamps", () => {
