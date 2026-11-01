@@ -36,9 +36,10 @@ fee recipients, token program ownership, remaining accounts, signatures,
 global feature settings, or on-chain state. `CreateV2` uses Token-2022 and its
 normal-mode ABI still requires the retained Mayhem account slots; the builder
 does not populate or verify their canonical addresses. In particular,
-inherited Pump `fee_config` and `fee_program`
-accounts in legacy buy/sell have not been rehosted for Beam, and the handlers
-expect additional validated remaining accounts. The builders return base
+inherited Pump `fee_config` and `fee_program` accounts remain unresolved in
+both legacy buy/sell and `buy_v2`/`sell_v2`; those trade handlers expect
+additional validated remaining accounts. A CreateV2 fixture does not make
+subsequent trading executable. The builders return base
 account metadata for inspection and testing, not an executable Beam client.
 The development program ID is not deployed. No RPC, wallet, signing, or live
 trade code is present.
