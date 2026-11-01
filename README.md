@@ -10,6 +10,11 @@ bonding curve, buy/sell quotes, a transparent launch fee split, and the token
 and quote amounts available at graduation. The calculations are a foundation
 for an on-chain program; they cannot hold funds or create pools by themselves.
 
+`programs/beam/` is an experimental Anchor program for fixed-supply SPL Token
+creation and exact-token buys and sells against a SOL bonding curve. It stores
+fee allocations in the launch account. There is no claim or migration
+instruction yet, and its current program ID is a development placeholder.
+
 `web/` is a responsive Beam interface preview with original blue, purple, and
 black branding. It includes sample token discovery, search, a browser watchlist,
 token details, and local token drafts. Market data is illustrative. Wallet
@@ -33,10 +38,15 @@ ownership; Beam cannot impose this fee split on all Raydium swaps.
 Install Rust 1.99.1, then run:
 
 ```sh
-cargo test --locked
+cargo test --workspace --locked
 cargo fmt --check
-cargo clippy --all-targets -- -D warnings
+cargo clippy --workspace --all-targets --locked -- -D warnings
 ```
+
+The launch program also compiles to SBF with Anza CLI 2.3.13 and platform
+tools v1.58. Its `launch_flow` transaction test passes with that SBF binary
+loaded through `BPF_OUT_DIR`. This validates the prototype on a local bank;
+it does not deploy the program or exercise Raydium migration.
 
 For the website, use Node.js 24 and run:
 

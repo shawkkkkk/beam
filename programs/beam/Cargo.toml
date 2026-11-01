@@ -1,0 +1,31 @@
+[package]
+name = "beam-launch"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+description = "Beam launch and bonding curve Solana program prototype"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "beam_launch"
+
+[features]
+default = []
+no-entrypoint = []
+cpi = ["no-entrypoint"]
+no-idl = []
+no-log-ix-name = []
+anchor-debug = []
+custom-heap = []
+custom-panic = []
+idl-build = ["anchor-lang/idl-build", "anchor-spl/idl-build"]
+
+[dependencies]
+anchor-lang = { version = "=0.31.2", features = ["init-if-needed"] }
+anchor-spl = { version = "=0.31.2", default-features = false, features = ["token", "token_2022", "token_2022_extensions", "associated_token"] }
+beam-core = { path = "../.." }
+
+[dev-dependencies]
+solana-program-test = "=2.3.13"
+solana-sdk = "=2.3.1"
+tokio = { version = "1.45", features = ["macros", "rt-multi-thread"] }

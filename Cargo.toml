@@ -9,3 +9,7 @@ description = "Checked launch curve and fee accounting for Beam"
 path = "src/lib.rs"
 
 [dependencies]
+
+[workspace]
+members = [".", "programs/beam"]
+resolver = "2"

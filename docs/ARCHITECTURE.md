@@ -9,23 +9,26 @@ instructions, fee routing, and Mayhem behavior change. Functional parity for
 the launch flow is the practical target; each instruction needs tests against
 reference vectors before it is called compatible.
 
-The current Rust crate is pure accounting only. It does not create mints,
-accept trades, distribute rewards, migrate liquidity, or deploy a program.
-There is no PumpSwap or Mayhem dependency in Beam.
+`beam-core` is pure accounting. `programs/beam/` now contains an experimental
+Anchor `create`, `buy`, and `sell` path for a classic SPL Token mint with six
+decimals. `create` mints a fixed supply into a launch PDA's token vault and
+removes mint authority. Buys and sells use the shared curve math; quote and
+accrued fee balances stay in the launch account. The caller currently chooses
+curve reserves, and the program has no token metadata, fee claims, Raydium
+migration, or deployment keypair. Its ID is a development placeholder. No
+on-chain program has been deployed. There is no PumpSwap or Mayhem dependency.
 
 ## On-chain work to implement
 
-1. Create a Beam Anchor program with a distinct program ID, mint and curve
-   accounts, metadata, authorities, and explicit token program support. Check
-   account ownership, PDA seeds, actual vault balances, overflow, and slippage.
-2. Port the tested curve math into `create`, `buy`, and `sell` instructions.
-   Compare outputs and account state against Pump Main fixtures, including
-   partial fills, rounding, completion, and error cases. The core currently
-   models only fixed token buy and sell quantities.
-3. Implement on-chain fee vaults and claim or buyback rules. The 0.40% reward
-   allocation needs an explicit recipient and auditable distribution policy;
-   a quoted allocation alone is not a payout.
-4. Replace PumpSwap migration with a CPI to Raydium's legacy AMM v4
+1. Add immutable or tightly governed launch parameters, metadata creation,
+   exact-quote buys, partial fills, and parity fixtures from Pump Main. Validate
+   account state and errors as well as arithmetic. The current program covers
+   only exact-token buys and sells, with caller-provided curve parameters.
+2. Implement authorized on-chain fee claims or buybacks and a documented
+   rewards distribution policy. The current fee amounts accrue in each launch
+   account but cannot be withdrawn. A recorded 0.40% allocation is not a
+   payout. Prove SOL escrow and rent invariants across claims and migration.
+3. Replace PumpSwap migration with a CPI to Raydium's legacy AMM v4
    `Initialize2`, matching the requested pre-PumpSwap destination. Use the
    canonical deployed program ID, config, authority, pool, vault, target-order,
    LP mint, fee destination, and market seed accounts. Verify the exact
@@ -36,11 +39,11 @@ There is no PumpSwap or Mayhem dependency in Beam.
    initializer currently requires classic SPL Token mints, so launches must
    reject incompatible mint extensions. Transfer the completed curve's
    reserved tokens and net quote into the pool atomically.
-5. Burn the LP tokens minted to Beam's migration authority in the same
+4. Burn the LP tokens minted to Beam's migration authority in the same
    transaction, after validating the Raydium pool and minted LP balance. This
    makes liquidity non-withdrawable; it also means Beam cannot claim LP fees
    as a revenue stream. Test this policy against the actual deployed AMM.
-6. Run local validator and devnet integration tests for create, buy, sell,
+5. Run local validator and devnet integration tests for create, buy, sell,
    graduation, failed CPI rollback, fee claims, and pool liquidity custody.
    Obtain independent security review before mainnet use.
 

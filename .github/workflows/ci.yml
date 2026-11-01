@@ -11,13 +11,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install pinned Rust toolchain
-        run: rustup toolchain install 1.99.1 --profile minimal --component rustfmt --component clippy
+        run: |
+          rustup toolchain install 1.99.1 --profile minimal --component rustfmt --component clippy
+          rustup default 1.99.1
       - name: Test
-        run: cargo test --locked
+        run: cargo test --workspace --locked
       - name: Check formatting
         run: cargo fmt --check
       - name: Lint
-        run: cargo clippy --all-targets --locked -- -D warnings
+        run: cargo clippy --workspace --all-targets --locked -- -D warnings
   web:
     runs-on: ubuntu-latest
     defaults:
