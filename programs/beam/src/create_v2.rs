@@ -280,7 +280,7 @@ use crate::quote_control::state::control_entry;use crate::pump_quote::price;
 
 
 
-use crate::pump_quote::{Record, depth, pool_record, AMM}; const EMPTY_RECORD: Record = Record::Pool { base: 0, quote: 0 };
+use crate::pump_quote::{Record, depth}; const EMPTY_RECORD: Record = Record::Pool { base: 0, quote: 0 };
 
 
 
@@ -460,7 +460,7 @@ fn ancestor(account: &AccountInfo<'_>, mint: &Pubkey) -> Result<BondingCurve> {
 
 
 
-fn record(curve: &BondingCurve, g: &Global, mint: &Pubkey, tail: &mut &[AccountInfo<'_>]) -> Result<Record> {
+fn record(curve: &BondingCurve, g: &Global, _mint: &Pubkey, tail: &mut &[AccountInfo<'_>]) -> Result<Record> {
     if curve.real_quote_reserves != 0 || curve.virtual_quote_reserves != 0
             || curve.real_token_reserves != 0 || curve.virtual_token_reserves != 0 {
         require!(!curve.complete, PumpError::QuoteCurveAwaitingMigration);
@@ -490,11 +490,9 @@ fn record(curve: &BondingCurve, g: &Global, mint: &Pubkey, tail: &mut &[AccountI
 
         Ok(Record::Curve { vt: curve.virtual_token_reserves, vq: curve.virtual_quote_reserves, rt: curve.real_token_reserves, rq: curve.real_quote_reserves, pool_base, migration_fee })
     } else {
-        let [_, pool, base_vault, quote_vault, rest @ ..] = *tail else { return Err(error!(PumpError::QuotePoolAccountsRequired)) };
-        let authority = Pubkey::find_program_address(&[b"pool-authority", mint.as_ref()], &crate::ID).0; let pool_quote = if curve.quote_mint == Pubkey::default() { anchor_spl::token::spl_token::native_mint::id() } else { curve.quote_mint }; let expected = Pubkey::find_program_address(&[b"pool", &0u16.to_le_bytes(), authority.as_ref(), mint.as_ref(), pool_quote.as_ref()], &AMM).0;
-        let (base, quote) = pool_record(pool, &expected, base_vault, quote_vault)?;
-        *tail = rest;
-        Ok(Record::Pool { base, quote })
+        // A graduated ancestor needs a Raydium AMM v4 quote adapter. Do not
+        // accept PumpSwap pool accounts while that adapter is unavailable.
+        err!(crate::beam_policy::BeamError::PumpSwapDisabled)
     }
 }
 // layout-pad(8)
