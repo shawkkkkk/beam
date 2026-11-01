@@ -1,16 +1,16 @@
 # Community-first economics
 
-Beam's proposed own fee is 50 basis points: 90% community, 10% platform. This is equivalent to 45 bps and 5 bps of trade value before integer rounding. The user's quoted competitor allocation to its platform is 10 bps; Beam's proposed allocation is half that. The competitor's claim has not been independently verified.
+The user selected a **50-basis-point Beam fee component**: 42 nominal bps for community holder rewards and flagship buybacks, 5 bps for treasury, and 3 bps for founder. Existing Pump creator fees and creator-selected payout-wallet behavior are separate obligations; this design does not remove or count them inside the Beam component. The quoted competitor fee split has not been independently verified.
 
 ## Rounding
 
 1. Compute the combined fee once with Pump's retained ceiling-fee routine at 50 bps.
-2. Compute the platform share as `floor(total_fee / 10)`.
+2. Compute the founder share as `floor(total_fee × 6 / 100)` and the treasury share as `floor(total_fee × 10 / 100)`.
 3. Give the remainder to the community.
 
-On 100 SOL notional, the fee is 0.5 SOL: 0.45 community and 0.05 platform. On a one-lamport trade, the rounded fee is one lamport, all assigned to the community. Quotes must disclose effective fees on dust trades.
+On 100 SOL notional, the Beam component is 0.5 SOL: 0.42 community, 0.05 treasury, and 0.03 founder, **plus any separately applicable creator fee**. On a one-lamport trade, the rounded Beam component is one lamport, all assigned to the community. Quotes must disclose effective fees on dust trades and every applicable fee component.
 
-`beam_economics.rs` implements the allocation. It is not yet wired into the recovered fee-program CPI, recipient routing or an executable keeper. Inherited Pump fee machinery remains until Beam-controlled configuration/vaults replace it. The new rate is not an enforced live trading fee.
+`beam_economics.rs` implements only Beam component allocation arithmetic. It is not yet wired into the recovered fee-program CPI, recipient routing or an executable keeper. Inherited Pump fee machinery and creator-fee behavior remain until Beam-controlled configuration/vaults can preserve and test those semantics. The 42/5/3 split is a requirement for the future Beam implementation, not an enforced live trading fee today.
 
 The requested direction splits the community share between holder rewards and
 flagship buybacks. A 50/50 split within that share is a provisional test setting,
@@ -19,13 +19,13 @@ and execution rules have not been selected.
 
 ## After graduation
 
-Raydium charges its selected on-chain pool configuration. Beam cannot invent a Raydium share such as 0.10%. Quotes must distinguish pool fees from any Beam fee, and must not silently stack the curve's 50 bps on top after graduation.
+Raydium charges its selected on-chain pool configuration. Beam cannot invent a Raydium share such as 0.10%. Quotes must distinguish Raydium pool fees, creator fees, Beam fees, and migration fees, and must not silently stack the curve's 50 bps on top after graduation. The user selected Raydium AMM v4; the existing gated CPMM migration code is a superseded candidate and does not satisfy that venue requirement.
 
-Recurring buybacks need a collectible fee source. The currently gated migration candidate burns all LP received by Beam. That removes its position; it does not retain an LP claim to harvest. It cannot fund perpetual buybacks from those burned tokens.
+Recurring buybacks need a collectible fee source. The currently gated CPMM migration candidate burns all LP received by Beam. That removes its position; it does not retain an LP claim to harvest. The selected AMM v4 venue has no Beam-controlled creator or protocol fee switch; its LP fee accrues in pool reserves and is realized through LP withdrawal. Burning all AMM v4 LP would likewise relinquish that claim. Raydium's [Burn & Earn](https://docs.raydium.io/user-flows/burn-and-earn) does not support AMM v4. A Beam 50-bps post-graduation swap fee cannot be assumed from AMM v4. Until an independently reviewed custody/fee-rights design exists, community rewards and buybacks can be funded only from collected pre-graduation proceeds or another explicitly authorized source.
 
 Before activation:
 
-- Implement and test permanently locked principal with community-controlled fee rights, or another explicitly supported fee mechanism.
+- Specify and test a transparent AMM v4 LP custody/escrow arrangement that preserves principal while defining who may realize fees, or another explicitly supported fee mechanism. Do not describe burned LP as continuing fee income.
 - Deny creators, operators and keepers authority to withdraw liquidity principal.
 - Set the post-graduation fee budget using the actual Raydium configuration.
 - Route flagship community proceeds to a dedicated vault, with public buyback receipts and an explicit burn/retention policy for acquired tokens.
