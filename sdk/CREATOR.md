@@ -65,7 +65,11 @@ separate concerns not implemented here.
 `timestamp:i64`, `creator:Pubkey`, `creator_fee:u64`, `quote_mint:Pubkey`, in that
 order. It returns `{ timestamp, creator, creatorFee, quoteMint }`, with both
 integers as `bigint`. Truncation, trailing bytes, the wrong discriminator and
-non-byte inputs reject. Subarray byte offsets are honored. A decoded payload is
+non-byte inputs reject. Internal TypedArray brand and storage length are checked;
+shadowed `length`/`byteLength` properties, fake prototypes and custom iterators
+cannot replace the underlying bytes. Genuine Uint8Array/Buffer subarray offsets
+are honored. The caller must keep storage stable during the synchronous copy;
+this is not an atomic shared-memory snapshot. A decoded payload is
 not proof of origin, finality, execution or a transfer. This event type is shared
 by other handlers; a nonzero quote mint is structurally valid and does not prove
 a legacy native collection. Log/base64/CPI envelopes are not accepted implicitly.
@@ -141,11 +145,14 @@ file is changed in this contribution. The temporary example is outside the
 source-provenance check's allowlist and belongs only in the disposable checkout.
 
 Observed local checks: the author's Node 24.19.0 run and an independent peer's
-Node 22.23.4 run each passed the same 20 tests below. These are local results,
+Node 22.23.4 run initially each passed 20 tests. Three later raw-byte-view
+regressions reproduced failures on the original decoder, then all 23 tests
+(18 creator plus five retained native) passed after the intrinsic storage guard
+fix on Node 22.23.4 and Node 24.19.0. These are local results,
 not a hosted-CI claim:
 
 ```sh
-node --test sdk/beam-native.test.mjs sdk/beam-creator.test.mjs  # 20 passed:15 new+5 retained
+node --test sdk/beam-native.test.mjs sdk/beam-creator.test.mjs  # 23 passed:18 creator+5 retained
 python3 scripts/check_fork.py  # 380 archive blobs;62 retained equal,4 declared changes
 git diff --check
 ```

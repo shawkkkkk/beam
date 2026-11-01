@@ -10,6 +10,9 @@ const U64_MAX = (1n << 64n) - 1n;
 const discriminator = (name) => Uint8Array.from(createHash('sha256').update(name).digest().subarray(0, 8));
 const COLLECT_DISC = discriminator('global:collect_creator_fee');
 const EVENT_DISC = discriminator('event:CollectCreatorFeeEvent');
+const TYPED_ARRAY = Object.getPrototypeOf(Uint8Array.prototype);
+const RAW_KIND = Object.getOwnPropertyDescriptor(TYPED_ARRAY, Symbol.toStringTag).get;
+const RAW_BYTE_LENGTH = Object.getOwnPropertyDescriptor(TYPED_ARRAY, 'byteLength').get;
 const ACCOUNT_FIELDS = ['creator', 'creatorVault', 'systemProgram', 'eventAuthority', 'program'];
 const SNAPSHOT_FIELDS = [
   'creator', 'creatorVault', 'creatorOwner', 'creatorExecutable',
@@ -79,12 +82,17 @@ export function buildCollectCreatorFee(config, accounts) {
 }
 
 export function decodeCollectCreatorFeeEvent(input) {
-  if (arguments.length !== 1 || !(input instanceof Uint8Array)) {
+  // Read internal TypedArray slots, never caller-owned length/tag properties.
+  if (arguments.length !== 1 || RAW_KIND.call(input) !== 'Uint8Array') {
     throw new TypeError('expected one raw event byte payload');
   }
-  if (input.length !== 88) throw new RangeError('expected an exact 88-byte CollectCreatorFeeEvent payload');
-  const data = Uint8Array.from(input);
-  if (!EVENT_DISC.every((byte, index) => data[index] === byte)) {
+  if (RAW_BYTE_LENGTH.call(input) !== 88) {
+    throw new RangeError('expected an exact 88-byte CollectCreatorFeeEvent payload');
+  }
+  // TypedArray construction copies internal storage; .from() could call a
+  // caller-controlled iterator and silently decode different bytes.
+  const data = new Uint8Array(input);
+  if (RAW_BYTE_LENGTH.call(data) !== 88 || !EVENT_DISC.every((byte, index) => data[index] === byte)) {
     throw new RangeError('expected an exact 88-byte CollectCreatorFeeEvent payload');
   }
   const view = new DataView(data.buffer, data.byteOffset, data.byteLength);

@@ -188,3 +188,45 @@ test('slot freshness is explicit, bounded and only relative to the supplied refe
   const max = previewCollectCreatorFee(config, snapshot({ observedSlot: U64_MAX, referenceSlot: U64_MAX, maxSlotAge: 0n }));
   assert.equal(max.observedSlot, U64_MAX);
 });
+
+test('event length comes from real typed-array storage rather than shadow properties', () => {
+  const event = Buffer.from(fixture.events[0].dataHex, 'hex');
+  for (const size of [87, 89]) {
+    const input = new Uint8Array(size);
+    input.set(event.subarray(0, Math.min(size, event.length)));
+    Object.defineProperties(input, { length: { value: 88 }, byteLength: { value: 88 } });
+    assert.throws(() => decodeCollectCreatorFeeEvent(input), /88-byte/);
+  }
+});
+
+test('exact raw Uint8Array and Buffer storage ignores custom getters and iterators', () => {
+  const expected = fixture.events[0].expected;
+  const event = Buffer.from(fixture.events[0].dataHex, 'hex');
+  for (const input of [Uint8Array.from(event), Buffer.from(event)]) {
+    let touched = false;
+    Object.defineProperties(input, {
+      length: { get() { touched = true; throw new Error('shadow length must not run'); } },
+      byteLength: { get() { touched = true; throw new Error('shadow byteLength must not run'); } },
+      [Symbol.iterator]: { value: function* () { touched = true; yield* Buffer.from(fixture.events[2].dataHex, 'hex'); } },
+    });
+    assert.deepEqual(strings(decodeCollectCreatorFeeEvent(input)), expected);
+    assert.equal(touched, false);
+  }
+});
+
+test('fake byte-view prototypes and non-byte views reject before using supplied iteration', () => {
+  const event = Buffer.from(fixture.events[0].dataHex, 'hex');
+  const fake = Object.create(Uint8Array.prototype);
+  const wide = Object.setPrototypeOf(new Uint16Array(44), Uint8Array.prototype);
+  const dataView = Object.setPrototypeOf(new DataView(new ArrayBuffer(88)), Uint8Array.prototype);
+  for (const input of [fake, wide, dataView]) {
+    let iterated = false;
+    Object.defineProperties(input, {
+      length: { value: 88 }, byteLength: { value: 88 },
+      [Symbol.iterator]: { value: function* () { iterated = true; yield* event; } },
+    });
+    assert.throws(() => decodeCollectCreatorFeeEvent(input), TypeError);
+    assert.equal(iterated, false);
+  }
+  assert.throws(() => decodeCollectCreatorFeeEvent(new Proxy(Uint8Array.from(event), {})), TypeError);
+});
