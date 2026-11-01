@@ -1,0 +1,22 @@
+{
+  "kind": "Actual independent root execution of reviewed own Rust producer",
+  "exitCode": 0,
+  "head": "b8120a8a58b1375ba3b8f0d2a590c49923e18021",
+  "sourceSha256": "88a6ae88e0eb8ef02a4ae9f33f965fa125d2e3b7eb4d36ea88750a20e0dac89d",
+  "stdoutSha256": "78eb6e27f773bdccf420e0d03a975c4e97f839b3095679d38f7b44e3620a2b44",
+  "stdoutBytes": 2368,
+  "stderrSha256": "1bfb5919fd63f907e5c0a9943df296a133fcecca6ed756b4f6580fb134050e15",
+  "instructions": 1,
+  "accountMetas": 5,
+  "events": 3,
+  "noHandlersOrNetworkOrTransactions": true,
+  "cargo": "1.89.0",
+  "rustc": "1.94.1",
+  "command": "cargo run --locked --manifest-path programs/beam/Cargo.toml --example beam_creator_fixture",
+  "compileEnv": {
+    "CARGO_HOME": "/tmp/beam-20261101/cargo-home",
+    "CARGO_TARGET_DIR": "/tmp/beam-20261101/target",
+    "RUSTFLAGS": "-C debuginfo=0",
+    "BEAM_CREATOR_FIXTURE_SOURCE_COMMIT": "b8120a8a58b1375ba3b8f0d2a590c49923e18021"
+  }
+}
