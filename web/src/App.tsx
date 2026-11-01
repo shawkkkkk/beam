@@ -24,6 +24,7 @@ import {
   Zap,
 } from "lucide-react";
 import { sampleTokens, type Token } from "./data";
+import { localFeaturePlans } from "./localFeaturePresentation";
 import {
   getBrowserStorage,
   nextDraftId,
@@ -262,6 +263,7 @@ function App() {
   const selectedDraft = selected?.isDraft
     ? drafts.find((draft) => draft.id === selected.id)
     : undefined;
+  const selectedPlans = selectedDraft ? localFeaturePlans(selectedDraft) : [];
 
   useEffect(() => {
     const storage = getBrowserStorage();
@@ -775,38 +777,19 @@ function App() {
                   </div>
                 </div>
                 <p className="detail-description">{selected.description}</p>
-                {selectedDraft &&
-                  (selectedDraft.creatorFeeWallet ||
-                    selectedDraft.donationChoice === "donate.gg" ||
-                    selectedDraft.callout ||
-                    selectedDraft.livestreamUrl) && (
-                    <div className="draft-options">
-                      <strong>Local plans only</strong>
-                      {selectedDraft.creatorFeeWallet && (
-                        <p>
-                          Creator fee wallet: {selectedDraft.creatorFeeWallet}
-                        </p>
-                      )}
-                      {selectedDraft.donationChoice === "donate.gg" && (
-                        <p>
-                          donate.gg interest
-                          {selectedDraft.charityName
-                            ? `: ${selectedDraft.charityName}`
-                            : " (charity not chosen)"}
-                          ; no donation is configured.
-                        </p>
-                      )}
-                      {selectedDraft.callout && (
-                        <p>Callout: {selectedDraft.callout}</p>
-                      )}
-                      {selectedDraft.livestreamUrl && (
-                        <p>
-                          Stream URL plan: {selectedDraft.livestreamUrl}. No
-                          stream is active here.
-                        </p>
-                      )}
-                    </div>
-                  )}
+                {selectedPlans.length > 0 && (
+                  <section
+                    className="draft-options"
+                    aria-label="Local feature plans"
+                  >
+                    <strong>Local plans only — all actions unavailable</strong>
+                    {selectedPlans.map((plan) => (
+                      <p key={plan.kind}>
+                        {plan.label}: {plan.value}. {plan.reason}
+                      </p>
+                    ))}
+                  </section>
+                )}
                 <div className="detail-chart">
                   <MiniChart negative={selected.change < 0} />
                 </div>

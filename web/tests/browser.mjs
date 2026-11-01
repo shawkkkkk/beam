@@ -178,8 +178,9 @@ try {
     true,
   );
 
+  const maliciousCallout = '<img src=x onerror="window.__beamXss=1">';
   await evaluate(
-    `(() => { const put = (selector, value) => { const input = document.querySelector(selector); const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set; setter.call(input, value); input.dispatchEvent(new Event('input', {bubbles:true})); }; put('input[placeholder="e.g. Cosmic Cat"]', 'First Draft'); put('input[placeholder="e.g. COSMIC"]', 'FIRST'); })()`,
+    `(() => { const put = (selector, value) => { const input = document.querySelector(selector); const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set; setter.call(input, value); input.dispatchEvent(new Event('input', {bubbles:true})); }; put('input[placeholder="e.g. Cosmic Cat"]', 'First Draft'); put('input[placeholder="e.g. COSMIC"]', 'FIRST'); const area = document.querySelector('textarea[placeholder="Optional community callout"]'); Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value').set.call(area, ${JSON.stringify(maliciousCallout)}); area.dispatchEvent(new Event('input', {bubbles:true})); })()`,
   );
   await until(
     "document.querySelector('input[placeholder=\"e.g. Cosmic Cat\"]').value === 'First Draft'",
@@ -188,6 +189,21 @@ try {
     "document.querySelector('form.create-form').requestSubmit(); document.querySelector('form.create-form')?.requestSubmit()",
   );
   await until("!!document.querySelector('.detail-heading')");
+  const planText = await evaluate(
+    "document.querySelector('.draft-options')?.textContent",
+  );
+  assert.match(planText, /Local plans only — all actions unavailable/);
+  assert.match(
+    planText,
+    /Not submitted for moderation or published as a callout/,
+  );
+  assert.equal(planText.includes(maliciousCallout), true);
+  assert.equal(
+    await evaluate(
+      "document.querySelector('.draft-options img') === null && document.querySelector('.draft-options a[href]') === null && window.__beamXss === undefined",
+    ),
+    true,
+  );
   assert.equal(
     await evaluate(
       "JSON.parse(localStorage.getItem('beam-local-drafts')).length",
