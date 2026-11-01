@@ -3220,5 +3220,6 @@ pub mod beam_economics;
 pub mod beam_amm_v4;
 pub mod beam_amm_v4_funding;
 pub mod beam_amm_v4_settlement;
+pub mod beam_amm_v4_snapshot;
 pub mod beam_raydium;
 pub use beam_raydium::*;
