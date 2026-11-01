@@ -33,6 +33,38 @@ fn set_enabled(authority: Pubkey, enabled: bool) -> Instruction {
     }
 }
 
+fn configure(authority: Pubkey, amm_config: Pubkey) -> Instruction {
+    Instruction {
+        program_id: beam_program::ID,
+        accounts: vec![
+            AccountMeta::new_readonly(global_pda(), false),
+            AccountMeta::new(authority, true),
+            AccountMeta::new(config_pda(), false),
+            AccountMeta::new_readonly(amm_config, false),
+            AccountMeta::new_readonly(system_program::ID, false),
+        ],
+        data: beam_program::instruction::ConfigureRaydium {}.data(),
+    }
+}
+
+fn synthetic_global(authority: Pubkey) -> Account {
+    // Global has retained historical fields. Set the initialized flag and
+    // authority; zeroed remaining fields are valid Borsh values. Extra bytes
+    // are harmless account padding.
+    let mut data = vec![0u8; 2048];
+    data[..8].copy_from_slice(Global::DISCRIMINATOR);
+    data[8] = 1;
+    data[9..41].copy_from_slice(authority.as_ref());
+    assert_eq!(Global::try_deserialize(&mut &data[..]).unwrap().authority, authority);
+    Account {
+        lamports: 100_000_000,
+        data,
+        owner: beam_program::ID,
+        executable: false,
+        rent_epoch: 0,
+    }
+}
+
 fn beam_processor<'a>(program_id: &Pubkey, accounts: &[AccountInfo<'a>], data: &[u8]) -> ProgramResult {
     // SAFETY: ProgramTest invokes this processor synchronously. Anchor's
     // generated entrypoint requires the slice borrow to share AccountInfo's
@@ -45,15 +77,6 @@ fn beam_processor<'a>(program_id: &Pubkey, accounts: &[AccountInfo<'a>], data: &
 async fn fixture() -> (ProgramTestContext, Keypair, Keypair) {
     let admin = Keypair::new();
     let other = Keypair::new();
-
-    // Global has retained historical fields. Set the initialized flag and
-    // authority; zeroed remaining fields are valid Borsh values. Extra bytes
-    // are harmless account padding.
-    let mut global_data = vec![0u8; 2048];
-    global_data[..8].copy_from_slice(Global::DISCRIMINATOR);
-    global_data[8] = 1;
-    global_data[9..41].copy_from_slice(admin.pubkey().as_ref());
-    assert_eq!(Global::try_deserialize(&mut &global_data[..]).unwrap().authority, admin.pubkey());
     let mut config_data = Vec::new();
     BeamRaydiumConfig {
         amm_config: Pubkey::new_unique(),
@@ -64,13 +87,7 @@ async fn fixture() -> (ProgramTestContext, Keypair, Keypair) {
     .unwrap();
 
     let mut bank = ProgramTest::new("beam_program", beam_program::ID, processor!(beam_processor));
-    bank.add_account(global_pda(), Account {
-        lamports: 100_000_000,
-        data: global_data,
-        owner: beam_program::ID,
-        executable: false,
-        rent_epoch: 0,
-    });
+    bank.add_account(global_pda(), synthetic_global(admin.pubkey()));
     bank.add_account(config_pda(), Account {
         lamports: 100_000_000,
         data: config_data,
@@ -90,9 +107,54 @@ async fn fixture() -> (ProgramTestContext, Keypair, Keypair) {
     (bank.start_with_context().await, admin, other)
 }
 
+async fn configure_fixture(disable_create_pool: bool) -> (ProgramTestContext, Keypair, Pubkey) {
+    let admin = Keypair::new();
+    let index = 7u16;
+    let amm_config = Pubkey::find_program_address(&[b"amm_config", &index.to_be_bytes()], &RAYDIUM_ID).0;
+    let mut data = vec![0u8; 236];
+    data[..8].copy_from_slice(&anchor_lang::solana_program::hash::hash(b"account:AmmConfig").to_bytes()[..8]);
+    data[9] = u8::from(disable_create_pool);
+    data[10..12].copy_from_slice(&index.to_le_bytes());
+    let mut bank = ProgramTest::new("beam_program", beam_program::ID, processor!(beam_processor));
+    bank.add_account(global_pda(), synthetic_global(admin.pubkey()));
+    bank.add_account(amm_config, Account {
+        lamports: 100_000_000,
+        data,
+        owner: RAYDIUM_ID,
+        executable: false,
+        rent_epoch: 0,
+    });
+    bank.add_account(admin.pubkey(), Account {
+        lamports: 1_000_000_000,
+        data: Vec::new(),
+        owner: system_program::ID,
+        executable: false,
+        rent_epoch: 0,
+    });
+    (bank.start_with_context().await, admin, amm_config)
+}
+
 async fn config_enabled(bank: &mut ProgramTestContext) -> bool {
     let account = bank.banks_client.get_account(config_pda()).await.unwrap().unwrap();
     BeamRaydiumConfig::try_deserialize(&mut &account.data[..]).unwrap().enabled
+}
+
+#[tokio::test]
+async fn invalid_amm_config_rolls_back_account_init_and_valid_config_starts_disabled() {
+    let (mut rejected_bank, admin, amm_config) = configure_fixture(true).await;
+    let rejected = signed_tx(&rejected_bank, &admin, None, &[configure(admin.pubkey(), amm_config)]);
+    let error = rejected_bank.banks_client.process_transaction(rejected).await.unwrap_err();
+    assert!(format!("{error:?}").contains("Custom(7003)"), "unexpected config error: {error:?}");
+    assert!(rejected_bank.banks_client.get_account(config_pda()).await.unwrap().is_none());
+
+    let (mut valid_bank, admin, amm_config) = configure_fixture(false).await;
+    let valid = signed_tx(&valid_bank, &admin, None, &[configure(admin.pubkey(), amm_config)]);
+    valid_bank.banks_client.process_transaction(valid).await.unwrap();
+    let account = valid_bank.banks_client.get_account(config_pda()).await.unwrap().unwrap();
+    let config = BeamRaydiumConfig::try_deserialize(&mut &account.data[..]).unwrap();
+    assert_eq!(config.amm_config, amm_config);
+    assert_eq!(config.raydium_program, RAYDIUM_ID);
+    assert!(!config.enabled);
 }
 
 fn signed_tx(bank: &ProgramTestContext, admin: &Keypair, other: Option<&Keypair>, instructions: &[Instruction]) -> Transaction {
