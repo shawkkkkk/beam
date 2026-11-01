@@ -13,6 +13,12 @@
       "LICENSE": "261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64"
     }
   },
+  "raydium_amm_v4_abi": {
+    "repository": "https://github.com/raydium-io/raydium-amm",
+    "commit": "91739d8d9f5cf347e0ce14ebe4d2bb7069fb31b6",
+    "license": "Apache-2.0",
+    "scope": "External source ABI reference only; no deployed-binary match established"
+  },
   "beam_development_program_id": "GdaQ7RHbGKGEL5Px66tQP78S67XcgxYAzFUwja71qSJP",
   "allowed_modified_paths": [
     "Cargo.toml",
@@ -24,7 +30,8 @@
     "src/beam_policy.rs",
     "src/beam_raydium.rs",
     "tests/compatibility.rs",
-    "src/beam_economics.rs"
+    "src/beam_economics.rs",
+    "src/beam_amm_v4.rs"
   ],
   "deployment_status": "not deployed"
 }
