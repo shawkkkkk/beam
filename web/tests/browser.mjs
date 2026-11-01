@@ -189,6 +189,25 @@ try {
     "document.querySelector('form.create-form').requestSubmit(); document.querySelector('form.create-form')?.requestSubmit()",
   );
   await until("!!document.querySelector('.detail-heading')");
+  assert.equal(
+    await evaluate(
+      `(() => { const region = document.querySelector('.amm-v4-status[role="region"]'); const heading = document.getElementById(region?.getAttribute('aria-labelledby')); return !!region && heading?.textContent === 'Curve and AMM v4 status' && region.contains(heading) && region.getBoundingClientRect().right <= innerWidth; })()`,
+    ),
+    true,
+    "the lifecycle status must be a labelled region that fits mobile width",
+  );
+  const draftLifecycle = await evaluate(
+    "document.querySelector('.amm-v4-status').textContent",
+  );
+  assert.match(draftLifecycle, /Local draft — no token or bonding curve/);
+  assert.match(draftLifecycle, /Migration in this build: disabled/);
+  assert.match(draftLifecycle, /Verified AMM v4 liquidity: unavailable/);
+  assert.equal(
+    await evaluate(
+      "document.querySelector('.amm-v4-status a, .amm-v4-status button') === null",
+    ),
+    true,
+  );
   const planText = await evaluate(
     "document.querySelector('.draft-options')?.textContent",
   );
@@ -223,6 +242,29 @@ try {
     ),
     true,
   );
+  await evaluate(
+    "document.querySelector('button[aria-label=\"View Nova Club\"]').click()",
+  );
+  await until("!!document.querySelector('.amm-v4-status')");
+  const sampleLifecycle = await evaluate(
+    "document.querySelector('.amm-v4-status').textContent",
+  );
+  assert.match(
+    sampleLifecycle,
+    /Sample preview — curve and AMM v4 state unavailable/,
+  );
+  assert.match(sampleLifecycle, /Verified AMM v4 liquidity: unavailable/);
+  assert.doesNotMatch(
+    sampleLifecycle,
+    /pool address|market cap|price|SOL reserves/i,
+  );
+  await send("Input.dispatchKeyEvent", {
+    type: "keyDown",
+    key: "Escape",
+    code: "Escape",
+    windowsVirtualKeyCode: 27,
+  });
+  await until("!document.querySelector('[role=dialog]')");
   assert.equal(
     await evaluate(
       "document.querySelector('.token-card .card-open')?.getAttribute('aria-label')",
