@@ -37,7 +37,7 @@ dependency. No percentage can honestly describe whole-product parity yet.
 | --- | --- | --- |
 | Pump-style experience with Beam branding | **In review** | [Separate PR #3](https://github.com/shawkkkkk/beam/pull/3) includes a responsive **sample-data preview**, not a live Pump clone or canonical client. Review the web subtree separately from its competing contract. |
 | Create, wallet and trade flows | **Blocked** | The preview saves local drafts; it does not upload metadata, connect wallets, sign or trade. A Beam IDL, client and verified chain data are required. |
-| Creator wallet, charity, callouts and livestream screens | **Not integrated** | Local UX concepts exist, but the current canonical site has no working provider or action. Preserve the observed behavior with Beam branding while implementing services independently. |
+| Creator wallet, charity, callouts and livestream screens | **Not started on main** | Requirements are recorded in the [feature matrix](docs/FEATURES.md); no canonical site screen, provider or action exists. Preserve observable behavior with Beam branding while implementing services independently. |
 | Client and frontend data | **In progress** | Native-SOL golden ABI fixtures are being tested separately; no deployed Beam ID, complete SDK, indexer or live market feed exists. |
 
 ### Backend and integrations
