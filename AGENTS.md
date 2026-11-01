@@ -47,9 +47,10 @@ additional archive restrictions. Do not alter the pinned archive for Beam work.
   share's holder-reward/buyback split is a provisional test setting. Holder
   eligibility, the flagship mint, vaults, and distribution rules are open.
   The user's Beam fee split is 42/5/3 nominal basis points for community,
-  treasury and founder. Preserve creator
-  fees and creator-selected payout-wallet semantics separately. Distinguish
-  curve, creator, migration, and Raydium pool fees; never promise returns.
+  treasury and founder. Preserve the creator payout and creator-selected
+  wallet system. Whether its fee comes from the community share or an
+  additional charge remains undecided; do not assume either. Disclose each
+  applicable curve, creator, migration, and Raydium pool fee; never promise returns.
 - On-chain reconstruction does not provide Pump's website, streaming, callout,
   or charity service backends. Treat those as independent feature work with
   authorized providers; never imply their behavior is byte-identical. The
