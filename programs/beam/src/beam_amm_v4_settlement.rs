@@ -33,6 +33,7 @@ pub struct SettlementKeys {
     pub curve: Pubkey,
     pub setup_authority: Pubkey,
     pub migration_fee_recipient: Pubkey,
+    pub curve_base_vault: Pubkey,
     pub base_source: Pubkey,
     pub wsol_source: Pubkey,
     pub base_vault: Pubkey,
@@ -42,11 +43,12 @@ pub struct SettlementKeys {
 }
 
 impl SettlementKeys {
-    fn all(self) -> [Pubkey; 9] {
+    fn all(self) -> [Pubkey; 10] {
         [
             self.curve,
             self.setup_authority,
             self.migration_fee_recipient,
+            self.curve_base_vault,
             self.base_source,
             self.wsol_source,
             self.base_vault,
@@ -81,6 +83,7 @@ pub fn expected_keys(
         curve,
         setup_authority: signer,
         migration_fee_recipient,
+        curve_base_vault: user_lp_ata(&curve, base_mint),
         base_source: user_lp_ata(&signer, base_mint),
         wsol_source: user_lp_ata(&signer, &anchor_spl::token::spl_token::native_mint::id()),
         base_vault: p.coin_vault,
@@ -99,6 +102,7 @@ pub struct Balances {
     pub curve_lamports: u64,
     pub setup_lamports: u64,
     pub migration_fee_recipient_lamports: u64,
+    pub curve_base_vault_tokens: u64,
     pub base_source_tokens: u64,
     pub wsol_source_tokens: u64,
     pub wsol_source_lamports: u64,
@@ -144,7 +148,9 @@ fn backed(balance: u64, reserve: u64, tokens: u64) -> Result<(), SettlementError
     }
 }
 
-/// Assert recipient-bound exact changes across funding and one CPI.
+/// Assert exact changes for the named token sources/vaults and fee recipients
+/// across funding and one CPI. Caller setup spend is only bounded by the fee
+/// and rent cap; this helper does not attribute each setup-rent payment.
 /// `before_funding` precedes the curve-to-WSOL source transfer and caller
 /// setup contribution. `before_cpi` follows both credits but precedes the
 /// Raydium CPI. `after_cpi` follows pool initialization, migration-fee payment
@@ -180,7 +186,8 @@ pub fn verify(
         ))?;
     if i.curve_lamports != expected_curve_before
         || i.setup_lamports != plan.setup_authority_before
-        || i.base_source_tokens != base_amount
+        || i.curve_base_vault_tokens != base_amount
+        || i.base_source_tokens != 0
         || i.wsol_source_tokens != 0
         || i.base_vault_tokens != 0
         || i.wsol_vault_tokens != 0
@@ -206,6 +213,14 @@ pub fn verify(
     expected_before_cpi.setup_lamports = i
         .setup_lamports
         .checked_add(plan.caller_setup_budget)
+        .ok_or(SettlementError::WrongFundingDelta)?;
+    expected_before_cpi.curve_base_vault_tokens = i
+        .curve_base_vault_tokens
+        .checked_sub(base_amount)
+        .ok_or(SettlementError::WrongFundingDelta)?;
+    expected_before_cpi.base_source_tokens = i
+        .base_source_tokens
+        .checked_add(base_amount)
         .ok_or(SettlementError::WrongFundingDelta)?;
     expected_before_cpi.wsol_source_tokens = i
         .wsol_source_tokens
@@ -254,6 +269,9 @@ pub fn verify(
         plan.migration_fee_unrouted,
     )?;
     debited(b.base_source_tokens, a.base_source_tokens, base_amount)?;
+    if a.curve_base_vault_tokens != b.curve_base_vault_tokens {
+        return Err(SettlementError::WrongDelta);
+    }
     debited(b.wsol_source_tokens, a.wsol_source_tokens, plan.pool_quote)?;
     debited(
         b.wsol_source_lamports,
@@ -328,6 +346,7 @@ mod tests {
                 curve_lamports: 77,
                 setup_lamports: 37,
                 migration_fee_recipient_lamports: 10,
+                curve_base_vault_tokens: 0,
                 base_source_tokens: 1_000,
                 wsol_source_tokens: 115,
                 wsol_source_lamports: 215,
@@ -349,6 +368,7 @@ mod tests {
                 curve_lamports: 67,
                 setup_lamports: 27,
                 migration_fee_recipient_lamports: 20,
+                curve_base_vault_tokens: 0,
                 base_source_tokens: 0,
                 wsol_source_tokens: 0,
                 wsol_source_lamports: 100,
@@ -367,6 +387,8 @@ mod tests {
         let mut initial = before;
         initial.balances.curve_lamports = 192;
         initial.balances.setup_lamports = 7;
+        initial.balances.curve_base_vault_tokens = 1_000;
+        initial.balances.base_source_tokens = 0;
         initial.balances.wsol_source_tokens = 0;
         initial.balances.wsol_source_lamports = 100;
         (keys, plan, initial, before, after)
@@ -413,6 +435,12 @@ mod tests {
         assert_eq!(
             verify(keys, plan, 1_000, 0, initial, before, after),
             Err(SettlementError::WrongFundingDelta)
+        );
+        let (keys, plan, mut initial, before, after) = fixture();
+        initial.balances.curve_base_vault_tokens += 1;
+        assert_eq!(
+            verify(keys, plan, 1_000, 0, initial, before, after),
+            Err(SettlementError::WrongBeforeBalance)
         );
         let (keys, plan, initial, before, mut after) = fixture();
         after.balances.curve_lamports -= 1;
