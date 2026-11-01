@@ -22,7 +22,7 @@ test("each optional plan remains unavailable with its own missing dependency", (
       "charity",
       /provider/,
     ],
-    [{ callout: "Hello" }, "callout", /moderated/],
+    [{ callout: "Hello" }, "callout", /moderation/],
     [
       { livestreamUrl: "https://example.invalid/stream" },
       "livestream",

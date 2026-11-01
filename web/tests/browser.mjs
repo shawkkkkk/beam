@@ -193,7 +193,10 @@ try {
     "document.querySelector('.draft-options')?.textContent",
   );
   assert.match(planText, /Local plans only — all actions unavailable/);
-  assert.match(planText, /Not submitted, moderated, or displayed/);
+  assert.match(
+    planText,
+    /Not submitted for moderation or published as a callout/,
+  );
   assert.equal(planText.includes(maliciousCallout), true);
   assert.equal(
     await evaluate(

@@ -61,7 +61,7 @@ export function localFeaturePlans(
       "callout",
       "Callout draft",
       draft.callout.trim(),
-      "Not submitted, moderated, or displayed.",
+      "Not submitted for moderation or published as a callout.",
     );
   }
   if (draft.livestreamUrl?.trim()) {
