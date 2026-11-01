@@ -190,6 +190,15 @@ fn migration_quote(real_quote: u64, post_complete_quote_in: u64, migration_fee: 
     Ok((total, pool_quote))
 }
 
+/// Fee counters are separate claims on the curve's lamports, not deductions
+/// from its recorded liquidity reserves. Extra lamports are left in place.
+fn protected_curve_floor(curve_lamports: u64, rent: u64, creator_fee: u64, protocol_fees: u64, owned_quote: u64) -> Result<u64> {
+    let floor = rent.checked_add(creator_fee).and_then(|v| v.checked_add(protocol_fees)).ok_or(PumpError::Overflow)?;
+    let required = floor.checked_add(owned_quote).ok_or(PumpError::Overflow)?;
+    require!(curve_lamports >= required, BeamError::InvalidMigrationBalance);
+    Ok(floor)
+}
+
 pub fn execute<'info>(ctx: Context<'_, '_, '_, 'info, MigrateRaydium<'info>>, setup_budget: u64) -> Result<()> {
     require!(cfg!(feature = "experimental-raydium"), BeamError::MigrationNotEnabled);
     let a = &ctx.accounts;
@@ -223,8 +232,13 @@ pub fn execute<'info>(ctx: Context<'_, '_, '_, 'info, MigrateRaydium<'info>>, se
     let base = a.curve_token_vault.amount;
     require!(base > 0 && base <= a.bonding_curve.token_total_supply && quote > 0 && setup_budget > 0, BeamError::InvalidMigrationBalance);
     let curve_info = a.bonding_curve.to_account_info();
-    let required = Rent::get()?.minimum_balance(curve_info.data_len()).checked_add(total_quote).ok_or(PumpError::Overflow)?;
-    require!(curve_info.lamports() >= required, BeamError::InvalidMigrationBalance);
+    let protected_floor = protected_curve_floor(
+        curve_info.lamports(),
+        Rent::get()?.minimum_balance(curve_info.data_len()),
+        a.bonding_curve.creator_fee,
+        a.bonding_curve.protocol_fees,
+        total_quote,
+    )?;
     let authority_before = a.migration_authority.lamports();
     let curve_bump = [ctx.bumps.bonding_curve]; let curve_seeds: &[&[u8]] = &[b"bonding-curve", mint.as_ref(), &curve_bump];
     let authority_bump = [ctx.bumps.migration_authority]; let authority_seeds: &[&[u8]] = &[b"pool-authority", mint.as_ref(), &authority_bump];
@@ -252,6 +266,7 @@ pub fn execute<'info>(ctx: Context<'_, '_, '_, 'info, MigrateRaydium<'info>>, se
     token::burn(CpiContext::new_with_signer(a.token_program.to_account_info(), token::Burn { mint: a.lp_mint.to_account_info(), from: a.authority_lp.to_account_info(), authority: a.migration_authority.to_account_info() }, &[authority_seeds]), lp.amount)?;
     require!(token::spl_token::state::Account::unpack(&a.authority_lp.try_borrow_data()?)?.amount == 0, BeamError::InvalidMigrationResult);
     checked_move(&curve_info, &a.withdraw_authority.to_account_info(), migration_fee)?;
+    require!(curve_info.lamports() >= protected_floor, BeamError::InvalidMigrationBalance);
     // Return only this caller's unspent setup contribution, never prior donations.
     let refund = a.migration_authority.lamports().saturating_sub(authority_before).min(setup_budget);
     if refund > 0 {
@@ -281,8 +296,25 @@ mod tests {
         assert_eq!(migration_quote(100, 25, 10).unwrap(), (125, 115));
         assert_eq!(migration_quote(100, 0, 10).unwrap(), (100, 90));
         assert_eq!(migration_quote(0, 25, 0).unwrap(), (25, 25));
+        assert_eq!(migration_quote(u64::MAX, 0, 0).unwrap(), (u64::MAX, u64::MAX));
         assert!(migration_quote(u64::MAX, 1, 0).is_err());
         assert!(migration_quote(100, 25, 126).is_err());
+    }
+    #[test]
+    fn migration_preserves_fee_liabilities_and_donor_surplus() {
+        assert_eq!(protected_curve_floor(0, 0, 0, 0, 0).unwrap(), 0);
+        assert_eq!(protected_curve_floor(u64::MAX, 0, 0, 0, u64::MAX).unwrap(), 0);
+        let (owned, pool) = migration_quote(100, 25, 10).unwrap();
+        let floor = protected_curve_floor(150, 10, 5, 10, owned).unwrap();
+        assert_eq!((owned, pool, floor), (125, 115, 25));
+        assert_eq!(150 - pool - 10, floor);
+        assert!(protected_curve_floor(149, 10, 5, 10, owned).is_err());
+        let donor_surplus = 42;
+        let funded = 150 + donor_surplus;
+        assert_eq!(protected_curve_floor(funded, 10, 5, 10, owned).unwrap(), floor);
+        assert_eq!(funded - pool - 10, floor + donor_surplus);
+        assert!(protected_curve_floor(u64::MAX, u64::MAX, 1, 0, 0).is_err());
+        assert!(protected_curve_floor(u64::MAX, 1, 0, 0, u64::MAX).is_err());
     }
     #[test]
     fn initialize_abi_has_exact_discriminator_arguments_and_privileges() {
