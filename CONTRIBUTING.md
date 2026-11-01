@@ -19,6 +19,19 @@ runtime gaps. Keep unfinished migration, fee-rights, and client work in draft
 state. Task descriptions in this repository are engineering scopes, not reward
 offers or claims that an external listing has accepted a submission.
 
+Website and backend contributors can choose a bounded [product lane](docs/TASKS.md)
+without changing the Anchor contract. State the interface and data source,
+mock the external provider locally, test unavailable/error states, and keep
+wallet signing, real donations, live streams, and live trades disabled until a
+separate reviewed release. Use observable product behavior and public
+documentation for compatibility research; the pinned on-chain reconstruction
+does not include Pump's proprietary website or service backends.
+
+There is currently no repository-root license file. The licenses inside the
+upstream snapshots apply to those snapshots; they do not establish a license
+for every new Beam file. Maintainers need to clarify the project's own license
+and contribution terms before inviting substantial external submissions.
+
 ## Check the change
 
 From the repository root, run:

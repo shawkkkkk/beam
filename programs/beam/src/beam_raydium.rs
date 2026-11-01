@@ -66,7 +66,9 @@ pub struct SetRaydiumEnabled<'info> {
 }
 
 pub fn set_enabled(ctx: Context<SetRaydiumEnabled>, enabled: bool) -> Result<()> {
-    require!(!enabled || cfg!(feature = "experimental-raydium"), BeamError::MigrationNotEnabled);
+    // The user selected AMM v4 after this CPMM adapter was written. Preserve
+    // its ABI for development review, but no feature flag may activate it.
+    require!(!enabled, BeamError::MigrationNotEnabled);
     require_keys_eq!(ctx.accounts.config.raydium_program, RAYDIUM_ID, BeamError::InvalidRaydiumAccount);
     ctx.accounts.config.enabled = enabled;
     Ok(())
@@ -207,7 +209,8 @@ fn protected_curve_floor(curve_lamports: u64, rent: u64, creator_fee: u64, proto
 }
 
 pub fn execute<'info>(ctx: Context<'_, '_, '_, 'info, MigrateRaydium<'info>>, setup_budget: u64) -> Result<()> {
-    require!(cfg!(feature = "experimental-raydium"), BeamError::MigrationNotEnabled);
+    // Superseded CPMM path. AMM v4 requires a distinct verified adapter.
+    require!(false, BeamError::MigrationNotEnabled);
     let a = &ctx.accounts;
     require!(a.global.enable_migrate, BeamError::MigrationNotEnabled);
     require_keys_eq!(a.config.raydium_program, RAYDIUM_ID, BeamError::InvalidRaydiumAccount);

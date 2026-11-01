@@ -17,6 +17,11 @@ additional archive restrictions. Do not alter the pinned archive for Beam work.
    Check `docs/TASKS.md` and active pull requests to avoid duplicate work.
 4. Work in a separate branch. Do not rewrite another contributor's branch or
    merge competing architectures or fee policies without a reviewed decision.
+5. For website and backend work, choose a bounded lane in `docs/TASKS.md`.
+   Define the interface, data source, authorization boundary, acceptance
+   behavior, and local tests before enabling an external action. Use public
+   behavior/docs for compatibility research, not private source or credential
+   collection.
 
 ## Source and behavior boundaries
 
@@ -33,14 +38,23 @@ additional archive restrictions. Do not alter the pinned archive for Beam work.
   signed router, and AMM-dependent CTO handlers fail closed. Do not reconnect
   them to PumpSwap or claim that the retained quote-chain code routes through
   Raydium.
-- Raydium CPMM migration is a gated candidate. Do not enable it based on host
-  tests alone. Current LP burning does not leave Beam an LP fee claim for
+- The existing Raydium CPMM migration is a gated, superseded candidate. The
+  user chose Raydium AMM v4; build and verify that adapter separately before
+  activation. Current LP burning does not leave Beam an LP fee claim for
   recurring buybacks. Principal custody and fee rights remain unresolved.
 - `beam_economics.rs` contains provisional fee-allocation arithmetic; the
   inherited Pump fee CPI still governs real trade collection. The community
   share's holder-reward/buyback split is a provisional test setting. Holder
   eligibility, the flagship mint, vaults, and distribution rules are open.
-  Distinguish curve fees from Raydium pool fees and never promise returns.
+  The user's Beam fee split is 42/5/3 nominal basis points for community,
+  treasury and founder. Preserve creator
+  fees and creator-selected payout-wallet semantics separately. Distinguish
+  curve, creator, migration, and Raydium pool fees; never promise returns.
+- On-chain reconstruction does not provide Pump's website, streaming, callout,
+  or charity service backends. Treat those as independent feature work with
+  authorized providers; never imply their behavior is byte-identical. The
+  pinned archive does contain separate donation-relay and Pump Fees programs;
+  their presence is not Beam integration or charity authorization.
 
 ## Validation and review
 
