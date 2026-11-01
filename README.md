@@ -20,7 +20,7 @@ The goal is to retain Pump's instruction/account compatibility and behavior outs
 | Beam operating treasury | 0.05% | 10% |
 | Total | **0.50%** | **100%** |
 
-The allocation engine rounds the combined charge once and gives split dust to the community. The flagship policy directs the community allocation to buybacks. Collection and buyback execution are not yet wired to trading instructions. Raydium's own pool fees are separate; this is not a promise of a 0.50% all-in post-graduation fee. See [economics](docs/ECONOMICS.md).
+The allocation engine rounds the combined charge once and gives split dust to the community. A provisional test setting would divide the community share equally between holder rewards and flagship buybacks; eligibility, the flagship mint, and distribution rules are undecided. Collection and distribution are not yet wired to trading instructions. Raydium's own pool fees are separate; this is not a promise of a 0.50% all-in post-graduation fee. See [economics](docs/ECONOMICS.md).
 
 ## First contract slice
 
@@ -46,3 +46,12 @@ cargo check --locked --manifest-path programs/beam/Cargo.toml --no-default-featu
 Default builds use Raydium devnet IDs with execution gated off. `experimental-raydium` permits an authorized configuration to enable the unqualified candidate. `--no-default-features` selects mainnet IDs and preserves the gate. Neither option deploys anything.
 
 Beam's declared ID is an undeployed placeholder. See [implementation status](docs/STATUS.md). The original MIT and third-party notices remain in the immutable archive.
+
+## Contributing
+
+Start with [contributor guidance](CONTRIBUTING.md), [agent instructions](AGENTS.md),
+and the [task ledger](docs/TASKS.md). [PR #1](https://github.com/shawkkkkk/beam/pull/1)
+introduced the pinned contract baseline; [PR #2](https://github.com/shawkkkkk/beam/pull/2)
+added migration-accounting guards to its development branch. Check current PR heads before
+starting a task. These documents prepare scoped work for contributors; no
+external listing or reward terms are established by this repository.

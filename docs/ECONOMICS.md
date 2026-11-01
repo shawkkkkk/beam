@@ -12,6 +12,11 @@ On 100 SOL notional, the fee is 0.5 SOL: 0.45 community and 0.05 platform. On a 
 
 `beam_economics.rs` implements the allocation. It is not yet wired into the recovered fee-program CPI, recipient routing or an executable keeper. Inherited Pump fee machinery remains until Beam-controlled configuration/vaults replace it. The new rate is not an enforced live trading fee.
 
+The requested direction splits the community share between holder rewards and
+flagship buybacks. A 50/50 split within that share is a provisional test setting,
+not deployed economics. Holder eligibility, the flagship mint, recipient vaults,
+and execution rules have not been selected.
+
 ## After graduation
 
 Raydium charges its selected on-chain pool configuration. Beam cannot invent a Raydium share such as 0.10%. Quotes must distinguish pool fees from any Beam fee, and must not silently stack the curve's 50 bps on top after graduation.

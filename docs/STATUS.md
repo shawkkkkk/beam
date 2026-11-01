@@ -23,6 +23,15 @@
 5. SBF build and local-validator differential tests: every retained instruction, actual Raydium CPIs, rollback, authority checks, rent, extensions, replay rejection and LP treatment.
 6. Deployment-key assignment, independent review and devnet end-to-end validation. This branch deploys nothing.
 
+The [task ledger](TASKS.md) tracks current ownership and bounded follow-up
+work. [PR #2](https://github.com/shawkkkkk/beam/pull/2) added checked
+post-completion quote accounting, fee/rent liability protection, and
+account-alias guards to the development branch. Those host-tested guards do
+not establish CPI success or fee-sweep/rollback safety.
+[The separate root-model PR #3](https://github.com/shawkkkkk/beam/pull/3)
+has different venue and economic assumptions and is not the current
+`programs/beam` contract; its website uses sample data.
+
 ## Meaning of checks
 
 Host compilation checks Rust/Anchor types. Differential tests cover selected quote/fee functions, decoding/serialization boundaries and retained instruction encodings, including semantic errors and source line numbers. Build-directory prefixes are normalized because the reference is compiled from another directory.
