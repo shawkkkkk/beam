@@ -13,6 +13,45 @@ A Solana launchpad forked from the completed community reconstruction of Pump, w
 
 The goal is to retain Pump's instruction/account compatibility and behavior outside documented Beam exceptions. A different program identity, migration destination, disabled Mayhem and revised fees produce a different binary. Full binary or behavioral parity is not established here.
 
+## Progress at a glance
+
+These are **development** milestones, not a live launch. “Done” means the
+named source/check is merged; “In review” means a separate change is pending;
+“Blocked” means the feature needs an implementation or a verified external
+dependency. No percentage can honestly describe whole-product parity yet.
+
+### Contract and byte evidence
+
+| Goal | Status | What has been shown / what remains |
+| --- | --- | --- |
+| Preserve the recovered Pump source | **Done** | The pinned community archive passes [380 Git-blob checks](docs/VALIDATION.md). In Beam's retained Pump package, 62 files remain byte-identical and four are declared changes. This is source evidence, not a Beam binary match. |
+| Keep Pump-style launch and curve trades | **In progress** | [Merged PR #1](https://github.com/shawkkkkk/beam/pull/1) contains the Anchor handlers and selected host tests. Full instruction execution, SBF and live behavior remain unverified. |
+| Remove Mayhem and PumpSwap | **Done in source** | Their legacy entry paths fail closed; inert fields remain for account compatibility. These are intentional differences from Pump. |
+| Graduate to Raydium AMM v4 | **Blocked** | The merged CPMM candidate is the wrong venue and remains gated; [PR #5](https://github.com/shawkkkkk/beam/pull/5) proposes retiring it under all build features. No tested AMM v4 adapter or Token-2022 graduation path exists. |
+| Apply Beam 42/5/3 fees and preserve creator payouts | **In review / blocked** | PR #5 updates allocation **math only**. Actual Beam collection, creator-fee compatibility, selected payout wallet and post-graduation rights need implementation and runtime tests. Creator fees are additional to the 0.50% Beam component. |
+| Match Pump byte for byte | **Not attainable for modified Beam binary** | The requested venue, Mayhem and fee changes alter code and program identity. The target is tested behavior/interface compatibility for unaffected features, tracked in the [feature matrix](docs/FEATURES.md). |
+
+### Website and frontend
+
+| Goal | Status | What has been shown / what remains |
+| --- | --- | --- |
+| Pump-style experience with Beam branding | **In review** | [Separate PR #3](https://github.com/shawkkkkk/beam/pull/3) includes a responsive **sample-data preview**, not a live Pump clone or canonical client. Review the web subtree separately from its competing contract. |
+| Create, wallet and trade flows | **Blocked** | The preview saves local drafts; it does not upload metadata, connect wallets, sign or trade. A Beam IDL, client and verified chain data are required. |
+| Creator wallet, charity, callouts and livestream screens | **Not integrated** | Local UX concepts exist, but the current canonical site has no working provider or action. Preserve the observed behavior with Beam branding while implementing services independently. |
+| Client and frontend data | **In progress** | Native-SOL golden ABI fixtures are being tested separately; no deployed Beam ID, complete SDK, indexer or live market feed exists. |
+
+### Backend and integrations
+
+| Goal | Status | What has been shown / what remains |
+| --- | --- | --- |
+| Read-only market/indexer API | **Not started** | Needs chain event replay, finality/freshness metadata and honest error states. Preview charts are fixtures. |
+| Creator fee, wallet and sharing service | **Blocked** | On-chain source retains creator vault/collection paths, but Beam still depends on inherited Pump fee configuration. No Beam-controlled payout integration is verified. |
+| Donate.gg charity donations | **Blocked** | The archive contains a donation relay and Pump Fees instructions; Beam has no authorized charity registry, configured adapter or settlement service. No real donations occur. |
+| Callouts and livestreaming | **Not started** | No backend or provider integration is in the on-chain archive. Identity, permissions, moderation and media services must be defined and tested. |
+
+See [implementation status](docs/STATUS.md) and [contributor tasks](docs/TASKS.md)
+for evidence and bounded ways to help with the website, frontend and backend.
+
 ## Provisional Beam curve fee
 
 | Allocation | Per trade | Share of fee |

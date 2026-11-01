@@ -10,7 +10,7 @@ contribution scopes, not paid bounties or a claim that Beam is listed anywhere.
 | --- | --- | --- |
 | [Contract fork, PR #1](https://github.com/shawkkkkk/beam/pull/1), merged to `main` at `200257a` | Development Anchor contract in `programs/beam`; pinned Pump/Raydium reference source; Mayhem and legacy PumpSwap paths blocked; gated CPMM migration candidate; host checks described in [validation](VALIDATION.md). | Canonical development baseline. CPMM candidate is superseded by the user's AMM v4 choice. Fee collection, LP fee rights, validator testing, IDL, and UI remain open. |
 | [Migration accounting, PR #2](https://github.com/shawkkkkk/beam/pull/2), head `f17f7e2` | Merged into PR #1's development branch as `65c96b5`: includes post-completion quote, preserves fee/rent liabilities and donor surplus, rejects balance aliases; exact-head CI and local default/experimental suites passed 10 unit and 4 compatibility tests each. | Runtime CPI, fee-sweep, replay, donation, and rollback tests remain before activation; migration stays gated. |
-| [Core model and web preview, PR #3](https://github.com/shawkkkkk/beam/pull/3), `codex/beam-core-foundation` at `5214074` | Separate draft PR against `main` with a root Rust model, sample-data website, and different venue/economic assumptions. | The model is not `programs/beam`; reconcile contracts and fee policy before integration. The sample UI is not an on-chain client. |
+| [Alternate prototype and web preview, PR #3](https://github.com/shawkkkkk/beam/pull/3), `codex/beam-core-foundation` at `eb0aef7` | Separate draft PR against `main` with a root Rust model, a second Anchor program under `programs/beam`, local SBF flow tests, a sample-data website, and a proposed root license. | Its `programs/beam` directly conflicts with the canonical program and still has the superseded 40/7/3 economics. Review web work selectively; do not merge the alternate program or license wholesale. |
 | [Contributor guidance, PR #4](https://github.com/shawkkkkk/beam/pull/4), merged as `3630889` within PR #1 | Contributor and agent guidance, reviewed before the development foundation landed. | Documentation only; does not activate or deploy contract behavior. |
 
 PR ownership and touched paths at this snapshot:
@@ -21,8 +21,9 @@ PR ownership and touched paths at this snapshot:
 - PR #2 — `@shawkkkkk`, `codex/beam-migration-invariant`:
   `programs/beam/src/beam_raydium.rs`; merged into PR #1's branch.
 - PR #3 — `@shawkkkkk`, `codex/beam-core-foundation`: root `src/lib.rs`,
-  root Cargo/CI files, `web/`, and its own architecture documents. It is a
-  separate draft model and preview, not the Anchor contract.
+  competing `programs/beam/`, root Cargo/CI/license files, `web/`, and its own
+  architecture documents. Its Anchor prototype is not the merged canonical
+  Beam contract; resolve ownership before integrating any program file.
 - PR #4 — `@shawkkkkk`, `codex/beam-agent-guide`: `AGENTS.md`,
   `CONTRIBUTING.md`, `README.md`, and `docs/TASKS.md`, `docs/STATUS.md`,
   `docs/ECONOMICS.md`, `docs/VALIDATION.md`.
@@ -86,7 +87,8 @@ tests, not recovered proprietary web/backend bytes.
 Before advertising these tasks on Slop, a maintainer should confirm the actual
 listing, repository-root license/contribution terms, task scope and any reward
 funding. This repo currently has no root `LICENSE`; archived MIT/third-party
-notices do not decide Beam's new-code license. Do not fabricate Slop registration
+notices do not decide Beam's new-code license. Draft PR #3 proposes a root
+license but it is not merged or adopted. Do not fabricate Slop registration
 or generated skill/provenance files, and do not install a GitHub app on behalf
 of contributors.
 
