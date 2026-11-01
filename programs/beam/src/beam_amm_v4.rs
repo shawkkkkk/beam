@@ -18,7 +18,7 @@ use anchor_lang::solana_program::{
 use anchor_lang::{prelude::Pubkey, system_program};
 use anchor_spl::token::spl_token::{
     native_mint,
-    state::{Account as SplAccount, Mint as SplMint},
+    state::{Account as SplAccount, AccountState, Mint as SplMint},
 };
 
 pub const MAINNET_PROGRAM_ID: Pubkey = pubkey!("675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8");
@@ -194,6 +194,7 @@ fn check_source(
     let source = SplAccount::unpack(&data).map_err(|_| AmmV4AbiError::InvalidSourceAccount)?;
     if source.mint != *mint
         || source.owner != *authority
+        || source.state != AccountState::Initialized
         || source.delegate != COption::None
         || source.close_authority != COption::None
         || source.is_native.is_some() != require_native
@@ -455,7 +456,6 @@ pub fn validate_initialize2_instruction(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use anchor_spl::token::spl_token::state::AccountState;
 
     fn synthetic_info(
         key: Pubkey,
@@ -671,6 +671,29 @@ mod tests {
             preflight_native_sol_initialize2(&program, &infos, &mint, args, 0),
             Err(AmmV4AbiError::InvalidSourceAccount)
         );
+    }
+
+    #[test]
+    fn actual_account_preflight_rejects_frozen_base_and_wsol_sources() {
+        for index in [16, 17] {
+            let (program, mut infos, mint, args) = native_sol_fixture();
+            let mut frozen = SplAccount::unpack(&infos[index].try_borrow_data().unwrap()).unwrap();
+            frozen.state = AccountState::Frozen;
+            let mut data = vec![0; SplAccount::LEN];
+            SplAccount::pack(frozen, &mut data).unwrap();
+            infos[index] = synthetic_info_with_lamports(
+                *infos[index].key,
+                SPL_TOKEN_PROGRAM_ID,
+                data,
+                true,
+                false,
+                infos[index].lamports(),
+            );
+            assert_eq!(
+                preflight_native_sol_initialize2(&program, &infos, &mint, args, 0),
+                Err(AmmV4AbiError::InvalidSourceAccount)
+            );
+        }
     }
 
     #[test]
