@@ -3,7 +3,7 @@
 - Unmodified pinned Pump Main package: `cargo check --locked` passed.
 - `python3 scripts/check_fork.py`: 380 original archive Git blobs verified. In the editable Pump Main fork, 62 retained files are byte-identical and four are explicitly modified: manifest, lockfile, `lib.rs`, and `create_v2.rs`.
 - Default Beam configuration: 7 unit tests and 4 differential test groups passed.
-- `experimental-raydium`: the same 11 host tests passed with the candidate compiled as enableable.
+- `experimental-raydium`: the same 11 host tests passed with the then-current CPMM candidate compiled as enableable. This was an earlier development state; activation is now blocked under every feature choice.
 - Mainnet-ID configuration (`--no-default-features`): host `cargo check --locked` passed; migration gate stays off.
 
 The differential groups check all 167 truncation boundaries of a retained curve layout, selected buy/sell/exact-input boundary matrices, fee rounding including u64 limits, and retained initialization/buy/sell instruction data. Semantic errors and retained source line numbers agree after normalizing build-directory prefixes.
@@ -22,3 +22,13 @@ The added tests cover checked post-completion quote, fee/rent liability
 backing, donor surplus, zero-liquidity and overflow boundaries, and account
 aliases. They do not exercise a Raydium CPI, local-validator fee sweep,
 rollback, replay, or real account substitution.
+
+## AMM v4 direction and fee correction
+
+After the user's AMM v4 choice, the superseded CPMM `set_enabled(true)` and
+`migrate_raydium` handlers were made fail closed under default and experimental
+builds. The proposed Beam component arithmetic was updated to 42/5/3 nominal
+basis points for community/treasury/founder, with creator fees left separate.
+Host tests cover arithmetic and compilation, not fee collection or an AMM v4
+CPI. The [feature ledger](FEATURES.md) tracks the missing integration and
+product behavior.
