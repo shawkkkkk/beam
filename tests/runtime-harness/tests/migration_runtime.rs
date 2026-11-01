@@ -169,7 +169,7 @@ fn signed_tx(bank: &ProgramTestContext, admin: &Keypair, instructions: &[Instruc
 }
 
 #[tokio::test]
-async fn retired_cpmm_cannot_enable_in_any_feature_mode_and_keeps_config_disabled() {
+async fn retired_cpmm_cannot_enable_in_default_or_experimental_build() {
     let (mut bank, admin, other) = fixture(false).await;
     assert!(!config_enabled(&mut bank).await);
     let attempt = signed_tx(&bank, &admin, &[set_enabled(admin.pubkey(), true)]);
