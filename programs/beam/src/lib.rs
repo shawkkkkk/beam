@@ -3218,5 +3218,7 @@ fn revoke_mint_authority<'info>(bump:u8,accounts:&(&Program<'info,anchor_spl::to
 pub mod beam_policy;
 pub mod beam_economics;
 pub mod beam_amm_v4;
+pub mod beam_amm_v4_funding;
+pub mod beam_amm_v4_settlement;
 pub mod beam_raydium;
 pub use beam_raydium::*;
