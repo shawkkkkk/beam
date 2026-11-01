@@ -11,9 +11,15 @@
 use anchor_lang::solana_program::{
     account_info::AccountInfo,
     instruction::{AccountMeta, Instruction},
+    program_option::COption,
+    program_pack::Pack,
     pubkey, sysvar,
 };
 use anchor_lang::{prelude::Pubkey, system_program};
+use anchor_spl::token::spl_token::{
+    native_mint,
+    state::{Account as SplAccount, Mint as SplMint},
+};
 
 pub const MAINNET_PROGRAM_ID: Pubkey = pubkey!("675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8");
 pub const DEVNET_PROGRAM_ID: Pubkey = pubkey!("DRaya7Kj3aMWQSy19kSjvmuwq9docCHofyP9kanQGaav");
@@ -33,6 +39,9 @@ pub const INITIALIZE2_ACCOUNT_COUNT: usize = 19;
 /// Its last u64 is `create_pool_fee` (state.rs::AmmConfig).
 pub const AMM_CONFIG_DATA_LEN: usize = 544;
 const CREATE_POOL_FEE_OFFSET: usize = 536;
+/// The pinned AMM v4 initializer multiplies `10^max(coin,pc decimals)` by 5
+/// in a u64 before dividing. A mint with 19 decimals would overflow there.
+pub const MAX_SAFE_MINT_DECIMALS: u8 = 18;
 
 const AUTHORITY_SEED: &[u8] = b"amm authority";
 const AMM_SEED: &[u8] = b"amm_associated_seed";
@@ -54,6 +63,14 @@ pub enum AmmV4AbiError {
     InvalidConfigAccount,
     InvalidConfigData,
     CreatePoolFeeExceedsCap,
+    InvalidProgramAccount,
+    InvalidMigrationSigner,
+    InvalidMintAccount,
+    UnsupportedDecimals,
+    InvalidSourceAccount,
+    InvalidSourceAmount,
+    InvalidNativeBacking,
+    InsufficientInitialLiquidity,
 }
 
 /// Pass the mint account's verified owner, not a caller-selected token program.
@@ -142,6 +159,162 @@ pub fn validate_create_pool_fee_account(
         return Err(AmmV4AbiError::CreatePoolFeeExceedsCap);
     }
     Ok(fee)
+}
+
+fn unpack_classic_mint(info: &AccountInfo<'_>) -> Result<SplMint, AmmV4AbiError> {
+    if info.owner != &SPL_TOKEN_PROGRAM_ID {
+        return Err(AmmV4AbiError::UnsupportedMintProgram);
+    }
+    let data = info
+        .try_borrow_data()
+        .map_err(|_| AmmV4AbiError::InvalidMintAccount)?;
+    let mint = SplMint::unpack(&data).map_err(|_| AmmV4AbiError::InvalidMintAccount)?;
+    if mint.decimals > MAX_SAFE_MINT_DECIMALS {
+        return Err(AmmV4AbiError::UnsupportedDecimals);
+    }
+    Ok(mint)
+}
+
+fn check_source(
+    info: &AccountInfo<'_>,
+    mint: &Pubkey,
+    authority: &Pubkey,
+    amount: u64,
+    require_native: bool,
+) -> Result<(), AmmV4AbiError> {
+    if amount == 0
+        || info.owner != &SPL_TOKEN_PROGRAM_ID
+        || info.key != &user_lp_ata(authority, mint)
+    {
+        return Err(AmmV4AbiError::InvalidSourceAccount);
+    }
+    let data = info
+        .try_borrow_data()
+        .map_err(|_| AmmV4AbiError::InvalidSourceAccount)?;
+    let source = SplAccount::unpack(&data).map_err(|_| AmmV4AbiError::InvalidSourceAccount)?;
+    if source.mint != *mint
+        || source.owner != *authority
+        || source.delegate != COption::None
+        || source.close_authority != COption::None
+        || source.is_native.is_some() != require_native
+    {
+        return Err(AmmV4AbiError::InvalidSourceAccount);
+    }
+    // Beam must not silently leave donated tokens in, or sweep them from, a
+    // migration-source ATA. The planned pool amounts must exactly match.
+    if source.amount != amount {
+        return Err(AmmV4AbiError::InvalidSourceAmount);
+    }
+    if require_native {
+        let COption::Some(rent_reserve) = source.is_native else {
+            return Err(AmmV4AbiError::InvalidNativeBacking);
+        };
+        let backed_lamports = rent_reserve
+            .checked_add(source.amount)
+            .ok_or(AmmV4AbiError::InvalidNativeBacking)?;
+        if info.lamports() != backed_lamports {
+            return Err(AmmV4AbiError::InvalidNativeBacking);
+        }
+    }
+    Ok(())
+}
+
+/// The pinned initializer reserves `10^coin_decimals` LP after taking the
+/// integer square root of the two deposited token amounts. Reject a planned
+/// pool that would yield no usable LP before any migration funds move.
+pub fn expected_initial_user_lp(
+    coin_amount: u64,
+    pc_amount: u64,
+    coin_decimals: u8,
+) -> Result<u64, AmmV4AbiError> {
+    let reserve = 10u64
+        .checked_pow(coin_decimals.into())
+        .ok_or(AmmV4AbiError::UnsupportedDecimals)?;
+    let liquidity = u128::from(coin_amount)
+        .checked_mul(u128::from(pc_amount))
+        .ok_or(AmmV4AbiError::InsufficientInitialLiquidity)?
+        .isqrt();
+    let liquidity: u64 = liquidity
+        .try_into()
+        .map_err(|_| AmmV4AbiError::InsufficientInitialLiquidity)?;
+    liquidity
+        .checked_sub(reserve)
+        .filter(|amount| *amount > 0)
+        .ok_or(AmmV4AbiError::InsufficientInitialLiquidity)
+}
+
+/// Source-only preflight for a *native-SOL*, classic-SPL `Initialize2` CPI.
+/// Build the instruction from actual AccountInfos, not caller-claimed owners.
+/// Index 15 is Beam's PDA and is signed by `invoke_signed` during a future CPI;
+/// it is not required to be an outer transaction signer. `max_fee_lamports`
+/// must eventually come from a stored Beam policy, not an untrusted caller.
+/// This helper does not move funds, invoke Raydium, verify pool creation, or
+/// decide LP custody and cannot enable the gated migration by itself.
+pub fn preflight_native_sol_initialize2<'info>(
+    program: &AccountInfo<'info>,
+    infos: &[AccountInfo<'info>],
+    beam_mint: &Pubkey,
+    args: Initialize2Args,
+    max_fee_lamports: u64,
+) -> Result<Initialize2Accounts, AmmV4AbiError> {
+    fee_destination(program.key)?;
+    if !program.executable || infos.len() != INITIALIZE2_ACCOUNT_COUNT {
+        return Err(AmmV4AbiError::InvalidProgramAccount);
+    }
+    let (signer, _) =
+        Pubkey::find_program_address(&[b"pool-authority", beam_mint.as_ref()], &crate::ID);
+    if infos[15].key != &signer
+        || infos[15].owner != &system_program::ID
+        || !infos[15].data_is_empty()
+    {
+        return Err(AmmV4AbiError::InvalidMigrationSigner);
+    }
+    if infos[7].key != beam_mint || infos[8].key != &native_mint::id() {
+        return Err(AmmV4AbiError::InvalidMintAccount);
+    }
+    for index in [0, 1, 2] {
+        if !infos[index].executable {
+            return Err(AmmV4AbiError::InvalidProgramAccount);
+        }
+    }
+    let coin_mint = unpack_classic_mint(&infos[7])?;
+    unpack_classic_mint(&infos[8])?;
+    let accounts = Initialize2Accounts {
+        coin_mint: MintKey {
+            key: *infos[7].key,
+            owner: *infos[7].owner,
+        },
+        pc_mint: MintKey {
+            key: *infos[8].key,
+            owner: *infos[8].owner,
+        },
+        market_seed: *infos[14].key,
+        user_wallet: *infos[15].key,
+        user_coin_source: *infos[16].key,
+        user_pc_source: *infos[17].key,
+        user_lp_ata: *infos[18].key,
+    };
+    let instruction = initialize2_instruction(*program.key, &accounts, args)?;
+    for (info, meta) in infos.iter().zip(&instruction.accounts) {
+        if info.key != &meta.pubkey || (meta.is_writable && !info.is_writable) {
+            return Err(AmmV4AbiError::InvalidAccounts);
+        }
+    }
+    validate_create_pool_fee_account(program.key, &infos[12], max_fee_lamports)?;
+    check_source(&infos[16], beam_mint, &signer, args.init_coin_amount, false)?;
+    check_source(
+        &infos[17],
+        &native_mint::id(),
+        &signer,
+        args.init_pc_amount,
+        true,
+    )?;
+    expected_initial_user_lp(
+        args.init_coin_amount,
+        args.init_pc_amount,
+        coin_mint.decimals,
+    )?;
+    Ok(accounts)
 }
 
 fn associated(program_id: &Pubkey, market_seed: &Pubkey, suffix: &[u8]) -> Pubkey {
@@ -282,6 +455,297 @@ pub fn validate_initialize2_instruction(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use anchor_spl::token::spl_token::state::AccountState;
+
+    fn synthetic_info(
+        key: Pubkey,
+        owner: Pubkey,
+        data: Vec<u8>,
+        writable: bool,
+        executable: bool,
+    ) -> AccountInfo<'static> {
+        synthetic_info_with_lamports(key, owner, data, writable, executable, 1)
+    }
+
+    fn synthetic_info_with_lamports(
+        key: Pubkey,
+        owner: Pubkey,
+        data: Vec<u8>,
+        writable: bool,
+        executable: bool,
+        balance: u64,
+    ) -> AccountInfo<'static> {
+        // Tiny test-only allocations live until the process exits. No source
+        // or production account is manufactured by this helper.
+        let key = Box::leak(Box::new(key));
+        let owner = Box::leak(Box::new(owner));
+        let lamports = Box::leak(Box::new(balance));
+        let data = Box::leak(data.into_boxed_slice());
+        AccountInfo::new(key, false, writable, lamports, data, owner, executable, 0)
+    }
+
+    fn mint_data(decimals: u8) -> Vec<u8> {
+        let mut data = vec![0; SplMint::LEN];
+        SplMint::pack(
+            SplMint {
+                mint_authority: COption::None,
+                supply: 1_000_000,
+                decimals,
+                is_initialized: true,
+                freeze_authority: COption::None,
+            },
+            &mut data,
+        )
+        .unwrap();
+        data
+    }
+
+    fn source_data(mint: Pubkey, authority: Pubkey, amount: u64, native: bool) -> Vec<u8> {
+        let mut data = vec![0; SplAccount::LEN];
+        SplAccount::pack(
+            SplAccount {
+                mint,
+                owner: authority,
+                amount,
+                delegate: COption::None,
+                state: AccountState::Initialized,
+                is_native: if native {
+                    COption::Some(1)
+                } else {
+                    COption::None
+                },
+                delegated_amount: 0,
+                close_authority: COption::None,
+            },
+            &mut data,
+        )
+        .unwrap();
+        data
+    }
+
+    fn native_sol_fixture() -> (
+        AccountInfo<'static>,
+        Vec<AccountInfo<'static>>,
+        Pubkey,
+        Initialize2Args,
+    ) {
+        let program_id = DEVNET_PROGRAM_ID;
+        let beam_mint = Pubkey::new_from_array([42; 32]);
+        let signer =
+            Pubkey::find_program_address(&[b"pool-authority", beam_mint.as_ref()], &crate::ID).0;
+        let args = Initialize2Args {
+            open_time: 0,
+            init_pc_amount: 2_000_000,
+            init_coin_amount: 2_000_000,
+        };
+        let market_seed = Pubkey::new_from_array([43; 32]);
+        let p = derive_pool_addresses(&program_id, &market_seed).unwrap();
+        let accounts = Initialize2Accounts {
+            coin_mint: MintKey {
+                key: beam_mint,
+                owner: SPL_TOKEN_PROGRAM_ID,
+            },
+            pc_mint: MintKey {
+                key: native_mint::id(),
+                owner: SPL_TOKEN_PROGRAM_ID,
+            },
+            market_seed,
+            user_wallet: signer,
+            user_coin_source: user_lp_ata(&signer, &beam_mint),
+            user_pc_source: user_lp_ata(&signer, &native_mint::id()),
+            user_lp_ata: user_lp_ata(&signer, &p.lp_mint),
+        };
+        let ix = initialize2_instruction(program_id, &accounts, args).unwrap();
+        let infos = ix
+            .accounts
+            .iter()
+            .enumerate()
+            .map(|(index, meta)| {
+                let owner = match index {
+                    7 | 8 | 16 | 17 => SPL_TOKEN_PROGRAM_ID,
+                    12 => program_id,
+                    _ => system_program::ID,
+                };
+                let data = match index {
+                    7 => mint_data(6),
+                    8 => mint_data(9),
+                    12 => vec![0; AMM_CONFIG_DATA_LEN],
+                    16 => source_data(beam_mint, signer, args.init_coin_amount, false),
+                    17 => source_data(native_mint::id(), signer, args.init_pc_amount, true),
+                    _ => Vec::new(),
+                };
+                synthetic_info_with_lamports(
+                    meta.pubkey,
+                    owner,
+                    data,
+                    meta.is_writable,
+                    index <= 2,
+                    if index == 17 {
+                        args.init_pc_amount + 1
+                    } else {
+                        1
+                    },
+                )
+            })
+            .collect();
+        let program = synthetic_info(program_id, system_program::ID, Vec::new(), false, true);
+        (program, infos, beam_mint, args)
+    }
+
+    #[test]
+    fn actual_account_preflight_accepts_classic_native_sol_without_outer_pda_signature() {
+        let (program, infos, mint, args) = native_sol_fixture();
+        assert!(!infos[15].is_signer);
+        assert_eq!(
+            preflight_native_sol_initialize2(&program, &infos, &mint, args, 0)
+                .unwrap()
+                .user_wallet,
+            *infos[15].key,
+        );
+        assert_eq!(
+            expected_initial_user_lp(args.init_coin_amount, args.init_pc_amount, 6),
+            Ok(1_000_000)
+        );
+    }
+
+    #[test]
+    fn actual_account_preflight_rejects_mint_owner_decimals_and_source_substitution() {
+        let (program, mut infos, mint, args) = native_sol_fixture();
+        infos[7] = synthetic_info(mint, TOKEN_2022_PROGRAM_ID, mint_data(6), false, false);
+        assert_eq!(
+            preflight_native_sol_initialize2(&program, &infos, &mint, args, 0),
+            Err(AmmV4AbiError::UnsupportedMintProgram)
+        );
+
+        let (program, mut infos, mint, args) = native_sol_fixture();
+        infos[7] = synthetic_info(mint, SPL_TOKEN_PROGRAM_ID, mint_data(19), false, false);
+        assert_eq!(
+            preflight_native_sol_initialize2(&program, &infos, &mint, args, 0),
+            Err(AmmV4AbiError::UnsupportedDecimals)
+        );
+        assert!(unpack_classic_mint(&synthetic_info(
+            mint,
+            SPL_TOKEN_PROGRAM_ID,
+            mint_data(18),
+            false,
+            false
+        ))
+        .is_ok());
+        infos[7] = synthetic_info(mint, SPL_TOKEN_PROGRAM_ID, mint_data(6), false, false);
+
+        infos.swap(16, 17);
+        assert_eq!(
+            preflight_native_sol_initialize2(&program, &infos, &mint, args, 0),
+            Err(AmmV4AbiError::InvalidSourceAccount)
+        );
+    }
+
+    #[test]
+    fn actual_account_preflight_rejects_unbacked_or_delegated_sources() {
+        let (program, mut infos, mint, args) = native_sol_fixture();
+        let signer = *infos[15].key;
+        infos[16] = synthetic_info(
+            *infos[16].key,
+            SPL_TOKEN_PROGRAM_ID,
+            source_data(mint, signer, args.init_coin_amount + 1, false),
+            true,
+            false,
+        );
+        assert_eq!(
+            preflight_native_sol_initialize2(&program, &infos, &mint, args, 0),
+            Err(AmmV4AbiError::InvalidSourceAmount)
+        );
+        let mut delegated = SplAccount::unpack(&infos[16].try_borrow_data().unwrap()).unwrap();
+        delegated.amount = args.init_coin_amount;
+        delegated.delegate = COption::Some(Pubkey::new_from_array([55; 32]));
+        let mut data = vec![0; SplAccount::LEN];
+        SplAccount::pack(delegated, &mut data).unwrap();
+        infos[16] = synthetic_info(*infos[16].key, SPL_TOKEN_PROGRAM_ID, data, true, false);
+        assert_eq!(
+            preflight_native_sol_initialize2(&program, &infos, &mint, args, 0),
+            Err(AmmV4AbiError::InvalidSourceAccount)
+        );
+        let (_, infos, mint, mut args) = native_sol_fixture();
+        args.init_coin_amount = 0;
+        assert_eq!(
+            preflight_native_sol_initialize2(&program, &infos, &mint, args, 0),
+            Err(AmmV4AbiError::InvalidSourceAccount)
+        );
+    }
+
+    #[test]
+    fn actual_account_preflight_requires_exact_wsol_backing_and_usable_lp() {
+        let (program, mut infos, mint, args) = native_sol_fixture();
+        let source = infos[17].clone();
+        for balance in [args.init_pc_amount, args.init_pc_amount + 2] {
+            infos[17] = synthetic_info_with_lamports(
+                *source.key,
+                SPL_TOKEN_PROGRAM_ID,
+                source.try_borrow_data().unwrap().to_vec(),
+                true,
+                false,
+                balance,
+            );
+            assert_eq!(
+                preflight_native_sol_initialize2(&program, &infos, &mint, args, 0),
+                Err(AmmV4AbiError::InvalidNativeBacking)
+            );
+        }
+        let mut overflowing = SplAccount::unpack(&source.try_borrow_data().unwrap()).unwrap();
+        overflowing.is_native = COption::Some(u64::MAX);
+        let mut data = vec![0; SplAccount::LEN];
+        SplAccount::pack(overflowing, &mut data).unwrap();
+        infos[17] = synthetic_info_with_lamports(
+            *source.key,
+            SPL_TOKEN_PROGRAM_ID,
+            data,
+            true,
+            false,
+            u64::MAX,
+        );
+        assert_eq!(
+            preflight_native_sol_initialize2(&program, &infos, &mint, args, 0),
+            Err(AmmV4AbiError::InvalidNativeBacking)
+        );
+        assert_eq!(
+            expected_initial_user_lp(600_000, 900_000, 6),
+            Err(AmmV4AbiError::InsufficientInitialLiquidity)
+        );
+        assert_eq!(
+            expected_initial_user_lp(1_000_000, 1_000_000, 6),
+            Err(AmmV4AbiError::InsufficientInitialLiquidity)
+        );
+    }
+
+    #[test]
+    fn actual_account_preflight_rejects_wrong_meta_signer_and_mutable_config_fee() {
+        let (mut program, mut infos, mint, args) = native_sol_fixture();
+        program.executable = false;
+        assert_eq!(
+            preflight_native_sol_initialize2(&program, &infos, &mint, args, 0),
+            Err(AmmV4AbiError::InvalidProgramAccount)
+        );
+        program.executable = true;
+        infos[16].is_writable = false;
+        assert_eq!(
+            preflight_native_sol_initialize2(&program, &infos, &mint, args, 0),
+            Err(AmmV4AbiError::InvalidAccounts)
+        );
+        infos[16].is_writable = true;
+        infos[12].try_borrow_mut_data().unwrap()[CREATE_POOL_FEE_OFFSET..]
+            .copy_from_slice(&2u64.to_le_bytes());
+        assert_eq!(
+            preflight_native_sol_initialize2(&program, &infos, &mint, args, 1),
+            Err(AmmV4AbiError::CreatePoolFeeExceedsCap)
+        );
+        assert!(preflight_native_sol_initialize2(&program, &infos, &mint, args, 2).is_ok());
+        let wrong = Pubkey::new_from_array([56; 32]);
+        infos[15] = synthetic_info(wrong, system_program::ID, Vec::new(), true, false);
+        assert_eq!(
+            preflight_native_sol_initialize2(&program, &infos, &mint, args, 2),
+            Err(AmmV4AbiError::InvalidMigrationSigner)
+        );
+    }
 
     fn with_config<R>(
         key: Pubkey,
