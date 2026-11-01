@@ -6,20 +6,22 @@
 - Editable Pump Main fork, with unchanged files retaining their exact bytes.
 - Separate Beam modules; hooks retain existing source line positions.
 - Mayhem creation/enablement rejected. Inert serialized flags/account slots remain; Beam does not deploy the companion Mayhem program.
-- Legacy `migrate`, `migrate_v2`, `multi_hop_curve_swap` and `admin_cto` handlers fail before transfers/CPIs. They are temporarily unavailable rather than silently routed back to PumpSwap. Other retained quote-chain code still understands historical PumpSwap layouts; it is not yet a Raydium router.
-- New `configure_raydium`, `set_raydium_enabled` and `migrate_raydium` candidates.
-- Gated native-SOL candidate validates the fixed executable, canonical administrator-pinned AmmConfig, mint ordering, vault/LP/observation PDAs, completion and real reserves/rent. It funds WSOL, invokes initialize, checks/burns received LP, records a one-time receipt and clears curve reserve fields in the same instruction. Runtime rollback remains unverified.
+- Legacy `migrate`, `migrate_v2`, `multi_hop_curve_swap` and `admin_cto` handlers fail before transfers/CPIs. They are temporary compatibility gaps, not permanent product deletions or PumpSwap fallbacks. Other retained quote-chain, creator-fee/sharing, CTO and donation source still has historical PumpSwap assumptions; finished Beam needs replacements or explicit unsupported states, with no active PumpSwap dependency.
+- New `configure_raydium`, `set_raydium_enabled` and `migrate_raydium` candidates targeting Raydium CPMM. The user subsequently chose Raydium AMM v4. This CPMM path is a superseded development candidate; activation and execution now fail closed even with `experimental-raydium`.
+- That native-SOL CPMM candidate validates the fixed executable, canonical administrator-pinned AmmConfig, mint ordering, vault/LP/observation PDAs, completion and real reserves/rent. It funds WSOL, invokes initialize, checks/burns received LP, records a one-time receipt and clears curve reserve fields in the same instruction. Runtime rollback remains unverified, and the code is not an AMM v4 adapter.
 - Caller setup funding is separate from curve liquidity. The budget covers Raydium CPIs; outer ATA/receipt rent and transaction fees are additional. Refunds cannot exceed the caller's unspent contribution or include prior authority donations.
-- Standard SPL Token and a restricted Token-2022 metadata extension subset supported by the migration candidate. Other extensions and non-SOL quote assets fail closed.
-- Inherited Global migration-fee behavior retained. The new 45/5 bps allocation does not silently rewrite creator or migration fees.
+- Standard SPL Token and a restricted Token-2022 metadata extension subset were supported by the superseded CPMM candidate. AMM v4 does not accept Token-2022 mints; those curve launches need a separately reviewed graduation plan rather than silent removal.
+- Inherited Global migration-fee behavior retained. Test-only Beam curve-fee arithmetic now reflects the requested 42/5/3 bps community/treasury/founder split; it does not rewrite inherited creator or migration fees or enforce a live rate.
+- Source-only [AMM v4 ABI guards](../programs/beam/src/beam_amm_v4.rs) encode the pinned 19-account `Initialize2` path and reject Token-2022 mint owners. They are not called by a Beam instruction and do not migrate a token.
 - Fee-allocation arithmetic and selected host differential tests.
 
 ## Outstanding before use
 
 1. Beam-controlled fee configuration and vaults. Pump's inherited fee-program namespaces/authority assumptions must be replaced or rehosted. Source compatibility does not establish that Pump's deployed fee program accepts Beam's ID.
-2. Principal-lock/fee-rights integration for recurring community buybacks. Current candidate burns LP; keep migration gated until the final policy is implemented and tested.
-3. Non-SOL migration, Raydium quote-chain routing and AMM-dependent creator operations.
+2. Replace the superseded CPMM candidate with an independently verified Raydium AMM v4 adapter. AMM v4 accepts classic SPL Token mints only, while Beam's retained curve also supports restricted Token-2022 mints; do not silently delete those launches or route them to an unsupported pool. Design principal-lock/fee-rights integration for recurring community buybacks and post-graduation creator claims; current candidate burns LP. Keep migration gated until the final venue, policy and tests are implemented.
+3. Non-SOL migration, Raydium AMM v4 quote-chain routing, AMM-dependent creator/sharing/CTO operations, and compatible donation creation/collection. Remove all active PumpSwap runtime, PDA and ownership assumptions outside the immutable upstream archive; fail-closed handlers are interim gaps, not the finished behavior.
 4. Regenerated Beam IDL, wallet builders, real indexer and production UI. Retained dependency IDLs are reference interfaces, not a finalized Beam client API.
+   Preserve creator-fee recipient selection and build independent, authorized services for donation choices, callouts, and livestreaming. The pinned on-chain source does not supply those off-chain products. See the [feature matrix](FEATURES.md).
 5. SBF build and local-validator differential tests: every retained instruction, actual Raydium CPIs, rollback, authority checks, rent, extensions, replay rejection and LP treatment.
 6. Deployment-key assignment, independent review and devnet end-to-end validation. This branch deploys nothing.
 
