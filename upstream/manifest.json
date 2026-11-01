@@ -1,0 +1,30 @@
+{
+  "pumpfun": {
+    "repository": "https://github.com/lalalune/pumpfun-source",
+    "commit": "5703df02131ab944408e0cf679b4bef9c22e1a3d"
+  },
+  "raydium": {
+    "repository": "https://github.com/raydium-io/raydium-cp-swap",
+    "commit": "3d69122790e97cd6aff24e8ba95940793773f58c",
+    "files": {
+      "programs/cp-swap/src/instructions/initialize.rs": "0f48a5beab0fa27021b6f7bdba50500a2437fb5e",
+      "programs/cp-swap/src/states/config.rs": "eaa966e7977315c4a5d3361c6b9bde0ce973515e",
+      "programs/cp-swap/src/lib.rs": "2040697ab2e90ccfa5becf22670fc6fa20e2c42c",
+      "LICENSE": "261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64"
+    }
+  },
+  "beam_development_program_id": "GdaQ7RHbGKGEL5Px66tQP78S67XcgxYAzFUwja71qSJP",
+  "allowed_modified_paths": [
+    "Cargo.toml",
+    "Cargo.lock",
+    "src/lib.rs",
+    "src/create_v2.rs"
+  ],
+  "allowed_added_paths": [
+    "src/beam_policy.rs",
+    "src/beam_raydium.rs",
+    "tests/compatibility.rs",
+    "src/beam_economics.rs"
+  ],
+  "deployment_status": "not deployed"
+}

@@ -1,0 +1,625 @@
+{
+  "address": "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P",
+  "metadata": {
+    "name": "pump",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Created with Anchor"
+  },
+  "instructions": [
+    {
+      "name": "sell",
+      "docs": [
+        "Sells tokens into a bonding curve.",
+        "For cashback coins, pass as remaining_accounts: [0] user_volume_accumulator,",
+        "[1] bonding_curve_v2. If provided and valid, creator_fee goes to user_volume_accumulator.",
+        "Otherwise, falls back to transferring creator_fee to creator_vault."
+      ],
+      "discriminator": [
+        51,
+        230,
+        133,
+        164,
+        1,
+        127,
+        131,
+        173
+      ],
+      "accounts": [
+        {
+          "name": "global",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  103,
+                  108,
+                  111,
+                  98,
+                  97,
+                  108
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "fee_recipient",
+          "writable": true
+        },
+        {
+          "name": "mint"
+        },
+        {
+          "name": "bonding_curve",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  98,
+                  111,
+                  110,
+                  100,
+                  105,
+                  110,
+                  103,
+                  45,
+                  99,
+                  117,
+                  114,
+                  118,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "associated_bonding_curve",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "bonding_curve"
+              },
+              {
+                "kind": "account",
+                "path": "token_program"
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "associated_user",
+          "writable": true
+        },
+        {
+          "name": "user",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "creator_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  114,
+                  101,
+                  97,
+                  116,
+                  111,
+                  114,
+                  45,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "bonding_curve.creator",
+                "account": "BondingCurve"
+              }
+            ]
+          }
+        },
+        {
+          "name": "token_program"
+        },
+        {
+          "name": "event_authority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  95,
+                  95,
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "program",
+          "address": "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P"
+        },
+        {
+          "name": "fee_config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  102,
+                  101,
+                  101,
+                  95,
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              },
+              {
+                "kind": "const",
+                "value": [
+                  1,
+                  86,
+                  224,
+                  246,
+                  147,
+                  102,
+                  90,
+                  207,
+                  68,
+                  219,
+                  21,
+                  104,
+                  191,
+                  23,
+                  91,
+                  170,
+                  81,
+                  137,
+                  203,
+                  151,
+                  245,
+                  210,
+                  255,
+                  59,
+                  101,
+                  93,
+                  43,
+                  182,
+                  253,
+                  109,
+                  24,
+                  176
+                ]
+              }
+            ],
+            "program": {
+              "kind": "account",
+              "path": "fee_program"
+            }
+          }
+        },
+        {
+          "name": "fee_program",
+          "address": "pfeeUxB6jkeY1Hxd7CsFCAjcbHA9rWtchMGdZ6VojVZ"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        },
+        {
+          "name": "min_sol_output",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "buy_v2",
+      "discriminator": [
+        184,
+        23,
+        238,
+        97,
+        103,
+        197,
+        211,
+        61
+      ],
+      "accounts": [
+        {
+          "name": "global"
+        },
+        {
+          "name": "mint"
+        },
+        {
+          "name": "quote_mint"
+        },
+        {
+          "name": "token_program"
+        },
+        {
+          "name": "quote_token_program"
+        },
+        {
+          "name": "associated_token_program"
+        },
+        {
+          "name": "fee_recipient",
+          "writable": true
+        },
+        {
+          "name": "fee_recipient_ata",
+          "writable": true
+        },
+        {
+          "name": "buyback_recipient",
+          "writable": true
+        },
+        {
+          "name": "buyback_recipient_ata",
+          "writable": true
+        },
+        {
+          "name": "bonding_curve",
+          "writable": true
+        },
+        {
+          "name": "associated_bonding_curve",
+          "writable": true
+        },
+        {
+          "name": "associated_quote_bonding_curve",
+          "writable": true
+        },
+        {
+          "name": "user",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "associated_user",
+          "writable": true
+        },
+        {
+          "name": "associated_quote_user",
+          "writable": true
+        },
+        {
+          "name": "creator_vault",
+          "writable": true
+        },
+        {
+          "name": "associated_creator_vault",
+          "writable": true
+        },
+        {
+          "name": "sharing_config"
+        },
+        {
+          "name": "global_volume_accumulator"
+        },
+        {
+          "name": "user_volume_accumulator",
+          "writable": true
+        },
+        {
+          "name": "associated_user_volume_accumulator",
+          "writable": true
+        },
+        {
+          "name": "fee_config"
+        },
+        {
+          "name": "fee_program"
+        },
+        {
+          "name": "system_program"
+        },
+        {
+          "name": "event_authority"
+        },
+        {
+          "name": "program"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        },
+        {
+          "name": "max_sol_cost",
+          "type": "u64"
+        },
+        {
+          "name": "track_volume",
+          "type": "bool"
+        }
+      ]
+    },
+    {
+      "name": "sell_v2",
+      "discriminator": [
+        93,
+        246,
+        130,
+        60,
+        231,
+        233,
+        64,
+        178
+      ],
+      "accounts": [
+        {
+          "name": "global"
+        },
+        {
+          "name": "mint"
+        },
+        {
+          "name": "quote_mint"
+        },
+        {
+          "name": "token_program"
+        },
+        {
+          "name": "quote_token_program"
+        },
+        {
+          "name": "associated_token_program"
+        },
+        {
+          "name": "fee_recipient",
+          "writable": true
+        },
+        {
+          "name": "fee_recipient_ata",
+          "writable": true
+        },
+        {
+          "name": "buyback_recipient",
+          "writable": true
+        },
+        {
+          "name": "buyback_recipient_ata",
+          "writable": true
+        },
+        {
+          "name": "bonding_curve",
+          "writable": true
+        },
+        {
+          "name": "associated_bonding_curve",
+          "writable": true
+        },
+        {
+          "name": "associated_quote_bonding_curve",
+          "writable": true
+        },
+        {
+          "name": "user",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "associated_user",
+          "writable": true
+        },
+        {
+          "name": "associated_quote_user",
+          "writable": true
+        },
+        {
+          "name": "creator_vault",
+          "writable": true
+        },
+        {
+          "name": "associated_creator_vault",
+          "writable": true
+        },
+        {
+          "name": "sharing_config"
+        },
+        {
+          "name": "user_volume_accumulator",
+          "writable": true
+        },
+        {
+          "name": "associated_user_volume_accumulator",
+          "writable": true
+        },
+        {
+          "name": "fee_config"
+        },
+        {
+          "name": "fee_program"
+        },
+        {
+          "name": "system_program"
+        },
+        {
+          "name": "event_authority"
+        },
+        {
+          "name": "program"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        },
+        {
+          "name": "min_sol_output",
+          "type": "u64"
+        }
+      ]
+    }
+  ],
+  "events": [
+    {
+      "name": "CreateEvent",
+      "discriminator": [
+        27,
+        114,
+        169,
+        77,
+        222,
+        235,
+        99,
+        118
+      ]
+    }
+  ],
+  "types": [
+    {
+      "name": "CreateEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "symbol",
+            "type": "string"
+          },
+          {
+            "name": "uri",
+            "type": "string"
+          },
+          {
+            "name": "mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "bonding_curve",
+            "type": "pubkey"
+          },
+          {
+            "name": "user",
+            "type": "pubkey"
+          },
+          {
+            "name": "creator",
+            "type": "pubkey"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "virtual_token_reserves",
+            "type": "u64"
+          },
+          {
+            "name": "virtual_sol_reserves",
+            "type": "u64"
+          },
+          {
+            "name": "real_token_reserves",
+            "type": "u64"
+          },
+          {
+            "name": "token_total_supply",
+            "type": "u64"
+          },
+          {
+            "name": "token_program",
+            "type": "pubkey"
+          },
+          {
+            "name": "is_mayhem_mode",
+            "type": "bool"
+          }
+        ]
+      }
+    }
+  ]
+}

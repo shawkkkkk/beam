@@ -1,0 +1,8 @@
+Reconstructed framework error model and expanded ErrorCode API adapted from
+Anchor v0.31.1 (https://github.com/coral-xyz/anchor), Apache License 2.0.
+Copyright: the respective Anchor contributors.
+
+This package is independently reconstructed source. It does not assert that
+its Rust namespace, source path, build metadata or dependency recipe is the
+historical source of the captured Donation Relay program. Program metadata
+values are explicitly recovered diagnostic data.

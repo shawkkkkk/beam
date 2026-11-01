@@ -1,0 +1,39 @@
+[package]
+name = "donation-relay-source-proposal"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lib]
+name = "donation_relay_source_proposal"
+crate-type = ["cdylib", "lib"]
+
+[dependencies]
+solana-security-txt = "=1.1.3"
+anchor-spl = { version = "=0.32.1", default-features = false, features = ["associated_token", "token", "token_2022", "token_2022_extensions"] }
+anchor-lang = { version = "=0.32.1", features = ["event-cpi", "init-if-needed"] }
+indexmap = "=2.11.4"
+borsh = "=0.10.4"
+relay-error-model-reconstructed = { path = "error-model" }
+spl-token-2022 = { version = "=8.0.1", features = ["no-entrypoint"] }
+
+# Independent workspace: never inherit or alter the parent repository workspace.
+[workspace]
+resolver = "2"
+
+[profile.release]
+panic = "abort"
+overflow-checks = true
+lto = false
+codegen-units = 1
+
+[features]
+default = ["no-entrypoint"]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+cpi = ["no-entrypoint"]
+anchor-debug = []
+# Recognized by the SDK entrypoint macro. Defaults install the real SDK heap/panic.
+custom-heap = []
+custom-panic = []

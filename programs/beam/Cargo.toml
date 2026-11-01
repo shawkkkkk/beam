@@ -1,0 +1,33 @@
+[package]
+name = "beam-program"
+version = "0.1.0"
+edition = "2021"
+publish = false
+[lib]
+crate-type = ["cdylib", "lib"]
+[features]
+default = ["raydium-devnet"]
+raydium-devnet = []
+experimental-raydium = []
+no-entrypoint = []
+cpi = ["no-entrypoint"]
+no-idl = []
+no-log-ix-name = []
+anchor-debug = []
+custom-heap = []
+custom-panic = []
+[dependencies]
+pump-token-ext = { path = "../../upstream/pumpfun-source/programs/pump/pump-token-ext" }
+spl-type-length-value = { version = "=0.7.0", default-features = false }
+anchor-lang = {version = "=0.31.1", features = ["event-cpi", "init-if-needed", "allow-missing-optionals"]}
+anchor-spl = { version = "=0.31.1", features = ["token_2022", "associated_token", "metadata"] }
+[profile.release]
+panic = "abort"
+overflow-checks = true
+lto = false
+codegen-units = 1
+
+[workspace]
+
+[dev-dependencies]
+pump-reference = { package = "pump-recovered", path = "../../upstream/pumpfun-source/programs/pump", features = ["no-entrypoint"] }
