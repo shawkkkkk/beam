@@ -7,7 +7,7 @@
     "dev": "vite --host 0.0.0.0",
     "build": "tsc -b && vite build",
     "format:check": "prettier --check src tests",
-    "test:unit": "node --experimental-strip-types --test tests/previewState.test.ts tests/indexerAdapter.test.ts tests/localFeaturePresentation.test.ts",
+    "test:unit": "node --experimental-strip-types --test tests/previewState.test.ts tests/indexerAdapter.test.ts tests/localFeaturePresentation.test.ts tests/ammV4Presentation.test.ts",
     "test:browser": "node tests/browser.mjs",
     "preview": "vite preview --host 0.0.0.0"
   },
