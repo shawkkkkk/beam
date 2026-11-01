@@ -10,6 +10,11 @@ bonding curve, buy/sell quotes, a transparent launch fee split, and the token
 and quote amounts available at graduation. The calculations are a foundation
 for an on-chain program; they cannot hold funds or create pools by themselves.
 
+`web/` is a responsive Beam interface preview with original blue, purple, and
+black branding. It includes sample token discovery, search, a browser watchlist,
+token details, and local token drafts. Market data is illustrative. Wallet
+connection, minting, and trading are not live.
+
 The proposed **pre-graduation fee is 0.50%** of gross quote traded:
 
 | Destination | Share of trade | Share of Beam fee |
@@ -33,7 +38,20 @@ cargo fmt --check
 cargo clippy --all-targets -- -D warnings
 ```
 
-The repository has no running service or required secret. See
+For the website, use Node.js 24 and run:
+
+```sh
+cd web
+npm ci
+npm run build
+npm run format:check
+npm run dev
+```
+
+The development server listens on port 5173. The website uses self-hosted fonts
+and needs no API key.
+
+The repository has no required secret. See
 [the architecture notes](docs/ARCHITECTURE.md) for the on-chain integration
 work and limits of current parity.
 
