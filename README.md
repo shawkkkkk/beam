@@ -32,6 +32,24 @@ The allocation engine rounds the combined charge once and gives split dust to th
 
 The current migration candidate burns LP. It cannot harvest fees from that burned position. A principal-lock/fee-rights integration is required for the recurring-buyback design, and migration remains gated pending that work and validator testing.
 
+## Website preview
+
+`web/` contains a responsive Beam interface with original blue, purple, and
+black ray-gun branding. It previews token discovery, search, a watchlist,
+token details, and local token drafts using sample market data. It is not a
+wallet client and does not create tokens or submit trades. The displayed fee
+allocation follows the proposal above; fee collection is not live.
+
+Use Node.js 24 to run the preview:
+
+```sh
+cd web
+npm ci
+npm run build
+npm run format:check
+npm run dev
+```
+
 ## Verify
 
 Requires Rust/Cargo and Python 3; no secret or wallet.
