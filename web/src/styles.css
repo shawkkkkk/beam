@@ -1083,6 +1083,7 @@ textarea:focus-visible {
   font-weight: 800;
 }
 .create-form input,
+.create-form select,
 .create-form textarea {
   width: 100%;
   background: #0d1020;
@@ -1094,6 +1095,7 @@ textarea:focus-visible {
   font-size: 12px;
 }
 .create-form input:focus,
+.create-form select:focus,
 .create-form textarea:focus {
   border-color: #8078f8;
 }
@@ -1103,6 +1105,36 @@ textarea:focus-visible {
 .create-form input::placeholder,
 .create-form textarea::placeholder {
   color: #69718d;
+}
+.metadata-hint {
+  margin: 0;
+  color: #a7b2d0;
+  font-size: 11px;
+  line-height: 1.5;
+}
+.form-error {
+  margin: 0;
+  color: #ffd3d8;
+  background: #432333;
+  border: 1px solid #a25465;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.draft-options {
+  margin: 12px 0;
+  padding: 12px;
+  border: 1px solid #313e6b;
+  border-radius: 9px;
+  background: #151b35;
+  color: #c5d0ed;
+  overflow-wrap: anywhere;
+  font-size: 11px;
+  line-height: 1.5;
+}
+.draft-options p {
+  margin: 6px 0 0;
 }
 .unavailable-note {
   display: flex;

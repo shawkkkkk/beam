@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import {
   Activity,
   ArrowRight,
@@ -24,9 +24,52 @@ import {
   Zap,
 } from "lucide-react";
 import { sampleTokens, type Token } from "./data";
+import {
+  getBrowserStorage,
+  nextDraftId,
+  orderNewFeed,
+  readDrafts,
+  readWatchlist,
+  toggleWatchlist,
+  validateCreateV2Metadata,
+  validateLocalDraftOptions,
+  writeDrafts,
+  writeWatchlist,
+  type DraftRecord,
+} from "./previewState";
 
 type Feed = "trending" | "new" | "graduating" | "watchlist";
 type Modal = "create" | "wallet" | "how" | null;
+
+function draftToken(draft: DraftRecord): Token {
+  const minutes = Math.max(
+    0,
+    Math.floor((Date.now() - draft.createdAt) / 60_000),
+  );
+  const age =
+    minutes === 0
+      ? "now"
+      : minutes < 60
+        ? `${minutes}m`
+        : minutes < 1440
+          ? `${Math.floor(minutes / 60)}h`
+          : `${Math.floor(minutes / 1440)}d`;
+  return {
+    id: draft.id,
+    name: draft.name,
+    symbol: draft.symbol,
+    description: draft.description || "A new idea is taking shape on Beam.",
+    icon: "✦",
+    colors: ["#4d76f8", "#9d61ed"],
+    marketCap: "$0",
+    volume: "$0",
+    holders: 0,
+    age,
+    progress: 0,
+    change: 0,
+    isDraft: true,
+  };
+}
 
 const chartPoints =
   "0,72 25,68 44,78 65,56 86,62 103,44 123,52 145,34 162,39 180,25 205,36 228,12 252,20";
@@ -152,7 +195,7 @@ function TokenCard({
         </div>
         <div className="card-progress">
           <div className="progress-copy">
-            <span>Raydium graduation</span>
+            <span>Sample curve progress</span>
             <strong>{token.progress}%</strong>
           </div>
           <div className="progress-track">
@@ -162,7 +205,8 @@ function TokenCard({
       </button>
       <div className="card-foot">
         <span>
-          <Clock3 size={13} /> {token.age} ago
+          <Clock3 size={13} />{" "}
+          {token.age === "now" ? "just now" : `${token.age} ago`}
         </span>
         <span>
           <Users size={13} /> {token.holders} holders
@@ -190,39 +234,111 @@ function App() {
   const [search, setSearch] = useState("");
   const [modal, setModal] = useState<Modal>(null);
   const [selected, setSelected] = useState<Token | null>(null);
-  const [drafts, setDrafts] = useState<Token[]>([]);
-  const [saved, setSaved] = useState<string[]>(() => {
-    try {
-      return JSON.parse(
-        localStorage.getItem("beam-watchlist") || "[]",
-      ) as string[];
-    } catch {
-      return [];
-    }
-  });
+  const [drafts, setDrafts] = useState<DraftRecord[]>(() =>
+    readDrafts(getBrowserStorage()),
+  );
+  const [saved, setSaved] = useState<string[]>(() =>
+    readWatchlist(getBrowserStorage()),
+  );
   const [name, setName] = useState("");
   const [symbol, setSymbol] = useState("");
   const [description, setDescription] = useState("");
+  const [metadataUri, setMetadataUri] = useState("");
+  const [creatorFeeWallet, setCreatorFeeWallet] = useState("");
+  const [donationChoice, setDonationChoice] = useState<"none" | "donate.gg">(
+    "none",
+  );
+  const [charityName, setCharityName] = useState("");
+  const [callout, setCallout] = useState("");
+  const [livestreamUrl, setLivestreamUrl] = useState("");
+  const [formError, setFormError] = useState<string | null>(null);
+  const [storageWarning, setStorageWarning] = useState(false);
+  const usedDraftIds = useRef(new Set(drafts.map((draft) => draft.id)));
+  const submittedDraft = useRef(false);
+  const dialogPanel = useRef<HTMLDivElement | null>(null);
+  const returnFocus = useRef<HTMLElement | null>(null);
+  const dialogWasOpen = useRef(false);
+  const dialogOpen = modal !== null || selected !== null;
+  const selectedDraft = selected?.isDraft
+    ? drafts.find((draft) => draft.id === selected.id)
+    : undefined;
 
   useEffect(() => {
-    localStorage.setItem("beam-watchlist", JSON.stringify(saved));
-  }, [saved]);
+    const storage = getBrowserStorage();
+    const watchlistSaved = writeWatchlist(storage, saved);
+    const draftsSaved = writeDrafts(storage, drafts);
+    setStorageWarning(!watchlistSaved || !draftsSaved);
+  }, [saved, drafts]);
   useEffect(() => {
+    if (modal === "create") submittedDraft.current = false;
+  }, [modal]);
+  useEffect(() => {
+    if (!dialogOpen) {
+      if (dialogWasOpen.current) returnFocus.current?.focus();
+      dialogWasOpen.current = false;
+      returnFocus.current = null;
+      return;
+    }
+    const panel = dialogPanel.current;
+    if (!panel) return;
+    if (
+      !dialogWasOpen.current &&
+      document.activeElement instanceof HTMLElement
+    ) {
+      returnFocus.current = document.activeElement;
+    }
+    dialogWasOpen.current = true;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const focusable = () => [
+      ...panel.querySelectorAll<HTMLElement>(
+        "button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex='-1'])",
+      ),
+    ];
+    (focusable()[0] || panel).focus();
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
+        event.preventDefault();
         setModal(null);
         setSelected(null);
       }
+      if (event.key !== "Tab") return;
+      const items = focusable();
+      if (items.length === 0) {
+        event.preventDefault();
+        panel.focus();
+        return;
+      }
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (
+        event.shiftKey &&
+        (document.activeElement === first ||
+          !panel.contains(document.activeElement))
+      ) {
+        event.preventDefault();
+        last.focus();
+      } else if (
+        !event.shiftKey &&
+        (document.activeElement === last ||
+          !panel.contains(document.activeElement))
+      ) {
+        event.preventDefault();
+        first.focus();
+      }
     };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, []);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [dialogOpen, modal, selected]);
 
   const tokens = useMemo(() => {
-    let result = [...drafts, ...sampleTokens];
+    const draftTokens = drafts.map(draftToken);
+    let result = orderNewFeed(draftTokens, sampleTokens);
     if (feed === "watchlist")
       result = result.filter((token) => saved.includes(token.id));
-    if (feed === "new") result = [...result].reverse();
     if (feed === "graduating")
       result = [...result].sort((a, b) => b.progress - a.progress);
     const query = search.trim().toLowerCase();
@@ -236,11 +352,7 @@ function App() {
   }, [drafts, feed, saved, search]);
 
   const toggleSaved = (id: string) =>
-    setSaved((current) =>
-      current.includes(id)
-        ? current.filter((item) => item !== id)
-        : [...current, id],
-    );
+    setSaved((current) => toggleWatchlist(current, id));
   const openExplore = () =>
     document.getElementById("explore")?.scrollIntoView({ behavior: "smooth" });
 
@@ -250,32 +362,56 @@ function App() {
     const cleanSymbol = symbol
       .trim()
       .toUpperCase()
-      .replace(/[^A-Z0-9]/g, "")
-      .slice(0, 10);
-    if (cleanName.length < 2 || cleanSymbol.length < 2) return;
-    const draft: Token = {
-      id: `draft-${Date.now()}`,
+      .replace(/[^A-Z0-9]/g, "");
+    const cleanUri = metadataUri.trim();
+    const cleanWallet = creatorFeeWallet.trim();
+    const cleanCharity = charityName.trim();
+    const cleanCallout = callout.trim();
+    const cleanStream = livestreamUrl.trim();
+    const error =
+      validateCreateV2Metadata(cleanName, cleanSymbol, cleanUri) ??
+      validateLocalDraftOptions(
+        cleanWallet,
+        cleanCharity,
+        cleanCallout,
+        cleanStream,
+      );
+    if (error) {
+      setFormError(error);
+      return;
+    }
+    if (submittedDraft.current) return;
+    submittedDraft.current = true;
+    const id = nextDraftId(usedDraftIds.current, Date.now());
+    usedDraftIds.current.add(id);
+    const draft: DraftRecord = {
+      id,
       name: cleanName,
       symbol: cleanSymbol,
-      description: description.trim() || "A new idea is taking shape on Beam.",
-      icon: "✦",
-      colors: ["#4d76f8", "#9d61ed"],
-      marketCap: "$0",
-      volume: "$0",
-      holders: 0,
-      age: "now",
-      progress: 0,
-      change: 0,
-      isDraft: true,
+      description: description.trim(),
+      metadataUri: cleanUri,
+      createdAt: Date.now(),
+      creatorFeeWallet: cleanWallet,
+      donationChoice,
+      charityName: donationChoice === "donate.gg" ? cleanCharity : "",
+      callout: cleanCallout,
+      livestreamUrl: cleanStream,
     };
-    setDrafts((current) => [draft, ...current]);
+    setDrafts((current) => [draft, ...current].slice(0, 100));
     setFeed("new");
     setSearch("");
     setModal(null);
-    setSelected(draft);
+    setSelected(draftToken(draft));
     setName("");
     setSymbol("");
     setDescription("");
+    setMetadataUri("");
+    setCreatorFeeWallet("");
+    setDonationChoice("none");
+    setCharityName("");
+    setCallout("");
+    setLivestreamUrl("");
+    setFormError(null);
   };
 
   return (
@@ -317,7 +453,7 @@ function App() {
               className="btn btn-quiet wallet-button"
               onClick={() => setModal("wallet")}
             >
-              <Wallet size={17} /> Connect wallet
+              <Wallet size={17} /> Wallet unavailable
             </button>
             <button
               className="btn btn-primary header-create"
@@ -335,6 +471,8 @@ function App() {
           <span>
             Interface preview with sample market data. Token creation and
             trading are not live.
+            {storageWarning &&
+              " Browser storage is unavailable; local drafts and watchlists may disappear on refresh."}
           </span>
         </div>
         <section className="hero container">
@@ -349,7 +487,7 @@ function App() {
             </h1>
             <p>
               Every great idea starts with a spark. Discover new tokens, build
-              your community, and follow the planned path to Raydium liquidity.
+              your community, and explore the planned path to Raydium AMM v4.
             </p>
             <div className="hero-actions">
               <button
@@ -371,7 +509,10 @@ function App() {
               </span>
               <span>Built for a clearer path to Raydium</span>
               <span className="proof-divider" />
-              <span>0.45% proposed community allocation</span>
+              <span>
+                Planned Beam fee: 0.42% community / 0.05% treasury / 0.03%
+                founder; creator fees separate
+              </span>
             </div>
           </div>
           <div className="hero-visual" aria-label="Beam ray gun brand artwork">
@@ -388,7 +529,7 @@ function App() {
             <div className="visual-card">
               <span className="visual-card-label">THE BEAM EFFECT</span>
               <strong>Find your spark.</strong>
-              <span>Launch → Grow → Raydium</span>
+              <span>Launch → Curve → Planned AMM v4</span>
             </div>
             <div className="visual-caption">01 / A NEW WAY TO LAUNCH</div>
           </div>
@@ -403,8 +544,12 @@ function App() {
               <Zap size={19} />
             </span>
             <span>
-              <strong>Launch in a moment</strong>
-              <small>From idea to community</small>
+              <strong>Preview a token draft</strong>
+              <small>
+                {storageWarning
+                  ? "Temporary until storage works"
+                  : "Saved locally in this browser"}
+              </small>
             </span>
           </div>
           <div>
@@ -413,7 +558,7 @@ function App() {
             </span>
             <span>
               <strong>Grow on the curve</strong>
-              <small>Clear, community-led discovery</small>
+              <small>Sample curve progress</small>
             </span>
           </div>
           <div>
@@ -421,8 +566,8 @@ function App() {
               <Sparkles size={19} />
             </span>
             <span>
-              <strong>Graduate to Raydium</strong>
-              <small>Liquidity built to last</small>
+              <strong>Plan an AMM v4 migration</strong>
+              <small>Selected target; adapter still gated</small>
             </span>
           </div>
         </section>
@@ -593,6 +738,8 @@ function App() {
         >
           <div
             className="modal-panel"
+            ref={dialogPanel}
+            tabIndex={-1}
             role="dialog"
             aria-modal="true"
             aria-label={
@@ -628,6 +775,38 @@ function App() {
                   </div>
                 </div>
                 <p className="detail-description">{selected.description}</p>
+                {selectedDraft &&
+                  (selectedDraft.creatorFeeWallet ||
+                    selectedDraft.donationChoice === "donate.gg" ||
+                    selectedDraft.callout ||
+                    selectedDraft.livestreamUrl) && (
+                    <div className="draft-options">
+                      <strong>Local plans only</strong>
+                      {selectedDraft.creatorFeeWallet && (
+                        <p>
+                          Creator fee wallet: {selectedDraft.creatorFeeWallet}
+                        </p>
+                      )}
+                      {selectedDraft.donationChoice === "donate.gg" && (
+                        <p>
+                          donate.gg interest
+                          {selectedDraft.charityName
+                            ? `: ${selectedDraft.charityName}`
+                            : " (charity not chosen)"}
+                          ; no donation is configured.
+                        </p>
+                      )}
+                      {selectedDraft.callout && (
+                        <p>Callout: {selectedDraft.callout}</p>
+                      )}
+                      {selectedDraft.livestreamUrl && (
+                        <p>
+                          Stream URL plan: {selectedDraft.livestreamUrl}. No
+                          stream is active here.
+                        </p>
+                      )}
+                    </div>
+                  )}
                 <div className="detail-chart">
                   <MiniChart negative={selected.change < 0} />
                 </div>
@@ -641,7 +820,7 @@ function App() {
                     <strong>{selected.holders}</strong>
                   </div>
                   <div>
-                    <span>To Raydium</span>
+                    <span>Curve progress</span>
                     <strong>{selected.progress}%</strong>
                   </div>
                 </div>
@@ -652,9 +831,9 @@ function App() {
                   <LockKeyhole size={18} />
                   <span>
                     {selected.isDraft
-                      ? "This token exists only in this browser session."
+                      ? "This is a local draft in this browser, with no token minted."
                       : "This is sample market data."}{" "}
-                    On-chain trading opens after Beam launches.
+                    Trading and migration are unavailable in this preview.
                   </span>
                 </div>
                 <button className="btn btn-primary modal-main-button" disabled>
@@ -667,8 +846,8 @@ function App() {
                 <span className="modal-kicker">START SOMETHING BRIGHT</span>
                 <h2>Create a token</h2>
                 <p className="modal-subtitle">
-                  Shape your idea. This preview stays in your browser session;
-                  it does not mint a token.
+                  Shape your idea. This draft stays in this browser; it does not
+                  upload metadata or mint a token.
                 </p>
                 <form className="create-form" onSubmit={makeDraft}>
                   <label>
@@ -677,7 +856,7 @@ function App() {
                       value={name}
                       onChange={(event) => setName(event.target.value)}
                       minLength={2}
-                      maxLength={40}
+                      maxLength={32}
                       required
                       placeholder="e.g. Cosmic Cat"
                     />
@@ -694,9 +873,21 @@ function App() {
                         )
                       }
                       minLength={2}
-                      maxLength={10}
+                      maxLength={13}
                       required
                       placeholder="e.g. COSMIC"
+                    />
+                  </label>
+                  <label>
+                    Metadata URI (optional for this local draft)
+                    <input
+                      value={metadataUri}
+                      onChange={(event) => {
+                        setMetadataUri(event.target.value);
+                        setFormError(null);
+                      }}
+                      maxLength={200}
+                      placeholder="Existing metadata URI; no upload occurs"
                     />
                   </label>
                   <label>
@@ -709,11 +900,83 @@ function App() {
                       placeholder="Tell everyone what makes it special"
                     />
                   </label>
+                  <p className="metadata-hint">
+                    Optional product plans below are saved locally. They do not
+                    set a creator fee, register a charity, publish a callout, or
+                    start a stream.
+                  </p>
+                  <label>
+                    Creator fee wallet address (local plan)
+                    <input
+                      value={creatorFeeWallet}
+                      onChange={(event) =>
+                        setCreatorFeeWallet(event.target.value)
+                      }
+                      maxLength={44}
+                      placeholder="Optional Solana address"
+                    />
+                  </label>
+                  <label>
+                    Charity/donation choice
+                    <select
+                      value={donationChoice}
+                      onChange={(event) =>
+                        setDonationChoice(
+                          event.target.value as "none" | "donate.gg",
+                        )
+                      }
+                    >
+                      <option value="none">No donation plan</option>
+                      <option value="donate.gg">
+                        Interested in donate.gg (not connected)
+                      </option>
+                    </select>
+                  </label>
+                  {donationChoice === "donate.gg" && (
+                    <label>
+                      Charity note (unverified)
+                      <input
+                        value={charityName}
+                        onChange={(event) => setCharityName(event.target.value)}
+                        maxLength={80}
+                        placeholder="Name of intended charity"
+                      />
+                    </label>
+                  )}
+                  <label>
+                    Callout text (local plan)
+                    <textarea
+                      value={callout}
+                      onChange={(event) => setCallout(event.target.value)}
+                      maxLength={180}
+                      rows={2}
+                      placeholder="Optional community callout"
+                    />
+                  </label>
+                  <label>
+                    Livestream URL (local plan)
+                    <input
+                      type="url"
+                      value={livestreamUrl}
+                      onChange={(event) => setLivestreamUrl(event.target.value)}
+                      maxLength={300}
+                      placeholder="https://…"
+                    />
+                  </label>
+                  <p className="metadata-hint">
+                    CreateV2 limits: name 32, symbol 13, metadata URI 200 UTF-8
+                    bytes. This form validates those byte limits locally.
+                  </p>
+                  {formError && (
+                    <p className="form-error" role="alert">
+                      {formError}
+                    </p>
+                  )}
                   <div className="unavailable-note">
                     <Info size={17} />
                     <span>
-                      Live launches will require a connected wallet and on-chain
-                      Beam program.
+                      This button saves a local draft only. It does not connect
+                      a wallet, upload files, or call the Beam program.
                     </span>
                   </div>
                   <button
@@ -728,16 +991,16 @@ function App() {
             {modal === "wallet" && !selected ? (
               <>
                 <span className="modal-kicker">
-                  COMING WITH ON-CHAIN LAUNCH
+                  NOT AVAILABLE IN THIS PREVIEW
                 </span>
                 <div className="modal-icon">
                   <Wallet size={28} />
                 </div>
-                <h2>Wallets are next.</h2>
+                <h2>No wallet connection here.</h2>
                 <p className="modal-subtitle">
-                  The Beam interface is a preview while the on-chain launch and
-                  Raydium migration programs are built and reviewed. Wallet
-                  connection and trading will be enabled with those contracts.
+                  This sample-data interface cannot connect, sign, or submit a
+                  transaction. Raydium AMM v4 is the selected migration target;
+                  the adapter still needs integration and runtime review.
                 </p>
                 <button
                   className="btn btn-secondary modal-main-button"
@@ -752,8 +1015,8 @@ function App() {
                 <span className="modal-kicker">THE BEAM PATH</span>
                 <h2>From spark to orbit.</h2>
                 <p className="modal-subtitle">
-                  Beam is being built around a simple path from launch to a
-                  Raydium pool after graduation.
+                  Beam is being built around a curve launch and a separate
+                  Raydium AMM v4 migration. That adapter is not active here.
                 </p>
                 <div className="how-steps">
                   <div>
@@ -771,8 +1034,10 @@ function App() {
                     <div>
                       <h3>Grow</h3>
                       <p>
-                        A proposed 0.45% of trading volume goes to community
-                        rewards and buybacks.
+                        The specified Beam fee is 0.50%: 0.42% for community
+                        rewards and buybacks, 0.05% treasury, and 0.03% founder.
+                        Creator fees are separate. Collection and distribution
+                        are not active in this preview.
                       </p>
                     </div>
                     <ChevronRight size={18} />
@@ -782,8 +1047,9 @@ function App() {
                     <div>
                       <h3>Graduate</h3>
                       <p>
-                        A Raydium pool is planned after completion. The pool
-                        design is still under review.
+                        Curve completion and migration are distinct states.
+                        Raydium AMM v4 is selected, but its adapter is not
+                        integrated here and this preview cannot create a pool.
                       </p>
                     </div>
                     <ChevronRight size={18} />
