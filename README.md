@@ -27,7 +27,7 @@ The allocation engine rounds the combined charge once and gives split dust to th
 - New undeployed development identity.
 - Mayhem creation/enablement rejected; inert serialized fields and account slots retained.
 - Original PumpSwap migration, signed router and AMM-dependent CTO handlers blocked.
-- New administrator-pinned Raydium configuration and native-SOL migration candidate: canonical account checks, caller-funded setup, WSOL funding, LP receipt checks and atomic LP burning.
+- New administrator-pinned Raydium configuration and native-SOL migration candidate: canonical account checks, caller-funded setup, WSOL funding, LP receipt checks and an LP burn in the same instruction. Runtime rollback remains unverified.
 - Differential tests compile the pristine upstream crate beside Beam and compare selected retained math, layouts and instruction data.
 
 The current migration candidate burns LP. It cannot harvest fees from that burned position. A principal-lock/fee-rights integration is required for the recurring-buyback design, and migration remains gated pending that work and validator testing.

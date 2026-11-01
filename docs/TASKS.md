@@ -11,7 +11,21 @@ contribution scopes, not paid bounties or a claim that Beam is listed anywhere.
 | [Contract fork, PR #1](https://github.com/shawkkkkk/beam/pull/1), `feat/pinned-contract-fork` at `65c96b5` | Draft Anchor contract in `programs/beam`; pinned Pump/Raydium reference source; Mayhem and legacy PumpSwap paths blocked; gated CPMM migration candidate; host checks described in [validation](VALIDATION.md). | Canonical contract baseline for review. Fee collection, LP fee rights, validator testing, IDL, and UI remain open. |
 | [Migration accounting, PR #2](https://github.com/shawkkkkk/beam/pull/2), head `f17f7e2` | Merged into PR #1's development branch as `65c96b5`: includes post-completion quote, preserves fee/rent liabilities and donor surplus, rejects balance aliases; exact-head CI and local default/experimental suites passed 10 unit and 4 compatibility tests each. | Runtime CPI, fee-sweep, replay, donation, and rollback tests remain before activation; migration stays gated. |
 | [Core model and web preview, PR #3](https://github.com/shawkkkkk/beam/pull/3), `codex/beam-core-foundation` at `5214074` | Separate draft PR against `main` with a root Rust model, sample-data website, and different venue/economic assumptions. | The model is not `programs/beam`; reconcile contracts and fee policy before integration. The sample UI is not an on-chain client. |
-| `codex/beam-agent-guide` | Contributor and agent guidance stacked on PR #1's updated development head. | Guidance only; does not activate or deploy contract behavior. |
+| [Contributor guidance, PR #4](https://github.com/shawkkkkk/beam/pull/4), `codex/beam-agent-guide` | Draft contributor and agent guidance stacked on PR #1's updated development head. | Documentation only; does not activate or deploy contract behavior. |
+
+PR ownership and touched paths at this snapshot:
+
+- PR #1 — `@shawkkkkk`, `feat/pinned-contract-fork`: `programs/beam/`,
+  `upstream/`, `scripts/check_fork.py`, `.github/workflows/contracts.yml`,
+  and contract status/economics documents.
+- PR #2 — `@shawkkkkk`, `codex/beam-migration-invariant`:
+  `programs/beam/src/beam_raydium.rs`; merged into PR #1's branch.
+- PR #3 — `@shawkkkkk`, `codex/beam-core-foundation`: root `src/lib.rs`,
+  root Cargo/CI files, `web/`, and its own architecture documents. It is a
+  separate draft model and preview, not the Anchor contract.
+- PR #4 — `@shawkkkkk`, `codex/beam-agent-guide`: `AGENTS.md`,
+  `CONTRIBUTING.md`, `README.md`, and `docs/TASKS.md`, `docs/STATUS.md`,
+  `docs/ECONOMICS.md`, `docs/VALIDATION.md`.
 
 ## Bounded follow-up scopes
 

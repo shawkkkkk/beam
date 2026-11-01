@@ -8,7 +8,7 @@
 - Mayhem creation/enablement rejected. Inert serialized flags/account slots remain; Beam does not deploy the companion Mayhem program.
 - Legacy `migrate`, `migrate_v2`, `multi_hop_curve_swap` and `admin_cto` handlers fail before transfers/CPIs. They are temporarily unavailable rather than silently routed back to PumpSwap. Other retained quote-chain code still understands historical PumpSwap layouts; it is not yet a Raydium router.
 - New `configure_raydium`, `set_raydium_enabled` and `migrate_raydium` candidates.
-- Gated native-SOL candidate validates the fixed executable, canonical administrator-pinned AmmConfig, mint ordering, vault/LP/observation PDAs, completion and real reserves/rent. It funds WSOL, invokes initialize, checks/burns received LP, records a one-time receipt and clears curve reserves atomically.
+- Gated native-SOL candidate validates the fixed executable, canonical administrator-pinned AmmConfig, mint ordering, vault/LP/observation PDAs, completion and real reserves/rent. It funds WSOL, invokes initialize, checks/burns received LP, records a one-time receipt and clears curve reserve fields in the same instruction. Runtime rollback remains unverified.
 - Caller setup funding is separate from curve liquidity. The budget covers Raydium CPIs; outer ATA/receipt rent and transaction fees are additional. Refunds cannot exceed the caller's unspent contribution or include prior authority donations.
 - Standard SPL Token and a restricted Token-2022 metadata extension subset supported by the migration candidate. Other extensions and non-SOL quote assets fail closed.
 - Inherited Global migration-fee behavior retained. The new 45/5 bps allocation does not silently rewrite creator or migration fees.

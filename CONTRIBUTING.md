@@ -35,8 +35,9 @@ and why. The differential host tests cover selected layouts, math, and
 instruction encodings; they do not establish complete runtime parity. Changes
 to CPI accounts, funds, migrations, or fee rights need SBF/local-validator
 tests for success, failure rollback, authority checks, replay, and accounting
-before activation. CI and independent review must pass; do not bypass branch
-protections or merge unresolved work.
+before activation. Check CI on the exact pull-request head and obtain any
+required formal approvals before merging. Do not self-approve, bypass branch
+protections, or merge unresolved work.
 
 Host tests, mock accounts, and local simulations are welcome. Do not deploy to
 a live network, use real wallets, sign live transactions, transfer funds, or

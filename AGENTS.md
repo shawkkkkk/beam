@@ -1,7 +1,8 @@
 # Working on Beam
 
-These instructions apply to the Beam repository. They do not apply to the
-archived copy at `upstream/pumpfun-source`, which has its own `AGENTS.md`.
+These instructions apply throughout Beam, including the archived copy at
+`upstream/pumpfun-source`. That copy also has its own `AGENTS.md`; follow its
+additional archive restrictions. Do not alter the pinned archive for Beam work.
 
 ## Start with the current work
 
@@ -62,7 +63,9 @@ Host tests, mock accounts, and local simulations are normal contributor work.
 Do not deploy to a live network, use real wallets, sign live transactions,
 trade, move funds, collect secrets, or launch live services in a pull request.
 A release requires a separate maintainer-controlled process. Respect branch
-protections and leave unresolved or untested work in draft state.
+protections and leave unresolved or untested work in draft state. Before any
+merge, check CI on the exact head commit and satisfy required formal approvals.
+Do not self-approve or bypass repository rules.
 
 If Beam is registered on Slop, report a suspected exploitable issue through
 Slop's current private security-report workflow. Otherwise use GitHub private
