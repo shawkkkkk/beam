@@ -15,9 +15,12 @@ or claim clearance or reward funding from this ledger.
 | [Alternate prototype, PR #3](https://github.com/shawkkkkk/beam/pull/3), closed unmerged at `eb0aef7` | Separate root Rust model, competing Anchor program under `programs/beam`, local SBF tests, sample website, and proposed root license. | Historical draft; its program and 40/7/3 fee policy are not canonical. The reviewed web subtree was carried into PR #6. |
 | [Contributor guidance, PR #4](https://github.com/shawkkkkk/beam/pull/4), merged as `3630889` within PR #1 | Contributor and agent guidance, reviewed before the development foundation landed. | Documentation only; does not activate or deploy contract behavior. |
 | [Fee/venue correction, PR #5](https://github.com/shawkkkkk/beam/pull/5), merged at `a265c3a` | 42/5/3 test arithmetic, superseded CPMM path made fail closed, feature matrix and contributor scopes. | No AMM v4 CPI or enforced Beam fee collection. |
-| [Website preview, PR #6](https://github.com/shawkkkkk/beam/pull/6), draft | Beam-branded sample-data web preview; [PR #8](https://github.com/shawkkkkk/beam/pull/8) merged state, copy and local interaction fixes into its branch. | No real wallet, trading, donations, streams, indexer or backend. |
+| [Website preview, PR #6](https://github.com/shawkkkkk/beam/pull/6), merged at `ecd1caf` | Beam-branded sample-data web preview; [PR #8](https://github.com/shawkkkkk/beam/pull/8) merged state, copy and local interaction fixes into its branch. | No real wallet, trading, donations, streams, indexer or backend. |
 | [Native-SOL ABI fixtures, PR #7](https://github.com/shawkkkkk/beam/pull/7), merged at `b8120a8` | Local-only legacy create/buy/sell encoder and current account/event fixtures. | No executable transaction builder or creator-fee account resolution. |
 | [AMM v4 ABI, PR #9](https://github.com/shawkkkkk/beam/pull/9), merged at `c8dc348` | Source-only `Initialize2` data/account/PDA guards for the official pinned AMM v4 source. | No migration CPI, LP disposition or Token-2022 graduation. |
+| [Creator-funding clarity, PR #11](https://github.com/shawkkkkk/beam/pull/11), merged at `9a6ede9` | Records that the 42/5/3-bps allocation does not decide whether creator payouts use its community share or add a separate charge. | No live fee collection or all-in fee quote. |
+| [Nested quote guard, PR #12](https://github.com/shawkkkkk/beam/pull/12), merged at `4e32d30` | Graduated `create_v2` quote fails closed before reading PumpSwap pool accounts. | No AMM v4 quote, venue migration or fee routing; other PumpSwap assumptions still need an audit. |
+| [Legacy creator SDK, PR #13](https://github.com/shawkkkkk/beam/pull/13), open draft at `8070083` | Local collection builder, event decoder and rent/balance preview under `sdk/`; review is pending. | No authenticated state, payout-wallet change, RPC, signing or live claim. Avoid duplicate creator SDK work. |
 
 PR ownership and touched paths at this snapshot:
 
@@ -29,11 +32,32 @@ PR ownership and touched paths at this snapshot:
 - PR #3 — `@shawkkkkk`, `codex/beam-core-foundation`: closed unmerged. Its root
   model, competing `programs/beam/`, Cargo/CI/license files and architecture
   notes are not the canonical Beam contract.
-- PR #6 / merged PR #8 — `@shawkkkkk`, `codex/beam-web-preview`: `web/`, website
-  CI and website status notes only. The web preview remains a separate draft.
+- Merged PR #6 / PR #8 — `@shawkkkkk`, `codex/beam-web-preview`: `web/`,
+  website CI and preview status notes. The sample-data preview is now on main.
 - PR #4 — `@shawkkkkk`, `codex/beam-agent-guide`: `AGENTS.md`,
   `CONTRIBUTING.md`, `README.md`, and `docs/TASKS.md`, `docs/STATUS.md`,
   `docs/ECONOMICS.md`, `docs/VALIDATION.md`.
+- Merged PR #12 — `@shawkkkkk`, `codex/beam-no-pumpswap-quote`:
+  `programs/beam/src/create_v2.rs` only. Its fail-closed guard does not create
+  an AMM v4 quote path.
+- Open PR #13 — `@shawkkkkk`, `codex/beam-creator-client-20261101`:
+  `sdk/beam-creator.mjs`, fixtures and creator SDK tests only; coordinate
+  against that interface before adding creator-wallet UI.
+
+## Nonoverlapping next slices
+
+| Owner and path | Dependency | Evidence before integration |
+| --- | --- | --- |
+| PR #13 owner: creator SDK files under `sdk/` | Confirm the final contract account/event ABI and selected creator-payout semantics; do not duplicate the active draft. | Locked Node fixtures and exact Anchor producer receipt; reject stale or missing account observations. |
+| Unassigned: AMM v4 execution adapter in a new `programs/beam/src/` module | Source-only ABI on main; decide SPL-only graduation, LP custody/fee rights and setup fee bounds first. Keep the retired CPMM path disabled. | Host ABI tests plus isolated local-program CPI, rollback, account substitution, donation and replay cases before activation. |
+| Unassigned: Beam fee custody and routing in dedicated contract modules | Decide creator payout funding and vault authority before editing shared trade handlers. Build on PR #12's merged `create_v2` guard without reintroducing PumpSwap reads. | Conserved total fee, creator/community allocation, rounding and unauthorized-recipient tests; local runtime evidence before live use. |
+| Unassigned: website data and wallet integration under `web/` | Build on merged sample preview, finalized Beam IDL/SDK and verified read-only API. PR #13 owns the pending creator SDK slice. | Local mock flows, stale-data/error states, accessibility and transaction-construction tests; no preview fixture presented as chain data. |
+
+Each future owner should record its exact base commit and touched paths in its
+PR. Do not combine these slices or treat a host-only result as a Raydium CPI
+receipt. The proposed 99%-to-base, three-second buy-only model remains disabled
+and test-only; it needs a precise specification and isolated adversarial tests
+before anyone edits a trading handler for it.
 
 ## Bounded follow-up scopes
 

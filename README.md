@@ -2,7 +2,7 @@
 
 A Solana launchpad forked from the completed community reconstruction of Pump, with Raydium AMM v4 as the selected secondary venue and Mayhem disabled.
 
-**Status: source fork and host-tested migration candidate. Not deployed. Not audited or complete. Raydium execution is disabled in default builds.**
+**Status: undeployed source fork, local ABI fixtures, and sample-data website preview. Not audited or complete. The selected AMM v4 migration has no execution adapter; the older CPMM candidate is disabled in every build.**
 
 ## Source baseline
 
@@ -28,17 +28,17 @@ dependency. No percentage can honestly describe whole-product parity yet.
 | Keep Pump-style launch and curve trades | **In progress** | [Merged PR #1](https://github.com/shawkkkkk/beam/pull/1) contains the Anchor handlers and selected host tests. Full instruction execution, SBF and live behavior remain unverified. |
 | Remove Mayhem and PumpSwap | **In progress** | Mayhem and legacy PumpSwap entry paths fail closed, with no PumpSwap fallback. Retained router, creator and fee/donation dependencies still need compatible replacements; blocked features are not considered complete. |
 | Graduate to Raydium AMM v4 | **Blocked** | [PR #5](https://github.com/shawkkkkk/beam/pull/5) retired the wrong-venue CPMM path. [Merged PR #9](https://github.com/shawkkkkk/beam/pull/9) adds source-only AMM v4 ABI guards, not a tested migration adapter or Token-2022 graduation path. |
-| Apply Beam 42/5/3 fees and preserve creator payouts | **Math done; routing blocked** | PR #5 merged allocation **math only**. Actual Beam collection, creator-fee compatibility, selected payout wallet and post-graduation rights need implementation and runtime tests. Whether creator payouts come from the 0.42% community share or an additional charge is undecided. |
+| Apply Beam 42/5/3 fees and preserve creator payouts | **Math done; routing blocked** | [PR #5](https://github.com/shawkkkkk/beam/pull/5) merged allocation **math only**; [PR #11](https://github.com/shawkkkkk/beam/pull/11) recorded the unresolved creator-funding choice. Actual Beam collection, creator-fee compatibility, selected payout wallet and post-graduation rights need implementation and runtime tests. |
 | Match Pump byte for byte | **Not attainable for modified Beam binary** | The requested venue, Mayhem and fee changes alter code and program identity. The target is tested behavior/interface compatibility for unaffected features, tracked in the [feature matrix](docs/FEATURES.md). |
 
 ### Website and frontend
 
 | Goal | Status | What has been shown / what remains |
 | --- | --- | --- |
-| Pump-style experience with Beam branding | **In review** | [PR #6](https://github.com/shawkkkkk/beam/pull/6) carries a responsive **sample-data preview** selected from the closed alternate PR #3. It is not a live Pump clone or canonical client. |
+| Pump-style experience with Beam branding | **Preview merged** | [PR #6](https://github.com/shawkkkkk/beam/pull/6) merged a responsive **sample-data preview** selected from the closed, unmerged alternate [PR #3](https://github.com/shawkkkkk/beam/pull/3). It is not a live Pump clone or canonical client. |
 | Create, wallet and trade flows | **Blocked** | The preview saves local drafts; it does not upload metadata, connect wallets, sign or trade. A Beam IDL, client and verified chain data are required. |
-| Creator wallet, charity, callouts and livestream screens | **In review as local plans** | PR #6 has draft fields only; no provider or action exists. Preserve observable behavior with Beam branding while implementing services independently. |
-| Client and frontend data | **In progress** | [PR #7](https://github.com/shawkkkkk/beam/pull/7) merged golden native-SOL ABI fixtures. There is still no deployed Beam ID, complete SDK, indexer or live market feed. |
+| Creator wallet, charity, callouts and livestream screens | **Local plans merged; services blocked** | PR #6 has draft fields only; no provider or action exists. Preserve observable behavior with Beam branding while implementing services independently. |
+| Client and frontend data | **Native-SOL fixtures merged; SDK incomplete** | [PR #7](https://github.com/shawkkkkk/beam/pull/7) merged golden create/buy/sell ABI fixtures. [Draft PR #13](https://github.com/shawkkkkk/beam/pull/13) adds a local legacy creator-fee client and is pending review. There is still no deployed Beam ID, complete SDK, indexer or live market feed. |
 
 ### Backend and integrations
 
@@ -68,10 +68,13 @@ The requested Beam allocation is 50 nominal basis points with the split shown ab
 - New undeployed development identity.
 - Mayhem creation/enablement rejected; inert serialized fields and account slots retained.
 - Original PumpSwap migration, signed router and AMM-dependent CTO handlers blocked.
-- New administrator-pinned Raydium configuration and native-SOL migration candidate: canonical account checks, caller-funded setup, WSOL funding, LP receipt checks and an LP burn in the same instruction. Runtime rollback remains unverified.
+- Earlier administrator-pinned CPMM migration candidate is disabled in every build; its account checks, caller-funded setup, WSOL funding and LP burn remain development source only. Runtime migration rollback remains unverified.
 - Differential tests compile the pristine upstream crate beside Beam and compare selected retained math, layouts and instruction data.
 
 The current gated migration code targets Raydium CPMM, an earlier candidate superseded by the selected Raydium AMM v4 direction. It is not an AMM v4 adapter. It also burns LP and cannot harvest fees from that burned position. An AMM v4 integration, principal-lock/fee-rights design, and validator testing are required before any migration is enabled.
+[Merged PR #12](https://github.com/shawkkkkk/beam/pull/12) separately guards a nested graduated PumpSwap quote in `create_v2`. It fails closed; it does not supply an AMM v4 quote.
+
+An optional 99%-to-base, three-second buy-only model is a **disabled, test-only proposal**. Its precise account, fee and timing behavior needs a separate specification and adversarial local tests before it can be considered for the launchpad. It is not an active launch mode or trading promise.
 
 ## Website preview
 
@@ -112,10 +115,12 @@ Start with [contributor guidance](CONTRIBUTING.md), [agent instructions](AGENTS.
 the [feature matrix](docs/FEATURES.md), and the [task ledger](docs/TASKS.md),
 which includes bounded website/backend lanes. [PR #1](https://github.com/shawkkkkk/beam/pull/1)
 introduced the pinned contract baseline; [PR #2](https://github.com/shawkkkkk/beam/pull/2)
-added migration-accounting guards to its development branch. Check current PR heads before
-starting a task. These documents prepare scoped work for contributors; no
-Beam is [registered on Slop](https://slop.cash/projects/beam), but the project
-was paused with its security scan queued at the last maintainer check. This
-repository does not claim clearance, an installed project skill, or funded
-bounties. Beam has no repository-root license yet; the archived sources retain
-their own licenses.
+added migration-accounting guards to its development branch. Check current PR
+heads before starting a task. [PR #12](https://github.com/shawkkkkk/beam/pull/12)
+merged the nested quote guard and [draft PR #13](https://github.com/shawkkkkk/beam/pull/13)
+owns the local creator-fee SDK slice. Beam is
+[registered on Slop](https://slop.cash/projects/beam), but its listing was
+paused with a security scan queued at the last maintainer check. This
+repository does not claim scan clearance, an installed project skill, or
+funded bounties. Beam has no repository-root license yet; the archived sources
+retain their own licenses.
