@@ -90,7 +90,7 @@ declare_program!(mayhem);
 #[program]
 pub mod pump_recovered {
     use super::*;
-    pub fn initialize(ctx:Context<Initialize>)->Result<()>{global_init::execute(ctx)} pub fn configure_raydium(ctx: Context<ConfigureRaydium>) -> Result<()> { beam_raydium::configure(ctx) } pub fn set_raydium_enabled(ctx: Context<SetRaydiumEnabled>, enabled: bool) -> Result<()> { beam_raydium::set_enabled(ctx, enabled) } pub fn migrate_raydium<'info>(ctx: Context<'_, '_, '_, 'info, MigrateRaydium<'info>>, setup_budget: u64) -> Result<()> { beam_raydium::execute(ctx, setup_budget) }
+    pub fn initialize(ctx:Context<Initialize>)->Result<()>{global_init::execute(ctx)} pub fn configure_raydium(ctx: Context<ConfigureRaydium>) -> Result<()> { beam_raydium::configure(ctx) } pub fn set_raydium_enabled(ctx: Context<SetRaydiumEnabled>, enabled: bool) -> Result<()> { beam_raydium::set_enabled(ctx, enabled) } pub fn migrate_raydium<'info>(ctx: Context<'_, '_, '_, 'info, MigrateRaydium<'info>>, setup_budget: u64) -> Result<()> { beam_raydium::execute(ctx, setup_budget) } pub fn initialize_beam_fee_policy_v1(ctx: Context<InitializeBeamFeePolicyV1>) -> Result<()> { beam_fee_policy_v1::initialize(ctx) }
     pub fn update_global_authority(ctx:Context<UpdateGlobalAuthority>)->Result<()>{update_global_authority_handler(ctx)}
 // layout-pad: aligns the next Source site with the original lib.rs line
 
@@ -3220,3 +3220,5 @@ pub mod beam_economics;
 pub mod beam_amm_v4;
 pub mod beam_raydium;
 pub use beam_raydium::*;
+pub mod beam_fee_policy_v1;
+pub use beam_fee_policy_v1::*;
