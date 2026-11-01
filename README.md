@@ -37,17 +37,17 @@ dependency. No percentage can honestly describe whole-product parity yet.
 | --- | --- | --- |
 | Pump-style experience with Beam branding | **Preview merged** | [PR #6](https://github.com/shawkkkkk/beam/pull/6) merged a responsive **sample-data preview** selected from the closed, unmerged alternate [PR #3](https://github.com/shawkkkkk/beam/pull/3). It is not a live Pump clone or canonical client. |
 | Create, wallet and trade flows | **Blocked** | The preview saves local drafts; it does not upload metadata, connect wallets, sign or trade. A Beam IDL, client and verified chain data are required. |
-| Creator wallet, charity, callouts and livestream screens | **Local plans merged; services blocked** | PR #6 has draft fields only; no provider or action exists. Preserve observable behavior with Beam branding while implementing services independently. |
-| Client and frontend data | **Native-SOL fixtures merged; SDK incomplete** | [PR #7](https://github.com/shawkkkkk/beam/pull/7) merged golden create/buy/sell ABI fixtures. [Draft PR #13](https://github.com/shawkkkkk/beam/pull/13) adds a local legacy creator-fee client and is pending review. There is still no deployed Beam ID, complete SDK, indexer or live market feed. |
+| Creator wallet, charity, callouts and livestream screens | **Local plans merged; services in review** | PR #6 has draft fields only. Separate draft [charity PR #14](https://github.com/shawkkkkk/beam/pull/14) and [callouts PR #15](https://github.com/shawkkkkk/beam/pull/15) provide local backend mocks, not authorized providers or live actions. Livestreaming remains unimplemented. |
+| Client and frontend data | **Native-SOL fixtures merged; drafts in review** | [PR #7](https://github.com/shawkkkkk/beam/pull/7) merged create/buy/sell ABI fixtures. Draft [creator PR #13](https://github.com/shawkkkkk/beam/pull/13), [CreateV2 PR #18](https://github.com/shawkkkkk/beam/pull/18), and [raw event PR #20](https://github.com/shawkkkkk/beam/pull/20) own distinct SDK files. There is no deployed Beam ID or complete SDK. |
 
 ### Backend and integrations
 
 | Goal | Status | What has been shown / what remains |
 | --- | --- | --- |
-| Read-only market/indexer API | **Not started** | Needs chain event replay, finality/freshness metadata and honest error states. Preview charts are fixtures. |
+| Read-only market/indexer API | **Local drafts in review** | [PR #16](https://github.com/shawkkkkk/beam/pull/16) owns a fixture backend under `backend/indexer/`; [PR #17](https://github.com/shawkkkkk/beam/pull/17) owns a read-only `web/` adapter. Their schema must be reconciled. Neither is a live chain feed; preview charts are fixtures. |
 | Creator fee, wallet and sharing service | **Blocked** | On-chain source retains creator vault/collection paths, but Beam still depends on inherited Pump fee configuration. No Beam-controlled payout integration is verified. |
-| Donate.gg charity donations | **Blocked** | The archive contains a donation relay and Pump Fees instructions; Beam has no authorized charity registry, configured adapter or settlement service. No real donations occur. |
-| Callouts and livestreaming | **Not started** | No backend or provider integration is in the on-chain archive. Identity, permissions, moderation and media services must be defined and tested. |
+| Donate.gg charity donations | **Local draft in review; live use blocked** | [PR #14](https://github.com/shawkkkkk/beam/pull/14) owns a disabled local charity mock. There is no authorized provider or settlement service; no real donations occur. |
+| Callouts and livestreaming | **Callouts draft in review; streams blocked** | [PR #15](https://github.com/shawkkkkk/beam/pull/15) owns a local callout service with mock adapters. No live provider integration or livestream service is present. |
 
 See [implementation status](docs/STATUS.md) and [contributor tasks](docs/TASKS.md)
 for evidence and bounded ways to help with the website, frontend and backend.
@@ -61,7 +61,7 @@ for evidence and bounded ways to help with the website, frontend and backend.
 | Founder | 0.03% | 6% |
 | Total | **0.50%** | **100%** |
 
-The requested Beam allocation is 50 nominal basis points with the split shown above. Existing creator payout behavior must be preserved, but whether creator payouts come from the 0.42% community share or are charged in addition is undecided. Therefore 0.50% is **not yet an all-in trading quote**. The allocation engine rounds this component once and gives split dust to the community. Holder rewards and flagship buybacks are proposed uses of the community amount remaining after any creator allocation, if that funding route is chosen. A 50/50 split of that remainder is only a provisional test setting; eligibility, the flagship mint, and distribution rules are undecided. Collection and distribution are not yet wired to trading instructions. Raydium's own pool fees are separate. See [economics](docs/ECONOMICS.md) and the [feature matrix](docs/FEATURES.md).
+The requested ordinary Beam allocation is 50 nominal basis points: 42 community, 5 treasury and 3 founder. Treasury plus founder are 8 basis points under platform control. Existing creator payout behavior must be preserved, but whether creator payouts come from the community share or are charged in addition is undecided. Therefore 0.50% is **not yet an all-in trading quote**. The allocation engine rounds this component once and gives split dust to the community. Holder rewards and flagship buybacks are proposed uses of the community amount remaining after any creator allocation, if that funding route is chosen. A 50/50 split of that remainder is only a provisional test setting; eligibility, the flagship mint, and distribution rules are undecided. Collection and distribution are not yet wired to trading instructions. Raydium's own pool fees are separate. See [economics](docs/ECONOMICS.md) and the [feature matrix](docs/FEATURES.md).
 
 ## First contract slice
 
@@ -74,7 +74,7 @@ The requested Beam allocation is 50 nominal basis points with the split shown ab
 The current gated migration code targets Raydium CPMM, an earlier candidate superseded by the selected Raydium AMM v4 direction. It is not an AMM v4 adapter. It also burns LP and cannot harvest fees from that burned position. An AMM v4 integration, principal-lock/fee-rights design, and validator testing are required before any migration is enabled.
 [Merged PR #12](https://github.com/shawkkkkk/beam/pull/12) separately guards a nested graduated PumpSwap quote in `create_v2`. It fails closed; it does not supply an AMM v4 quote.
 
-An optional 99%-to-base, three-second buy-only model is a **disabled, test-only proposal**. Its precise account, fee and timing behavior needs a separate specification and adversarial local tests before it can be considered for the launchpad. It is not an active launch mode or trading promise.
+An optional three-second, buy-side launch-fee quote prototype is **disabled and test-only**. Its initial 99% models the fee as a share of the **gross buyer debit**: for a 100-unit debit, 99 units would be fee and 1 unit base quote. A fee of 99% of **net base** would instead be about 49.75% of the gross debit (0.99 / 1.99); these are different models. The prototype keeps its launch surcharge separate from the ordinary 42/5/3 allocation and has no recipient or withdrawal path for that surcharge. It has no enabled contract path, sell-handler change, live trades or promised outcome. Creator funding, account custody and adversarial runtime behavior remain unresolved.
 
 ## Website preview
 
@@ -117,8 +117,9 @@ which includes bounded website/backend lanes. [PR #1](https://github.com/shawkkk
 introduced the pinned contract baseline; [PR #2](https://github.com/shawkkkkk/beam/pull/2)
 added migration-accounting guards to its development branch. Check current PR
 heads before starting a task. [PR #12](https://github.com/shawkkkkk/beam/pull/12)
-merged the nested quote guard and [draft PR #13](https://github.com/shawkkkkk/beam/pull/13)
-owns the local creator-fee SDK slice. Beam is
+merged the nested quote guard. Draft PRs #13–#20 own separate SDK, backend,
+web-adapter and documentation slices listed in the [task ledger](docs/TASKS.md).
+Beam is
 [registered on Slop](https://slop.cash/projects/beam), but its listing was
 paused with a security scan queued at the last maintainer check. This
 repository does not claim scan clearance, an installed project skill, or

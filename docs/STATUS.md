@@ -14,7 +14,7 @@
 - Inherited Global migration-fee behavior retained. Test-only Beam curve-fee arithmetic now reflects the requested 42/5/3 bps community/treasury/founder split; it does not rewrite inherited creator or migration fees or enforce a live rate.
 - Source-only [AMM v4 ABI guards](../programs/beam/src/beam_amm_v4.rs) encode the pinned 19-account `Initialize2` path and reject Token-2022 mint owners. They are not called by a Beam instruction and do not migrate a token.
 - Fee-allocation arithmetic and selected host differential tests.
-- [PR #7](https://github.com/shawkkkkk/beam/pull/7) merged native-SOL create/buy/sell ABI fixtures and local encoders. They do not resolve live accounts, sign or submit transactions. [PR #13](https://github.com/shawkkkkk/beam/pull/13) is a separate draft for local legacy creator-fee fixtures; it is not part of this main-branch snapshot.
+- [PR #7](https://github.com/shawkkkkk/beam/pull/7) merged native-SOL create/buy/sell ABI fixtures and local encoders. They do not resolve live accounts, sign or submit transactions. Draft [PR #13](https://github.com/shawkkkkk/beam/pull/13) owns legacy creator-fee fixtures, [PR #18](https://github.com/shawkkkkk/beam/pull/18) owns CreateV2 construction, and [PR #20](https://github.com/shawkkkkk/beam/pull/20) owns raw Create/Trade event decoding; these are not part of this main-branch snapshot.
 - [PR #6](https://github.com/shawkkkkk/beam/pull/6) merged a Beam-branded website preview with sample market data and browser-local drafts. It has no wallet, chain feed, metadata upload, donation, callout or livestream service.
 
 ## Outstanding before use
@@ -39,9 +39,14 @@ carried into merged [PR #6](https://github.com/shawkkkkk/beam/pull/6).
 
 Creator payouts and creator-selected wallet behavior remain requirements,
 while funding from the community share versus an additional charge is
-undecided. The optional 99%-to-base, three-second buy-only model has no
-enabled contract path or validated specification; treat it as a disabled,
-test-only proposal, with no live trades or promised outcome.
+undecided. The ordinary proposed allocation is 42/5/3 basis points for
+community/treasury/founder: 50 basis points total, including 8 basis points
+under platform control. The optional disabled, three-second buy-side quote
+prototype models an initial 99% fee of gross buyer debit. A 99% fee on net
+base would be about 49.75% of gross (0.99 / 1.99), so it is not the same rule.
+Its launch surcharge is separate from ordinary allocation, with no recipient
+or withdrawal path in the prototype. There is no enabled contract path, live
+trade, sell-handler change or promised outcome.
 
 Beam's [Slop listing](https://slop.cash/projects/beam) was paused with a
 security scan queued at the last maintainer check. Clearance and reward terms
@@ -52,6 +57,10 @@ have not been established in this repository.
 Host compilation checks Rust/Anchor types. Differential tests cover selected quote/fee functions, decoding/serialization boundaries and retained instruction encodings, including semantic errors and source line numbers. Build-directory prefixes are normalized because the reference is compiled from another directory.
 
 These checks do not establish full instruction execution parity, SBF byte identity, CPI success, current-chain behavior or security. Source equality is separate from program-binary equality.
+
+Any isolated local-bank harness uses synthetic accounts and valueless balances
+to exercise Beam code. It does not execute captured original Pump binaries,
+prove Raydium CPI behavior or submit a transaction to a live network.
 
 Upstream declares the reconstruction complete and removed captured binaries and its research toolchain. This branch pins the final source; it does not independently re-prove the historical reconstruction claim.
 
