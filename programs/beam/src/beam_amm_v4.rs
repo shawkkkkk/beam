@@ -9,6 +9,7 @@
 //! emits the accepted legacy 21-account layout with unused market placeholders.
 
 use anchor_lang::solana_program::{
+    account_info::AccountInfo,
     instruction::{AccountMeta, Instruction},
     pubkey, sysvar,
 };
@@ -28,6 +29,10 @@ pub const DEVNET_CREATE_POOL_FEE_DESTINATION: Pubkey =
 pub const INITIALIZE2_TAG: u8 = 1;
 pub const INITIALIZE2_DATA_LEN: usize = 26;
 pub const INITIALIZE2_ACCOUNT_COUNT: usize = 19;
+/// `AmmConfig` is a packed 544-byte struct in the pinned Raydium AMM v4 source.
+/// Its last u64 is `create_pool_fee` (state.rs::AmmConfig).
+pub const AMM_CONFIG_DATA_LEN: usize = 544;
+const CREATE_POOL_FEE_OFFSET: usize = 536;
 
 const AUTHORITY_SEED: &[u8] = b"amm authority";
 const AMM_SEED: &[u8] = b"amm_associated_seed";
@@ -46,6 +51,9 @@ pub enum AmmV4AbiError {
     InvalidNonce,
     InvalidAccounts,
     InvalidUserLpAta,
+    InvalidConfigAccount,
+    InvalidConfigData,
+    CreatePoolFeeExceedsCap,
 }
 
 /// Pass the mint account's verified owner, not a caller-selected token program.
@@ -103,6 +111,37 @@ fn fee_destination(program_id: &Pubkey) -> Result<Pubkey, AmmV4AbiError> {
     } else {
         Err(AmmV4AbiError::UnsupportedProgram)
     }
+}
+
+/// Read Raydium's *current* pool-creation charge from its canonical config.
+/// A future migration caller must supply `max_fee_lamports` from an authorized
+/// Beam policy account and invoke this immediately before the Raydium CPI.
+/// This cap does not include rent, transaction fees, or other setup funding.
+/// Reading a config here neither pins future fees nor enables migration.
+pub fn validate_create_pool_fee_account(
+    program_id: &Pubkey,
+    config: &AccountInfo<'_>,
+    max_fee_lamports: u64,
+) -> Result<u64, AmmV4AbiError> {
+    fee_destination(program_id)?;
+    let expected = Pubkey::find_program_address(&[CONFIG_SEED], program_id).0;
+    if config.key != &expected || config.owner != program_id {
+        return Err(AmmV4AbiError::InvalidConfigAccount);
+    }
+    let data = config
+        .try_borrow_data()
+        .map_err(|_| AmmV4AbiError::InvalidConfigData)?;
+    if data.len() != AMM_CONFIG_DATA_LEN {
+        return Err(AmmV4AbiError::InvalidConfigData);
+    }
+    let fee_bytes: [u8; 8] = data[CREATE_POOL_FEE_OFFSET..AMM_CONFIG_DATA_LEN]
+        .try_into()
+        .map_err(|_| AmmV4AbiError::InvalidConfigData)?;
+    let fee = u64::from_le_bytes(fee_bytes);
+    if fee > max_fee_lamports {
+        return Err(AmmV4AbiError::CreatePoolFeeExceedsCap);
+    }
+    Ok(fee)
 }
 
 fn associated(program_id: &Pubkey, market_seed: &Pubkey, suffix: &[u8]) -> Pubkey {
@@ -243,6 +282,103 @@ pub fn validate_initialize2_instruction(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn with_config<R>(
+        key: Pubkey,
+        owner: Pubkey,
+        mut data: Vec<u8>,
+        f: impl FnOnce(&AccountInfo<'_>) -> R,
+    ) -> R {
+        let mut lamports = 1;
+        let account = AccountInfo::new(
+            &key,
+            false,
+            false,
+            &mut lamports,
+            &mut data,
+            &owner,
+            false,
+            0,
+        );
+        f(&account)
+    }
+
+    fn config_key(program_id: &Pubkey) -> Pubkey {
+        Pubkey::find_program_address(&[CONFIG_SEED], program_id).0
+    }
+
+    fn config_data(fee: u64) -> Vec<u8> {
+        let mut data = vec![0; AMM_CONFIG_DATA_LEN];
+        data[CREATE_POOL_FEE_OFFSET..].copy_from_slice(&fee.to_le_bytes());
+        data
+    }
+
+    #[test]
+    fn current_create_pool_fee_is_read_from_canonical_owned_config() {
+        for program in [MAINNET_PROGRAM_ID, DEVNET_PROGRAM_ID] {
+            let key = config_key(&program);
+            for (fee, cap, expected) in [
+                (0, 0, Ok(0)),
+                (123, 123, Ok(123)),
+                (124, 123, Err(AmmV4AbiError::CreatePoolFeeExceedsCap)),
+                (u64::MAX, u64::MAX, Ok(u64::MAX)),
+            ] {
+                with_config(key, program, config_data(fee), |account| {
+                    assert_eq!(
+                        validate_create_pool_fee_account(&program, account, cap),
+                        expected
+                    );
+                });
+            }
+        }
+    }
+
+    #[test]
+    fn create_pool_fee_config_rejects_substitution_and_rechecks_changes() {
+        let program = MAINNET_PROGRAM_ID;
+        let key = config_key(&program);
+        let wrong_key = Pubkey::new_from_array([21; 32]);
+        let wrong_owner = Pubkey::new_from_array([22; 32]);
+        let unknown_program = Pubkey::new_from_array([23; 32]);
+        with_config(wrong_key, program, config_data(1), |account| {
+            assert_eq!(
+                validate_create_pool_fee_account(&program, account, 1),
+                Err(AmmV4AbiError::InvalidConfigAccount)
+            );
+        });
+        with_config(key, wrong_owner, config_data(1), |account| {
+            assert_eq!(
+                validate_create_pool_fee_account(&program, account, 1),
+                Err(AmmV4AbiError::InvalidConfigAccount)
+            );
+        });
+        with_config(key, program, config_data(1), |account| {
+            assert_eq!(
+                validate_create_pool_fee_account(&unknown_program, account, 1),
+                Err(AmmV4AbiError::UnsupportedProgram)
+            );
+        });
+        for len in [AMM_CONFIG_DATA_LEN - 1, AMM_CONFIG_DATA_LEN + 1] {
+            with_config(key, program, vec![0; len], |account| {
+                assert_eq!(
+                    validate_create_pool_fee_account(&program, account, 1),
+                    Err(AmmV4AbiError::InvalidConfigData)
+                );
+            });
+        }
+        with_config(key, program, config_data(1), |account| {
+            assert_eq!(
+                validate_create_pool_fee_account(&program, account, 1),
+                Ok(1)
+            );
+            account.try_borrow_mut_data().unwrap()[CREATE_POOL_FEE_OFFSET..]
+                .copy_from_slice(&2u64.to_le_bytes());
+            assert_eq!(
+                validate_create_pool_fee_account(&program, account, 1),
+                Err(AmmV4AbiError::CreatePoolFeeExceedsCap)
+            );
+        });
+    }
 
     fn accounts() -> Initialize2Accounts {
         let mut accounts = Initialize2Accounts {
