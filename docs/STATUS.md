@@ -8,7 +8,7 @@
 - Mayhem creation/enablement rejected. Inert serialized flags/account slots remain; Beam does not deploy the companion Mayhem program.
 - Legacy `migrate`, `migrate_v2`, `multi_hop_curve_swap` and `admin_cto` handlers fail before transfers/CPIs. They are temporarily unavailable rather than silently routed back to PumpSwap. Other retained quote-chain code still understands historical PumpSwap layouts; it is not yet a Raydium router.
 - New `configure_raydium`, `set_raydium_enabled` and `migrate_raydium` candidates.
-- Gated native-SOL candidate validates the fixed executable, canonical administrator-pinned AmmConfig, mint ordering, vault/LP/observation PDAs, completion and real reserves/rent. It funds WSOL, invokes initialize, checks/burns received LP, records a one-time receipt and clears curve reserves atomically.
+- Gated native-SOL candidate validates the fixed executable, canonical administrator-pinned AmmConfig, mint ordering, vault/LP/observation PDAs, completion and real reserves/rent. It funds WSOL, invokes initialize, checks/burns received LP, records a one-time receipt and clears curve reserve fields in the same instruction. Runtime rollback remains unverified.
 - Caller setup funding is separate from curve liquidity. The budget covers Raydium CPIs; outer ATA/receipt rent and transaction fees are additional. Refunds cannot exceed the caller's unspent contribution or include prior authority donations.
 - Standard SPL Token and a restricted Token-2022 metadata extension subset supported by the migration candidate. Other extensions and non-SOL quote assets fail closed.
 - Inherited Global migration-fee behavior retained. The new 45/5 bps allocation does not silently rewrite creator or migration fees.
@@ -22,6 +22,15 @@
 4. Regenerated Beam IDL, wallet builders, real indexer and production UI. Retained dependency IDLs are reference interfaces, not a finalized Beam client API.
 5. SBF build and local-validator differential tests: every retained instruction, actual Raydium CPIs, rollback, authority checks, rent, extensions, replay rejection and LP treatment.
 6. Deployment-key assignment, independent review and devnet end-to-end validation. This branch deploys nothing.
+
+The [task ledger](TASKS.md) tracks current ownership and bounded follow-up
+work. [PR #2](https://github.com/shawkkkkk/beam/pull/2) added checked
+post-completion quote accounting, fee/rent liability protection, and
+account-alias guards to the development branch. Those host-tested guards do
+not establish CPI success or fee-sweep/rollback safety.
+[The separate root-model PR #3](https://github.com/shawkkkkk/beam/pull/3)
+has different venue and economic assumptions and is not the current
+`programs/beam` contract; its website uses sample data.
 
 ## Meaning of checks
 
