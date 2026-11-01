@@ -1,0 +1,11 @@
+[package]
+name = "beam-core"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+description = "Checked launch curve and fee accounting for Beam"
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
