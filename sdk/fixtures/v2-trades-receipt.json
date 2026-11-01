@@ -1,0 +1,15 @@
+{
+  "kind": "Compiled Beam Anchor serialization of synthetic values",
+  "exitCode": 0,
+  "sourceCommit": "4e32d302f5dfe7650030db9cbde0bcc5edf9aaaf",
+  "producerSha256": "2bf7be5fecc3937a322eb5ba90ab6f74739bb766e1985bbcdad0bf26de6ceab0",
+  "stdoutSha256": "baf01bc782d34536613895107125775f3d08e9900e8defb1344979d749da7fab",
+  "stderrSha256": "c8ec7c23677a0c15cf7a7de012f7a9a44abe8f7769fd32bab2295ed53e1d6568",
+  "stdoutBytes": 3963,
+  "accountMetas": { "buyV2": 27, "sellV2": 26 },
+  "cargo": "1.99.1",
+  "rustc": "1.99.1",
+  "command": "cargo run --locked --offline --manifest-path programs/beam/Cargo.toml --example beam_v2_trades_fixture --quiet",
+  "runtimeHandlersExecuted": false,
+  "networkOrTransactions": false
+}
