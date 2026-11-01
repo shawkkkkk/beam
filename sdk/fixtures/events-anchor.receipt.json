@@ -1,0 +1,32 @@
+{
+  "kind": "Actual independent root execution of reviewed own Rust event producer",
+  "exitCode": 0,
+  "head": "b8120a8a58b1375ba3b8f0d2a590c49923e18021",
+  "sourceSha256": "412f0a68a7cb233fef8dd5eae1752bf424573826b025020e8fb408f5aaf8dc32",
+  "stdoutSha256": "03dd6980312409e1e0aa330d99326482c6b1b7d8a57a89f7def8045c9749be37",
+  "stdoutBytes": 4136,
+  "stderrSha256": "f02fbe60d04454dfc0113b082557cbadf5220031aed7a3a56799cb6d0866f2e3",
+  "eventIds": [
+    "create-unicode",
+    "create-empty",
+    "trade-mixed",
+    "trade-empty",
+    "trade-sequential"
+  ],
+  "eventLengths": [
+    319,
+    272,
+    466,
+    387,
+    493
+  ],
+  "noHandlersOrNetworkOrTransactions": true,
+  "cargo": "1.89.0",
+  "rustc": "1.94.1",
+  "command": "cargo run --locked --manifest-path programs/beam/Cargo.toml --example beam_events_fixture",
+  "compileEnv": {
+    "CARGO_HOME": "/tmp/beam-20261101/cargo-home",
+    "CARGO_TARGET_DIR": "/tmp/beam-20261101/target",
+    "RUSTFLAGS": "-C debuginfo=0"
+  }
+}
