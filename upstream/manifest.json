@@ -31,7 +31,9 @@
     "src/beam_raydium.rs",
     "tests/compatibility.rs",
     "src/beam_economics.rs",
-    "src/beam_amm_v4.rs"
+    "src/beam_amm_v4.rs",
+    "src/beam_amm_v4_funding.rs",
+    "tests/amm_v4_funding.rs"
   ],
   "deployment_status": "not deployed"
 }
