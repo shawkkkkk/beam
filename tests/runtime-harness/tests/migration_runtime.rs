@@ -1,5 +1,7 @@
-//! Local-bank activation and rollback checks for the Beam Raydium gate.
-//! This test never invokes Raydium and does not establish migration CPI safety.
+//! Local-bank gate, authority, and rollback checks for the retired CPMM adapter.
+//! The user selected AMM v4. These synthetic transactions never invoke the
+//! Raydium program, do not test a migration CPI, and do not establish safety
+//! or behavior of any deployed Raydium binary.
 use anchor_lang::{AccountDeserialize, AccountSerialize, Discriminator, InstructionData};
 use anchor_lang::solana_program::{account_info::AccountInfo, entrypoint::ProgramResult};
 use beam_program::{beam_raydium::{BeamRaydiumConfig, RAYDIUM_ID}, Global};
@@ -74,14 +76,14 @@ fn beam_processor<'a>(program_id: &Pubkey, accounts: &[AccountInfo<'a>], data: &
     beam_program::entry(program_id, accounts, data)
 }
 
-async fn fixture() -> (ProgramTestContext, Keypair, Keypair) {
+async fn fixture(initially_enabled: bool) -> (ProgramTestContext, Keypair, Keypair) {
     let admin = Keypair::new();
     let other = Keypair::new();
     let mut config_data = Vec::new();
     BeamRaydiumConfig {
         amm_config: Pubkey::new_unique(),
         raydium_program: RAYDIUM_ID,
-        enabled: false,
+        enabled: initially_enabled,
     }
     .try_serialize(&mut config_data)
     .unwrap();
@@ -142,13 +144,13 @@ async fn config_enabled(bank: &mut ProgramTestContext) -> bool {
 #[tokio::test]
 async fn invalid_amm_config_rolls_back_account_init_and_valid_config_starts_disabled() {
     let (mut rejected_bank, admin, amm_config) = configure_fixture(true).await;
-    let rejected = signed_tx(&rejected_bank, &admin, None, &[configure(admin.pubkey(), amm_config)]);
+    let rejected = signed_tx(&rejected_bank, &admin, &[configure(admin.pubkey(), amm_config)]);
     let error = rejected_bank.banks_client.process_transaction(rejected).await.unwrap_err();
     assert!(format!("{error:?}").contains("Custom(7003)"), "unexpected config error: {error:?}");
     assert!(rejected_bank.banks_client.get_account(config_pda()).await.unwrap().is_none());
 
     let (mut valid_bank, admin, amm_config) = configure_fixture(false).await;
-    let valid = signed_tx(&valid_bank, &admin, None, &[configure(admin.pubkey(), amm_config)]);
+    let valid = signed_tx(&valid_bank, &admin, &[configure(admin.pubkey(), amm_config)]);
     valid_bank.banks_client.process_transaction(valid).await.unwrap();
     let account = valid_bank.banks_client.get_account(config_pda()).await.unwrap().unwrap();
     let config = BeamRaydiumConfig::try_deserialize(&mut &account.data[..]).unwrap();
@@ -157,50 +159,57 @@ async fn invalid_amm_config_rolls_back_account_init_and_valid_config_starts_disa
     assert!(!config.enabled);
 }
 
-fn signed_tx(bank: &ProgramTestContext, admin: &Keypair, other: Option<&Keypair>, instructions: &[Instruction]) -> Transaction {
-    let mut signers: Vec<&Keypair> = vec![&bank.payer, admin];
-    if let Some(other) = other { signers.push(other); }
+fn signed_tx(bank: &ProgramTestContext, admin: &Keypair, instructions: &[Instruction]) -> Transaction {
     Transaction::new_signed_with_payer(
         instructions,
         Some(&bank.payer.pubkey()),
-        &signers,
+        &[&bank.payer, admin],
         bank.last_blockhash,
     )
 }
 
-#[cfg(not(feature = "experimental-raydium"))]
 #[tokio::test]
-async fn default_build_cannot_enable_migration_and_keeps_config_disabled() {
-    let (mut bank, admin, _) = fixture().await;
+async fn retired_cpmm_cannot_enable_in_any_feature_mode_and_keeps_config_disabled() {
+    let (mut bank, admin, other) = fixture(false).await;
     assert!(!config_enabled(&mut bank).await);
-    let attempt = signed_tx(&bank, &admin, None, &[set_enabled(admin.pubkey(), true)]);
+    let attempt = signed_tx(&bank, &admin, &[set_enabled(admin.pubkey(), true)]);
     let error = bank.banks_client.process_transaction(attempt).await.unwrap_err();
     assert!(format!("{error:?}").contains("Custom(7002)"), "unexpected gate error: {error:?}");
     assert!(!config_enabled(&mut bank).await);
 
-    // Disabling remains available without the experimental feature.
-    let disable = signed_tx(&bank, &admin, None, &[set_enabled(admin.pubkey(), false)]);
+    let unauthorized = Transaction::new_signed_with_payer(
+        &[set_enabled(other.pubkey(), false)],
+        Some(&bank.payer.pubkey()),
+        &[&bank.payer, &other],
+        bank.last_blockhash,
+    );
+    let error = bank.banks_client.process_transaction(unauthorized).await.unwrap_err();
+    assert!(format!("{error:?}").contains("Custom(2001)"), "unexpected authority error: {error:?}");
+    assert!(!config_enabled(&mut bank).await);
+
+    // An authorized disable remains idempotent for a retired adapter.
+    let disable = signed_tx(&bank, &admin, &[set_enabled(admin.pubkey(), false)]);
     bank.banks_client.process_transaction(disable).await.unwrap();
     assert!(!config_enabled(&mut bank).await);
 }
 
-#[cfg(feature = "experimental-raydium")]
 #[tokio::test]
-async fn failed_second_instruction_rolls_back_experimental_enable() {
-    let (mut bank, admin, other) = fixture().await;
-    assert!(!config_enabled(&mut bank).await);
+async fn failed_enable_rolls_back_prior_disable_of_legacy_state() {
+    // Synthetic legacy state represents a config enabled before CPMM retirement.
+    let (mut bank, admin, _) = fixture(true).await;
+    assert!(config_enabled(&mut bank).await);
 
-    // The first instruction would enable the gate, but the second uses a
-    // signer that is not Global.authority. The bank must roll back both.
-    let attempted_pair = signed_tx(&bank, &admin, Some(&other), &[
+    // The first instruction disables; the second attempts to re-enable and
+    // fails. The bank rolls back the entire transaction, including disable.
+    let attempted_pair = signed_tx(&bank, &admin, &[
+        set_enabled(admin.pubkey(), false),
         set_enabled(admin.pubkey(), true),
-        set_enabled(other.pubkey(), false),
     ]);
     let error = bank.banks_client.process_transaction(attempted_pair).await.unwrap_err();
-    assert!(format!("{error:?}").contains("Custom(2001)"), "unexpected authority error: {error:?}");
-    assert!(!config_enabled(&mut bank).await);
-
-    let authorized = signed_tx(&bank, &admin, None, &[set_enabled(admin.pubkey(), true)]);
-    bank.banks_client.process_transaction(authorized).await.unwrap();
+    assert!(format!("{error:?}").contains("Custom(7002)"), "unexpected gate error: {error:?}");
     assert!(config_enabled(&mut bank).await);
+
+    let disable = signed_tx(&bank, &admin, &[set_enabled(admin.pubkey(), false)]);
+    bank.banks_client.process_transaction(disable).await.unwrap();
+    assert!(!config_enabled(&mut bank).await);
 }
