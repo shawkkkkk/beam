@@ -181,6 +181,15 @@ fn checked_move(from: &AccountInfo, to: &AccountInfo, amount: u64) -> Result<()>
     Ok(())
 }
 
+/// Post-completion buys can add quote to the curve after real reserves stop
+/// changing. Include that quote in the Raydium pool, as the retained Pump
+/// migration does, while charging the migration fee only once.
+fn migration_quote(real_quote: u64, post_complete_quote_in: u64, migration_fee: u64) -> Result<(u64, u64)> {
+    let total = real_quote.checked_add(post_complete_quote_in).ok_or(PumpError::Overflow)?;
+    let pool_quote = total.checked_sub(migration_fee).ok_or(BeamError::InvalidMigrationBalance)?;
+    Ok((total, pool_quote))
+}
+
 pub fn execute<'info>(ctx: Context<'_, '_, '_, 'info, MigrateRaydium<'info>>, setup_budget: u64) -> Result<()> {
     require!(cfg!(feature = "experimental-raydium"), BeamError::MigrationNotEnabled);
     let a = &ctx.accounts;
@@ -205,9 +214,12 @@ pub fn execute<'info>(ctx: Context<'_, '_, '_, 'info, MigrateRaydium<'info>>, se
     pda(&a.observation.to_account_info(), &[b"observation", pool.as_ref()])?;
     let expected_lp = anchor_spl::associated_token::get_associated_token_address_with_program_id(&a.migration_authority.key(), &a.lp_mint.key(), &token::ID);
     require_keys_eq!(a.authority_lp.key(), expected_lp, BeamError::InvalidRaydiumAccount);
-    let total_quote = a.bonding_curve.real_quote_reserves;
     let migration_fee = a.global.pool_migration_fee;
-    let quote = total_quote.checked_sub(migration_fee).ok_or(BeamError::InvalidMigrationBalance)?;
+    let (total_quote, quote) = migration_quote(
+        a.bonding_curve.real_quote_reserves,
+        a.bonding_curve.post_complete_quote_in,
+        migration_fee,
+    )?;
     let base = a.curve_token_vault.amount;
     require!(base > 0 && base <= a.bonding_curve.token_total_supply && quote > 0 && setup_budget > 0, BeamError::InvalidMigrationBalance);
     let curve_info = a.bonding_curve.to_account_info();
@@ -264,6 +276,14 @@ pub struct BeamRaydiumMigration {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn migration_includes_post_completion_quote_and_charges_fee_once() {
+        assert_eq!(migration_quote(100, 25, 10).unwrap(), (125, 115));
+        assert_eq!(migration_quote(100, 0, 10).unwrap(), (100, 90));
+        assert_eq!(migration_quote(0, 25, 0).unwrap(), (25, 25));
+        assert!(migration_quote(u64::MAX, 1, 0).is_err());
+        assert!(migration_quote(100, 25, 126).is_err());
+    }
     #[test]
     fn initialize_abi_has_exact_discriminator_arguments_and_privileges() {
         let keys = std::array::from_fn(|_| Pubkey::new_unique());
