@@ -36,6 +36,8 @@ test('base58 pubkeys roundtrip and malformed keys fail', () => {
   assert.equal(encodeBase58Pubkey(decodeBase58Pubkey(fixture.create.args.creator)), fixture.create.args.creator);
   assert.throws(() => decodeBase58Pubkey('0'), /invalid base58/);
   assert.throws(() => decodeBase58Pubkey('2'), /32 bytes/);
+  assert.throws(() => decodeBase58Pubkey('1'.repeat(45)), /too long/);
+  assert.throws(() => decodeBase58Pubkey('z'.repeat(100_000)), /too long/);
   assert.throws(() => encodeBase58Pubkey(new Uint8Array(31)), /32 bytes/);
 });
 
@@ -46,6 +48,7 @@ test('u64 encoding accepts exact bigint and rejects unsafe or malformed amounts'
   assert.throws(() => encodeSell({ ...base, amount: -1n }), /fit u64/);
   assert.throws(() => encodeSell({ ...base, amount: Number.MAX_SAFE_INTEGER + 1 }), /safe integer/);
   assert.throws(() => encodeSell({ ...base, amount: '01' }), /canonical decimal/);
+  assert.throws(() => encodeSell({ ...base, amount: '9'.repeat(100_000) }), /fit u64/);
   assert.throws(() => encodeBuy({ ...fixture.buy.args, partialFill: 1 }), /boolean/);
   const unicode = encodeCreate({ ...fixture.create.args, name: '⚡' });
   assert.equal(new DataView(unicode.buffer, unicode.byteOffset, unicode.byteLength).getUint32(8, true), 3);

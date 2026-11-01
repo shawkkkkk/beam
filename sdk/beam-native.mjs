@@ -24,6 +24,7 @@ function equal(a, b) {
 
 export function decodeBase58Pubkey(value) {
   if (typeof value !== 'string' || !value.length) throw new TypeError('pubkey must be a base58 string');
+  if (value.length > 44) throw new RangeError('base58 pubkey is too long');
   let n = 0n;
   for (const char of value) {
     const digit = ALPHABET.indexOf(char);
@@ -52,7 +53,10 @@ function u64(value, name) {
   let n;
   if (typeof value === 'bigint') n = value;
   else if (typeof value === 'number' && Number.isSafeInteger(value)) n = BigInt(value);
-  else if (typeof value === 'string' && /^(0|[1-9][0-9]*)$/.test(value)) n = BigInt(value);
+  else if (typeof value === 'string' && /^(0|[1-9][0-9]*)$/.test(value)) {
+    if (value.length > 20) throw new RangeError(`${name} must fit u64`);
+    n = BigInt(value);
+  }
   else throw new TypeError(`${name} must be a safe integer, bigint, or canonical decimal string`);
   if (n < 0n || n > U64_MAX) throw new RangeError(`${name} must fit u64`);
   const out = new Uint8Array(8);
