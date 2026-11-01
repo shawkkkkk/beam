@@ -511,7 +511,7 @@ function App() {
               <span className="proof-divider" />
               <span>
                 Planned Beam fee: 0.42% community / 0.05% treasury / 0.03%
-                founder; creator fees separate
+                founder; creator payout funding pending
               </span>
             </div>
           </div>
@@ -1034,10 +1034,10 @@ function App() {
                     <div>
                       <h3>Grow</h3>
                       <p>
-                        The specified Beam fee is 0.50%: 0.42% for community
-                        rewards and buybacks, 0.05% treasury, and 0.03% founder.
-                        Creator fees are separate. Collection and distribution
-                        are not active in this preview.
+                        The specified Beam allocation is 0.50%: 0.42% for the
+                        community bucket, 0.05% treasury, and 0.03% founder.
+                        Creator payout funding is undecided. Collection and
+                        distribution are not active in this preview.
                       </p>
                     </div>
                     <ChevronRight size={18} />
