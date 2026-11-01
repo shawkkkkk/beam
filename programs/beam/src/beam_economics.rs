@@ -4,9 +4,9 @@ use anchor_lang::prelude::*;
 use crate::PumpError;
 
 pub const TOTAL_FEE_BPS: u64 = 50;
-pub const COMMUNITY_SHARE_BPS: u64 = 8_400;
-pub const TREASURY_SHARE_BPS: u64 = 1_000;
-pub const FOUNDER_SHARE_BPS: u64 = 600;
+pub const COMMUNITY_NOMINAL_BPS: u64 = 42;
+pub const TREASURY_NOMINAL_BPS: u64 = 5;
+pub const FOUNDER_NOMINAL_BPS: u64 = 3;
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct FeeAllocation {
@@ -16,15 +16,18 @@ pub struct FeeAllocation {
     pub founder: u64,
 }
 
-/// Round the total once using Pump's recovered fee routine. Assign split dust
-/// to the community, never round two separate charges up against the trader.
+/// Round the total once using Pump's recovered fee routine. Cap the treasury
+/// and founder against the trade notional itself, then assign split dust to
+/// the community. Never round two separate charges up against the trader.
 pub fn allocate(quote_amount: u64) -> Result<FeeAllocation> {
     let total = crate::fee_math::fee(quote_amount, TOTAL_FEE_BPS)?;
-    let founder = u64::try_from(u128::from(total) * u128::from(FOUNDER_SHARE_BPS) / 10_000)
+    let founder = u64::try_from(u128::from(quote_amount) * u128::from(FOUNDER_NOMINAL_BPS) / 10_000)
         .map_err(|_| error!(PumpError::Truncation))?;
-    let treasury = u64::try_from(u128::from(total) * u128::from(TREASURY_SHARE_BPS) / 10_000)
+    let treasury = u64::try_from(u128::from(quote_amount) * u128::from(TREASURY_NOMINAL_BPS) / 10_000)
         .map_err(|_| error!(PumpError::Truncation))?;
-    Ok(FeeAllocation { total, community: total - founder - treasury, treasury, founder })
+    let community = total.checked_sub(founder).and_then(|v| v.checked_sub(treasury))
+        .ok_or_else(|| error!(PumpError::Overflow))?;
+    Ok(FeeAllocation { total, community, treasury, founder })
 }
 
 #[cfg(test)]
@@ -39,6 +42,10 @@ mod tests {
     #[test]
     fn dust_favors_community_without_a_second_rounded_charge() {
         assert_eq!(allocate(1).unwrap(), FeeAllocation { total: 1, community: 1, treasury: 0, founder: 0 });
+        // Splitting the rounded total by 10%/6% would exceed 5/3 bps of
+        // these trade notionals by one lamport.
+        assert_eq!(allocate(1_801).unwrap(), FeeAllocation { total: 10, community: 10, treasury: 0, founder: 0 });
+        assert_eq!(allocate(3_201).unwrap(), FeeAllocation { total: 17, community: 16, treasury: 1, founder: 0 });
         assert_eq!(allocate(10_000).unwrap(), FeeAllocation { total: 50, community: 42, treasury: 5, founder: 3 });
         assert_eq!(allocate(0).unwrap(), FeeAllocation { total: 0, community: 0, treasury: 0, founder: 0 });
     }
@@ -47,9 +54,9 @@ mod tests {
         for amount in [0,1,199,200,201,9999,10_000,1_000_000_000,u64::MAX] {
             let a = allocate(amount).unwrap();
             assert_eq!(a.total, a.community + a.treasury + a.founder);
-            assert!(u128::from(a.founder) * 10_000 <= u128::from(a.total) * FOUNDER_SHARE_BPS as u128);
-            assert!(u128::from(a.treasury) * 10_000 <= u128::from(a.total) * TREASURY_SHARE_BPS as u128);
-            assert!(u128::from(a.community) * 10_000 >= u128::from(a.total) * COMMUNITY_SHARE_BPS as u128);
+            assert!(u128::from(a.founder) * 10_000 <= u128::from(amount) * FOUNDER_NOMINAL_BPS as u128);
+            assert!(u128::from(a.treasury) * 10_000 <= u128::from(amount) * TREASURY_NOMINAL_BPS as u128);
+            assert!(u128::from(a.community) * 10_000 >= u128::from(amount) * COMMUNITY_NOMINAL_BPS as u128);
         }
     }
 }
