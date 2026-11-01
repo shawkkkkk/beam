@@ -27,6 +27,7 @@ pump.fun contributors. The original license notice follows:
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > SOFTWARE.
 
-The Raydium CPMM integration is being designed against the Apache-2.0-licensed
-[raydium-io/raydium-cp-swap](https://github.com/raydium-io/raydium-cp-swap).
+The legacy Raydium AMM v4 integration is being designed against the
+Apache-2.0-licensed [raydium-io/raydium-amm](https://github.com/raydium-io/raydium-amm),
+reviewed at commit `91739d8d9f5cf347e0ce14ebe4d2bb7069fb31b6`.
 No Raydium code is copied into Beam yet.
