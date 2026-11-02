@@ -64,16 +64,17 @@ tests for success, failure rollback, authority checks, replay, and accounting
 before activation. Do not treat a host pass as a real program or deployed
 Raydium test.
 
-For the merged native-SOL SDK fixtures, use Node.js 22 from the repository
+For merged SDK fixtures and event decoders, use Node.js 22 from the repository
 root; `sdk/` has no package manifest:
 
 ```sh
-node --test sdk/beam-native.test.mjs
+node --test sdk/*.test.mjs
 ```
 
 For SDK drafts, also run each changed `sdk/*.test.mjs` file explicitly.
-The SDK workflow on `main` runs only `beam-native.test.mjs`; a green job
-does not prove other draft fixtures ran unless the workflow is updated.
+The merged SDK workflow runs matching `sdk/*.test.mjs` and
+`backend/*/*.test.mjs` files under Node.js 22. A green job does not prove
+unmerged draft fixtures or website browser interactions ran.
 
 For the merged website preview, use Node.js 24:
 
@@ -102,8 +103,8 @@ node --test backend/livestream/livestream.test.mjs
 
 Run only commands for paths present in your checked-out branch. These
 services do not start an authenticated production API, media provider or
-donation provider. Their tests are not included in `main` CI until a reviewed
-workflow adds them.
+donation provider. The merged SDK workflow discovers their test files once
+those draft service paths land on `main`.
 
 If `tests/runtime-harness/Cargo.toml` exists in your checked-out branch, run
 its separate locked suite from the repository root in both modes:
@@ -117,6 +118,17 @@ The harness is in draft PR #25 and its descendants, not on `main`. It uses
 synthetic accounts and valueless balances; it does not execute captured
 original Pump binaries or prove real Raydium CPI behavior. The normal
 `programs/beam` tests above do not run this separate manifest.
+
+The merged AMM v4 validator is another separate crate. With Rust 1.99.1,
+run its pinned-source local CPI tests from the repository root:
+
+```sh
+cargo test --locked --manifest-path tests/amm-v4-validator/Cargo.toml -- --test-threads=1
+```
+
+These tests invoke the pinned Raydium Rust processor through a synthetic
+local probe. They do not execute Beam's migration handler or verify deployed
+Raydium bytecode. See the [validator scope](tests/amm-v4-validator/README.md).
 
 Host tests, mock accounts, and local simulations are welcome. Do not deploy to
 a live network, use real wallets, sign live transactions, transfer funds, or

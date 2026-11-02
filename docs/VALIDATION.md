@@ -33,3 +33,18 @@ undecided; the inherited source currently calculates creator fees separately.
 Host tests cover arithmetic and compilation, not fee collection or an AMM v4
 CPI. The [feature ledger](FEATURES.md) tracks the missing integration and
 product behavior.
+
+## AMM v4 local source-processor CPI, PR #38
+
+[Merged PR #38](https://github.com/shawkkkkk/beam/pull/38) adds a separate
+[locked validator crate](../tests/amm-v4-validator/README.md). Its ProgramTest
+suite cross-program invokes Raydium AMM v4 `Initialize2` using the pinned
+`91739d8d9f5cf347e0ce14ebe4d2bb7069fb31b6` Rust source processor,
+synthetic classic SPL/WSOL accounts, and a synthetic Beam probe. It checks
+selected pool/vault/LP balances, fee transfer, replay, precreated-pool failure,
+rollback and Token-2022 rejection. The exact-head hosted validator workflow
+passed before merge `ae3b3b61582750de5f62a6b0e6ea768b0a19c3a6`.
+
+This is source-processor local CPI evidence. It does not invoke Beam's
+migration handler, run deployed Raydium bytecode, establish LP custody or fee
+rights, or validate mainnet behavior. No live network or real assets were used.

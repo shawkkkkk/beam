@@ -14,8 +14,10 @@
 - Inherited Global migration-fee behavior retained. Test-only Beam curve-fee arithmetic now reflects the requested 42/5/3 bps community/treasury/founder split; it does not rewrite inherited creator or migration fees or enforce a live rate.
 - Source-only [AMM v4 ABI guards](../programs/beam/src/beam_amm_v4.rs) encode the pinned 19-account `Initialize2` path and reject Token-2022 mint owners. They are not called by a Beam instruction and do not migrate a token.
 - Fee-allocation arithmetic and selected host differential tests.
-- [PR #7](https://github.com/shawkkkkk/beam/pull/7) merged native-SOL create/buy/sell ABI fixtures and local encoders. They do not resolve live accounts, sign or submit transactions. Draft [PR #13](https://github.com/shawkkkkk/beam/pull/13) owns legacy creator-fee fixtures, [PR #18](https://github.com/shawkkkkk/beam/pull/18) owns CreateV2 construction, and [PR #20](https://github.com/shawkkkkk/beam/pull/20) owns raw Create/Trade event decoding; these are not part of this main-branch snapshot.
+- [PR #7](https://github.com/shawkkkkk/beam/pull/7) merged native-SOL create/buy/sell ABI fixtures and local encoders. [PR #18](https://github.com/shawkkkkk/beam/pull/18) merged CreateV2 construction and [PR #20](https://github.com/shawkkkkk/beam/pull/20) merged raw Create/Trade event decoding. These helpers do not resolve live accounts, sign or submit transactions. Draft [PR #13](https://github.com/shawkkkkk/beam/pull/13) owns legacy creator-fee fixtures and [PR #27](https://github.com/shawkkkkk/beam/pull/27) owns V2 trade fixtures.
+- [PR #17](https://github.com/shawkkkkk/beam/pull/17) merged a read-only indexer payload boundary. It labels candidate records unverified and exposes no wallet, signing or trade capability. It is not a live indexer feed.
 - [PR #6](https://github.com/shawkkkkk/beam/pull/6) merged a Beam-branded website preview with sample market data and browser-local drafts. It has no wallet, chain feed, metadata upload, donation, callout or livestream service.
+- [PR #38](https://github.com/shawkkkkk/beam/pull/38) merged a separate local validator that invokes the pinned Raydium AMM v4 Rust source processor through a synthetic CPI probe. It does not invoke Beam migration or validate deployed Raydium bytecode.
 
 Separate draft [PR #21](https://github.com/shawkkkkk/beam/pull/21) owns a
 local mock livestream authorization and moderation lifecycle under
@@ -29,7 +31,7 @@ stream; the [task ledger](TASKS.md) records adjacent draft backend scopes.
 | AMM v4 configuration, accounts and funding | [#22 → #29 → #30](TASKS.md#draft-review-queue-prs-2234) | Source guards and accounting only. No Beam migration instruction calls them. |
 | Synthetic AMM v4 settlement and account snapshot | [#25 → #33 → #34](TASKS.md#draft-review-queue-prs-2234) | Local-bank tests use mock processors. The source-pinned snapshot decoder does not authenticate a deployed Raydium binary or settle a real pool. |
 | Beam fee policy | [#23, #24 and #26](TASKS.md#draft-review-queue-prs-2234) | Strict arithmetic, disabled policy state and local-bank initializer tests; no executable fee quote, trade collection or creator payout routing. |
-| Client and preview | SDK [#20](https://github.com/shawkkkkk/beam/pull/20) and [#27](https://github.com/shawkkkkk/beam/pull/27); web [#17 → #28 → #31 → #32](TASKS.md#draft-review-queue-prs-2234) | Fixture decoders and unverified, read-only preview states. No wallet, RPC-authenticated market feed, provider actions or live trade. |
+| Client and preview | SDK draft [#27](https://github.com/shawkkkkk/beam/pull/27); web drafts [#28 → #31 → #32](TASKS.md#draft-review-queue-prs-2234) | Merged #17/#18/#20 provide unverified data and local SDK boundaries. Draft work adds fixtures and unavailable preview states; no wallet, RPC-authenticated market feed, provider actions or live trade. |
 
 See the [task ledger](TASKS.md) for dated heads, target branches, checks and
 stacked review order. A passing draft test does not make its feature live.
@@ -83,9 +85,13 @@ Host compilation checks Rust/Anchor types. Differential tests cover selected quo
 
 These checks do not establish full instruction execution parity, SBF byte identity, CPI success, current-chain behavior or security. Source equality is separate from program-binary equality.
 
-Any isolated local-bank harness uses synthetic accounts and valueless balances
-to exercise Beam code. It does not execute captured original Pump binaries,
-prove Raydium CPI behavior or submit a transaction to a live network.
+The draft local-bank harness uses synthetic accounts and valueless balances
+with mock processors to exercise selected Beam helper paths. Separately,
+[merged PR #38](https://github.com/shawkkkkk/beam/pull/38) invokes the pinned
+Raydium AMM v4 Rust source processor through a local CPI probe and tests
+selected rollback/replay cases. Neither test executes captured original Pump
+binaries, the Beam migration handler, or deployed Raydium bytecode, nor submits
+a transaction to a live network.
 
 Upstream declares the reconstruction complete and removed captured binaries and its research toolchain. This branch pins the final source; it does not independently re-prove the historical reconstruction claim.
 
