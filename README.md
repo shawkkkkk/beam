@@ -56,12 +56,12 @@ for evidence and bounded ways to help with the website, frontend and backend.
 
 | Allocation | Per trade | Share of fee |
 | --- | ---: | ---: |
-| Community allocation (uses pending) | 0.42% | 84% |
+| Community allocation (creator slice, holder airdrop, flagship burn) | 0.42% | 84% |
 | Treasury | 0.05% | 10% |
 | Founder | 0.03% | 6% |
 | Total | **0.50%** | **100%** |
 
-The requested Beam allocation is 50 nominal basis points with the split shown above. Existing creator payout behavior must be preserved, but whether creator payouts come from the 0.42% community share or are charged in addition is undecided. Therefore 0.50% is **not yet an all-in trading quote**. The allocation engine rounds this component once and gives split dust to the community. Holder rewards and flagship buybacks are proposed uses of the community amount remaining after any creator allocation, if that funding route is chosen. A 50/50 split of that remainder is only a provisional test setting; eligibility, the flagship mint, and distribution rules are undecided. Collection and distribution are not yet wired to trading instructions. Raydium's own pool fees are separate. See [economics](docs/ECONOMICS.md) and the [feature matrix](docs/FEATURES.md).
+The decided curve fee is 50 nominal basis points all-in, with the split shown above. Creator payouts come out of the 0.42% community share; there is no additional creator charge. How many of those 42 basis points go to creators is unset. The 0.03% founder share is the current proposal and is tunable. The design goal is a minimal fee, with a very small founder cut, kept below pump.fun's published bonding-curve total. The allocation engine rounds this component once and gives split dust to the community. After the creator take, the remainder funds `$BEAM` holder airdrops and a `$BEAM` buyback-and-burn. `$BEAM` will launch on Beam and has no mint address yet. A 50/50 remainder split is only a provisional test setting. Holder eligibility and buyback execution are still open. Collection is not wired. A post-graduation Beam fee stacks with Raydium's own pool fee. See [economics](docs/ECONOMICS.md), [community allocation](docs/COMMUNITY_ALLOCATION.md), and the [feature matrix](docs/FEATURES.md).
 
 ## First contract slice
 

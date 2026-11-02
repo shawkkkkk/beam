@@ -42,9 +42,10 @@ PR ownership and touched paths at this snapshot:
    vaults. Prove total-fee conservation and per-recipient authorization in
    host and validator tests. Enforce the user's 42/5/3-bps
    community/treasury/founder split while
-   preserving creator payouts and creator-selected payout wallets. Creator
-   funding from the community share versus an additional charge is undecided;
-   do not hard-code either interpretation or present 50 bps as all-in.
+   preserving creator payouts and creator-selected payout wallets. The
+   maintainer decided creator payouts come from the community share, with no
+   additional charge, so 50 bps is the all-in curve total. Do not invent how
+   many of the 42 bps go to creators.
    Treat `beam_economics.rs` as proposed arithmetic, not a live 50-bps fee.
    Disclose each applicable creator, Raydium pool, and inherited migration fee
    in quotes and receipts.
@@ -64,12 +65,17 @@ PR ownership and touched paths at this snapshot:
    create/buy/sell and gated-migration fixtures against the real Anchor
    accounts/events. Test retained instruction encodings and each intentional
    difference. Retained dependency IDLs are references, not a usable Beam SDK.
-5. **Community allocation policy.** The user's direction is to fund holder
-   rewards and flagship buybacks from the available community allocation.
-   If creator payouts use that allocation, divide only its remainder. A 50/50
-   division of the available amount is a provisional test setting. Holder
-   eligibility, flagship mint, recipients, and execution policy remain to be
-   specified. Do not add automatic market orders or claim perpetual revenue.
+5. **Community allocation policy.** Fund holder airdrops of `$BEAM` and a
+   flagship buyback-and-burn of `$BEAM` from the community allocation after
+   the creator take. The maintainer decided that creator payouts come out of
+   the 42 bps community share, with no additional creator charge, so the curve
+   total stays 50 bps all-in. How many of those 42 bps go to creators is unset.
+   `$BEAM` launches on Beam and has no mint address yet. A 50/50 division of
+   the remainder is a provisional test setting. Holder eligibility and buyback
+   execution remain open. A separate 10,000,000 whole-token `$BEAM` supply
+   allocation for Slop Cash contributors is not part of the fee. Do not add
+   automatic market orders or claim perpetual revenue. See
+   [community allocation](COMMUNITY_ALLOCATION.md).
 6. **Feature parity outside the contract.** Use the [feature matrix](FEATURES.md)
    to distinguish on-chain interfaces from missing product services. Build
    authorized creator-wallet, charity/donation, callout, and livestream
