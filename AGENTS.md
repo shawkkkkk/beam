@@ -43,14 +43,21 @@ additional archive restrictions. Do not alter the pinned archive for Beam work.
   activation. Current LP burning does not leave Beam an LP fee claim for
   recurring buybacks. Principal custody and fee rights remain unresolved.
 - `beam_economics.rs` contains provisional fee-allocation arithmetic; the
-  inherited Pump fee CPI still governs real trade collection. The community
-  share's holder-reward/buyback split is a provisional test setting. Holder
-  eligibility, the flagship mint, vaults, and distribution rules are open.
-  The user's Beam fee split is 42/5/3 nominal basis points for community,
-  treasury and founder. Preserve the creator payout and creator-selected
-  wallet system. Whether its fee comes from the community share or an
-  additional charge remains undecided; do not assume either. Disclose each
-  applicable curve, creator, migration, and Raydium pool fee; never promise returns.
+  inherited Pump fee CPI still governs real trade collection. The maintainer
+  decided that creator payouts come out of the 42 bps community share, with
+  no additional creator charge, so the curve total stays 50 bps all-in.
+  How many of those 42 bps go to creators is unset; do not invent that
+  number. The founder share is the current 3 bps proposal and is tunable.
+  The goal is minimal fees, with a very small founder cut. The community
+  remainder's holder-airdrop/buyback split is a provisional test setting.
+  Holder eligibility and buyback execution remain open. The flagship coin is
+  `$BEAM`, launched later on Beam; its mint address is required configuration
+  and is not hard-coded. Holder rewards are `$BEAM` airdrops. Acquired
+  flagship tokens are burned. A separate 10,000,000 whole-token `$BEAM`
+  supply allocation for Slop Cash contributors is not part of the fee and is
+  not funded. Preserve the creator payout and creator-selected wallet system.
+  Disclose each applicable curve, creator, migration, and Raydium pool fee;
+  never promise returns.
 - On-chain reconstruction does not provide Pump's website, streaming, callout,
   or charity service backends. Treat those as independent feature work with
   authorized providers; never imply their behavior is byte-identical. The
