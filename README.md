@@ -15,7 +15,7 @@ The goal is to retain Pump's instruction/account compatibility and behavior outs
 
 ## Progress at a glance
 
-These are **development** milestones, not a live launch. “Done” means the
+These are **development** milestones as recorded on 2 November 2026, not a live launch. “Done” means the
 named source/check is merged; “In review” means a separate change is pending;
 “Blocked” means the feature needs an implementation or a verified external
 dependency. No percentage can honestly describe whole-product parity yet.
@@ -27,8 +27,8 @@ dependency. No percentage can honestly describe whole-product parity yet.
 | Preserve the recovered Pump source | **Done** | The pinned community archive passes [380 Git-blob checks](docs/VALIDATION.md). In Beam's retained Pump package, 62 files remain byte-identical and four are declared changes. This is source evidence, not a Beam binary match. |
 | Keep Pump-style launch and curve trades | **In progress** | [Merged PR #1](https://github.com/shawkkkkk/beam/pull/1) contains the Anchor handlers and selected host tests. Full instruction execution, SBF and live behavior remain unverified. |
 | Remove Mayhem and PumpSwap | **In progress** | Mayhem and legacy PumpSwap entry paths fail closed, with no PumpSwap fallback. Retained router, creator and fee/donation dependencies still need compatible replacements; blocked features are not considered complete. |
-| Graduate to Raydium AMM v4 | **Blocked** | [PR #5](https://github.com/shawkkkkk/beam/pull/5) retired the wrong-venue CPMM path. [Merged PR #9](https://github.com/shawkkkkk/beam/pull/9) adds source-only AMM v4 ABI guards, not a tested migration adapter or Token-2022 graduation path. |
-| Apply Beam 42/5/3 fees and preserve creator payouts | **Math done; routing blocked** | [PR #5](https://github.com/shawkkkkk/beam/pull/5) merged allocation **math only**; [PR #11](https://github.com/shawkkkkk/beam/pull/11) recorded the unresolved creator-funding choice. Actual Beam collection, creator-fee compatibility, selected payout wallet and post-graduation rights need implementation and runtime tests. |
+| Graduate to Raydium AMM v4 | **Blocked; guards in draft review** | [PR #5](https://github.com/shawkkkkk/beam/pull/5) retired CPMM; merged [PR #9](https://github.com/shawkkkkk/beam/pull/9) adds source-only AMM v4 ABI guards. Draft [#22 → #29 → #30](docs/TASKS.md#draft-review-queue-prs-2234) and [#25 → #33 → #34](docs/TASKS.md#draft-review-queue-prs-2234) add preflight, funding, synthetic settlement and snapshot checks. No AMM v4 migration entrypoint, real Raydium CPI, LP-rights policy or Token-2022 graduation exists. |
+| Apply Beam 42/5/3 fees and preserve creator payouts | **Math only on main; routing blocked** | [PR #5](https://github.com/shawkkkkk/beam/pull/5) merged provisional allocation math; [PR #11](https://github.com/shawkkkkk/beam/pull/11) recorded the unresolved creator-funding choice. Draft [#23/#24/#26](docs/TASKS.md#draft-review-queue-prs-2234) add strict caps, disabled policy state and a synthetic initializer test. Actual collection, creator-fee compatibility, selected payout wallet and post-graduation rights still need implementation and runtime tests. |
 | Match Pump byte for byte | **Not attainable for modified Beam binary** | The requested venue, Mayhem and fee changes alter code and program identity. The target is tested behavior/interface compatibility for unaffected features, tracked in the [feature matrix](docs/FEATURES.md). |
 
 ### Website and frontend
@@ -36,9 +36,9 @@ dependency. No percentage can honestly describe whole-product parity yet.
 | Goal | Status | What has been shown / what remains |
 | --- | --- | --- |
 | Pump-style experience with Beam branding | **Preview merged** | [PR #6](https://github.com/shawkkkkk/beam/pull/6) merged a responsive **sample-data preview** selected from the closed, unmerged alternate [PR #3](https://github.com/shawkkkkk/beam/pull/3). It is not a live Pump clone or canonical client. |
-| Create, wallet and trade flows | **Blocked** | The preview saves local drafts; it does not upload metadata, connect wallets, sign or trade. A Beam IDL, client and verified chain data are required. |
+| Create, wallet and trade flows | **Blocked; SDK fixtures in draft review** | The preview saves local drafts; it does not upload metadata, connect wallets, sign or trade. Draft [#27](https://github.com/shawkkkkk/beam/pull/27) adds V2 trade ABI fixtures; a Beam IDL, full client and verified chain data remain open. |
 | Creator wallet, charity, callouts and livestream screens | **Local plans merged; services in review** | PR #6 has draft fields only. Separate draft [charity PR #14](https://github.com/shawkkkkk/beam/pull/14), [callouts PR #15](https://github.com/shawkkkkk/beam/pull/15) and [livestream PR #21](https://github.com/shawkkkkk/beam/pull/21) provide local backend mocks, not authorized providers, live actions or playable streams. |
-| Client and frontend data | **Native-SOL fixtures merged; drafts in review** | [PR #7](https://github.com/shawkkkkk/beam/pull/7) merged create/buy/sell ABI fixtures. Draft [creator PR #13](https://github.com/shawkkkkk/beam/pull/13), [CreateV2 PR #18](https://github.com/shawkkkkk/beam/pull/18), and [raw event PR #20](https://github.com/shawkkkkk/beam/pull/20) own distinct SDK files. There is no deployed Beam ID or complete SDK. |
+| Client and frontend data | **Native-SOL fixtures merged; drafts in review** | [PR #7](https://github.com/shawkkkkk/beam/pull/7) merged create/buy/sell ABI fixtures. Draft [#13](https://github.com/shawkkkkk/beam/pull/13), [#18](https://github.com/shawkkkkk/beam/pull/18), [#20](https://github.com/shawkkkkk/beam/pull/20) and [#27](https://github.com/shawkkkkk/beam/pull/27) own distinct SDK slices; [#17 → #28 → #31 → #32](docs/TASKS.md#draft-review-queue-prs-2234) own read-only web work. No deployed Beam ID, complete SDK or authenticated feed exists. |
 
 ### Backend and integrations
 
@@ -61,7 +61,7 @@ for evidence and bounded ways to help with the website, frontend and backend.
 | Founder | 0.03% | 6% |
 | Total | **0.50%** | **100%** |
 
-The requested ordinary Beam allocation is 50 nominal basis points: 42 community, 5 treasury and 3 founder. Treasury plus founder are 8 basis points under platform control. Existing creator payout behavior must be preserved, but whether creator payouts come from the community share or are charged in addition is undecided. Therefore 0.50% is **not yet an all-in trading quote**. The allocation engine rounds this component once and gives split dust to the community. Holder rewards and flagship buybacks are proposed uses of the community amount remaining after any creator allocation, if that funding route is chosen. A 50/50 split of that remainder is only a provisional test setting; eligibility, the flagship mint, and distribution rules are undecided. Collection and distribution are not yet wired to trading instructions. Raydium's own pool fees are separate. See [economics](docs/ECONOMICS.md) and the [feature matrix](docs/FEATURES.md).
+The requested ordinary Beam allocation is 50 nominal basis points: 42 community, 5 treasury and 3 founder. Treasury plus founder are 8 basis points under platform control. Existing creator payout behavior must be preserved, but whether creator payouts come from the community share or are charged in addition is undecided. Therefore 0.50% is **not yet an all-in trading quote**. The current helper rounds this component once; draft [#23](https://github.com/shawkkkkk/beam/pull/23) corrects dust arithmetic to cap founder and treasury against the trade base. Holder rewards and flagship buybacks are proposed uses of the community amount remaining after any creator allocation, if that funding route is chosen. A 50/50 split of that remainder is only a provisional test setting; eligibility, the flagship mint, and distribution rules are undecided. Collection and distribution are not yet wired to trading instructions. Raydium's own pool fees are separate. See [economics](docs/ECONOMICS.md) and the [feature matrix](docs/FEATURES.md).
 
 ## First contract slice
 
@@ -105,7 +105,7 @@ cargo test --locked --manifest-path programs/beam/Cargo.toml --features experime
 cargo check --locked --manifest-path programs/beam/Cargo.toml --no-default-features
 ```
 
-Default builds retain earlier Raydium CPMM devnet IDs for the superseded adapter. `--no-default-features` selects its mainnet IDs. Both configurations and `experimental-raydium` now reject activation of that adapter while AMM v4 work is pending. Neither option deploys anything.
+Default builds retain earlier Raydium CPMM devnet IDs for the superseded adapter; `--no-default-features` selects its mainnet IDs. Every current build rejects activation and execution of that superseded adapter, including `experimental-raydium`. AMM v4 has no callable migration entrypoint. These flags do not deploy anything.
 
 Beam's declared ID is an undeployed placeholder. See [implementation status](docs/STATUS.md). The original MIT and third-party notices remain in the immutable archive.
 
@@ -117,11 +117,12 @@ which includes bounded website/backend lanes. [PR #1](https://github.com/shawkkk
 introduced the pinned contract baseline; [PR #2](https://github.com/shawkkkkk/beam/pull/2)
 added migration-accounting guards to its development branch. Check current PR
 heads before starting a task. [PR #12](https://github.com/shawkkkkk/beam/pull/12)
-merged the nested quote guard. Draft PRs #13–#21 own separate SDK, backend,
-web-adapter and documentation slices listed in the [task ledger](docs/TASKS.md).
+merged the nested quote guard. Draft PRs #13–#34 own separate SDK, backend,
+web-adapter, contract guard and documentation slices listed in the [task ledger](docs/TASKS.md).
 Beam is
 [registered on Slop](https://slop.cash/projects/beam), but its listing was
-paused with a security scan queued at the last maintainer check. This
-repository does not claim scan clearance, an installed project skill, or
+paused with a security scan queued at the 1 November maintainer check. The
+listing could not be verified on 2 November; this repository does not claim
+scan clearance, an installed project skill, or
 funded bounties. Beam has no repository-root license yet; the archived sources
 retain their own licenses.

@@ -22,6 +22,18 @@ local mock livestream authorization and moderation lifecycle under
 `backend/livestream/`. It is not on main and has no media provider or playable
 stream; the [task ledger](TASKS.md) records adjacent draft backend scopes.
 
+## Draft work, not merged or activated
+
+| Area | Current draft chain | Limit |
+| --- | --- | --- |
+| AMM v4 configuration, accounts and funding | [#22 → #29 → #30](TASKS.md#draft-review-queue-prs-2234) | Source guards and accounting only. No Beam migration instruction calls them. |
+| Synthetic AMM v4 settlement and account snapshot | [#25 → #33 → #34](TASKS.md#draft-review-queue-prs-2234) | Local-bank tests use mock processors. The source-pinned snapshot decoder does not authenticate a deployed Raydium binary or settle a real pool. |
+| Beam fee policy | [#23, #24 and #26](TASKS.md#draft-review-queue-prs-2234) | Strict arithmetic, disabled policy state and local-bank initializer tests; no executable fee quote, trade collection or creator payout routing. |
+| Client and preview | SDK [#20](https://github.com/shawkkkkk/beam/pull/20) and [#27](https://github.com/shawkkkkk/beam/pull/27); web [#17 → #28 → #31 → #32](TASKS.md#draft-review-queue-prs-2234) | Fixture decoders and unverified, read-only preview states. No wallet, RPC-authenticated market feed, provider actions or live trade. |
+
+See the [task ledger](TASKS.md) for dated heads, target branches, checks and
+stacked review order. A passing draft test does not make its feature live.
+
 ## Outstanding before use
 
 1. Beam-controlled fee configuration and vaults. Pump's inherited fee-program namespaces/authority assumptions must be replaced or rehosted. Source compatibility does not establish that Pump's deployed fee program accepts Beam's ID.
@@ -53,9 +65,17 @@ Its launch surcharge is separate from ordinary allocation, with no recipient
 or withdrawal path in the prototype. There is no enabled contract path, live
 trade, sell-handler change or promised outcome.
 
-Beam's [Slop listing](https://slop.cash/projects/beam) was paused with a
-security scan queued at the last maintainer check. Clearance and reward terms
-have not been established in this repository.
+## Contribution and security status
+
+At the last maintainer check on 1 November 2026, Beam's
+[Slop listing](https://slop.cash/projects/beam) was paused with a security
+scan queued. The page was inaccessible to this documentation review on
+2 November 2026, so its current scan and listing status are **unknown here**.
+Verify the live status and maintainer direction before claiming an available
+Slop task, clearance, reward funding or a changed development scope. A Slop
+task's automatic closure does not approve or merge a GitHub pull request.
+The repository still has no root license; maintainers must clarify
+contribution terms before inviting substantial external submissions.
 
 ## Meaning of checks
 
