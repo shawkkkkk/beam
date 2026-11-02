@@ -1,11 +1,13 @@
 // Development-only ABI helpers for the retained native-SOL Create/Buy/Sell
 // instructions in programs/beam/src/lib.rs at canonical commit 65c96b5.
+// CreateV2 data/metas additionally match the compiled Beam source at c8dc348.
 // These encode account metas; they do not derive PDAs or authorize execution.
 
 export const PROGRAM_ID = 'GdaQ7RHbGKGEL5Px66tQP78S67XcgxYAzFUwja71qSJP';
 const ALPHABET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
 const U64_MAX = (1n << 64n) - 1n;
 const CREATE_DISC = Uint8Array.from([24, 30, 200, 40, 5, 28, 7, 119]);
+const CREATE_V2_DISC = Uint8Array.from([214, 144, 76, 236, 95, 139, 49, 180]);
 const BUY_DISC = Uint8Array.from([102, 6, 61, 18, 1, 218, 235, 234]);
 const SELL_DISC = Uint8Array.from([51, 230, 133, 164, 1, 127, 131, 173]);
 const COMPLETE_EVENT_DISC = Uint8Array.from([95, 114, 97, 156, 212, 46, 152, 8]);
@@ -64,9 +66,12 @@ function u64(value, name) {
   return out;
 }
 
-function borshString(value, name) {
+function borshString(value, name, maxBytes = null) {
   if (typeof value !== 'string') throw new TypeError(`${name} must be a string`);
   const bytes = new TextEncoder().encode(value);
+  if (maxBytes !== null && bytes.length > maxBytes) {
+    throw new RangeError(`${name} exceeds the CreateV2 limit of ${maxBytes} UTF-8 bytes`);
+  }
   if (bytes.length > 0xffff_ffff) throw new RangeError(`${name} is too long`);
   const len = new Uint8Array(4);
   new DataView(len.buffer).setUint32(0, bytes.length, true);
@@ -83,6 +88,27 @@ export function encodeCreate({ name, symbol, uri, creator }) {
     CREATE_DISC, borshString(name, 'name'),
     borshString(symbol, 'symbol'), borshString(uri, 'uri'),
     decodeBase58Pubkey(creator),
+  ]);
+}
+
+export function encodeCreateV2({
+  name, symbol, uri, creator, isMayhemMode, isCashbackEnabled,
+  creatorFeeBps, isHolderReward,
+}) {
+  const mayhem = bool(isMayhemMode, 'isMayhemMode');
+  const cashback = bool(isCashbackEnabled, 'isCashbackEnabled');
+  const holder = bool(isHolderReward, 'isHolderReward');
+  if (isMayhemMode) throw new RangeError('Beam rejects Mayhem creation');
+  if (isCashbackEnabled) throw new RangeError('Beam rejects deprecated cashback creation');
+  const creatorKey = decodeBase58Pubkey(creator);
+  if (!isHolderReward && creatorKey.every((byte) => byte === 0)) {
+    throw new RangeError('creator must be nonzero unless holder rewards replace it');
+  }
+  return concat([
+    CREATE_V2_DISC,
+    borshString(name, 'name', 32), borshString(symbol, 'symbol', 13),
+    borshString(uri, 'uri', 200), creatorKey,
+    mayhem, cashback, u64(creatorFeeBps, 'creatorFeeBps'), holder,
   ]);
 }
 
@@ -109,6 +135,16 @@ const CREATE_ACCOUNTS = [
   ['metadata', false, true], ['user', true, true],
   ['systemProgram', false, false], ['tokenProgram', false, false],
   ['associatedTokenProgram', false, false], ['rent', false, false],
+  ['eventAuthority', false, false], ['program', false, false],
+];
+const CREATE_V2_ACCOUNTS = [
+  ['mint', true, true], ['mintAuthority', false, false],
+  ['bondingCurve', false, true], ['associatedBondingCurve', false, true],
+  ['global', false, false], ['user', true, true],
+  ['systemProgram', false, false], ['tokenProgram', false, false],
+  ['associatedTokenProgram', false, false], ['mayhemProgramId', false, true],
+  ['globalParams', false, false], ['solVault', false, true],
+  ['mayhemState', false, true], ['mayhemTokenVault', false, true],
   ['eventAuthority', false, false], ['program', false, false],
 ];
 const BUY_ACCOUNTS = [
@@ -145,6 +181,7 @@ function build(layout, accounts, data) {
 }
 
 export function buildCreate(accounts, args) { return build(CREATE_ACCOUNTS, accounts, encodeCreate(args)); }
+export function buildCreateV2(accounts, args) { return build(CREATE_V2_ACCOUNTS, accounts, encodeCreateV2(args)); }
 export function buildBuy(accounts, args) { return build(BUY_ACCOUNTS, accounts, encodeBuy(args)); }
 export function buildSell(accounts, args) { return build(SELL_ACCOUNTS, accounts, encodeSell(args)); }
 

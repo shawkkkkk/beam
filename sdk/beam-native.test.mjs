@@ -3,11 +3,13 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import {
   PROGRAM_ID, decodeBase58Pubkey, encodeBase58Pubkey,
-  encodeCreate, encodeBuy, encodeSell, buildCreate, buildBuy, buildSell,
+  encodeCreate, encodeCreateV2, encodeBuy, encodeSell,
+  buildCreate, buildCreateV2, buildBuy, buildSell,
   decodeCompleteEvent, decodeCurrentBondingCurve,
 } from './beam-native.mjs';
 
 const fixture = JSON.parse(readFileSync(new URL('./fixtures/native-sol.json', import.meta.url)));
+const createV2Fixture = JSON.parse(readFileSync(new URL('./fixtures/create-v2.json', import.meta.url)));
 const hex = (bytes) => Buffer.from(bytes).toString('hex');
 const asStrings = (value) => Object.fromEntries(Object.entries(value).map(([key, v]) => [key, typeof v === 'bigint' ? v.toString() : v]));
 
@@ -28,6 +30,43 @@ test('golden legacy instruction bytes and account metas match Anchor output', ()
   assert.equal(fixture.create.metas.length, 14);
   assert.equal(fixture.buy.metas.length, 16);
   assert.equal(fixture.sell.metas.length, 14);
+});
+
+test('golden CreateV2 bytes and account privileges match compiled Anchor source', () => {
+  const expected = createV2Fixture.createV2;
+  assert.equal(createV2Fixture.programId, PROGRAM_ID);
+  assert.equal(hex(encodeCreateV2(expected.args)), expected.dataHex);
+  const instruction = buildCreateV2(expected.accounts, expected.args);
+  assert.equal(instruction.programId, PROGRAM_ID);
+  assert.equal(hex(instruction.data), expected.dataHex);
+  assert.deepEqual(instruction.keys, expected.metas);
+  assert.equal(instruction.keys.length, 16);
+  assert.equal(instruction.keys[9].isWritable, true); // inert Mayhem program slot is retained in ABI
+  assert.equal(instruction.keys[14].isSigner, false);
+});
+
+test('CreateV2 enforces UTF-8 metadata limits and Beam creation policy', () => {
+  const args = createV2Fixture.createV2.args;
+  assert.doesNotThrow(() => encodeCreateV2({
+    ...args, name: 'é'.repeat(16), symbol: 'é'.repeat(6) + 'A',
+    uri: 'é'.repeat(100), creatorFeeBps: 0n,
+  }));
+  for (const [field, value, limit] of [
+    ['name', 'é'.repeat(17), 32],
+    ['symbol', 'é'.repeat(7), 13],
+    ['uri', 'é'.repeat(101), 200],
+  ]) {
+    assert.throws(() => encodeCreateV2({ ...args, [field]: value }),
+      new RegExp(`${limit} UTF-8 bytes`));
+  }
+  assert.throws(() => encodeCreateV2({ ...args, isMayhemMode: true }), /rejects Mayhem/);
+  assert.throws(() => encodeCreateV2({ ...args, isCashbackEnabled: true }), /rejects deprecated cashback/);
+  assert.throws(() => encodeCreateV2({ ...args, isHolderReward: undefined }), /boolean/);
+  assert.throws(() => encodeCreateV2({ ...args, creatorFeeBps: 1n << 64n }), /fit u64/);
+  const zero = '11111111111111111111111111111111';
+  assert.throws(() => encodeCreateV2({ ...args, creator: zero }), /creator must be nonzero/);
+  assert.doesNotThrow(() => encodeCreateV2({ ...args, creator: zero, isHolderReward: true }));
+  assert.throws(() => buildCreateV2({ ...createV2Fixture.createV2.accounts, program: zero }, args), /self-CPI/);
 });
 
 test('base58 pubkeys roundtrip and malformed keys fail', () => {
