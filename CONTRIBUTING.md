@@ -105,9 +105,18 @@ services do not start an authenticated production API, media provider or
 donation provider. Their tests are not included in `main` CI until a reviewed
 workflow adds them.
 
-An isolated local-bank harness, if used, exercises Beam with synthetic accounts
-and valueless balances; it does not execute captured original Pump binaries or
-prove real Raydium CPI behavior.
+If `tests/runtime-harness/Cargo.toml` exists in your checked-out branch, run
+its separate locked suite from the repository root in both modes:
+
+```sh
+cargo test --locked --manifest-path tests/runtime-harness/Cargo.toml
+cargo test --locked --manifest-path tests/runtime-harness/Cargo.toml --features experimental-raydium
+```
+
+The harness is in draft PR #25 and its descendants, not on `main`. It uses
+synthetic accounts and valueless balances; it does not execute captured
+original Pump binaries or prove real Raydium CPI behavior. The normal
+`programs/beam` tests above do not run this separate manifest.
 
 Host tests, mock accounts, and local simulations are welcome. Do not deploy to
 a live network, use real wallets, sign live transactions, transfer funds, or
