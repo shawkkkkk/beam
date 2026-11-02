@@ -1,0 +1,118 @@
+{
+  "sourceCommit": "c8dc34836418778f6a23928cbd8cbad10475e786",
+  "programId": "GdaQ7RHbGKGEL5Px66tQP78S67XcgxYAzFUwja71qSJP",
+  "fixtureOnly": true,
+  "createV2": {
+    "args": {
+      "name": "Beam ⚡",
+      "symbol": "BEAM",
+      "uri": "https://example.invalid/beam-v2.json",
+      "creator": "US517G5965aydkZ46HS38QLi7UQiSojurfbQfKCELFx",
+      "isMayhemMode": false,
+      "isCashbackEnabled": false,
+      "creatorFeeBps": "37",
+      "isHolderReward": false
+    },
+    "accounts": {
+      "mint": "4vJ9JU1bJJE96FWSJKvHsmmFADCg4gpZQff4P3bkLKi",
+      "mintAuthority": "8qbHbw2BbbTHBW1sbeqakYXVKRQM8Ne7pLK7m6CVfeR",
+      "bondingCurve": "CktRuQ2mttgRGkXJtyksdKHjUdc2C4TgDzyB98oEzy8",
+      "associatedBondingCurve": "GgBaCs3NCBuZN12kCJgAW63ydqohFkHEdfdEXBPzLHq",
+      "global": "LbUiWL3xVV8hTFYBVdbTNrpDo41NKS6o3LHHuDzjfcY",
+      "user": "QWmroo4YnnMqYW3cnxWkFdaTxGD3P7vMSzwMHGbUzwF",
+      "systemProgram": "YMN9Qj5jPNp7j14VPcML1B6xGgcPWVZUGLFU3Mnyfaf",
+      "tokenProgram": "cGfHiC6Kgg3FpFZvgwGcswsCRtp4aBP2fzuXRQPizuN",
+      "associatedTokenProgram": "gBxS1f6uyyGPuW5MzGBukidSb71jdsCb5fZaoSzULE5",
+      "mayhemProgramId": "k7FaK87WHGVXzkaoHb7CdVPgkKDQhZ29VLDeBVbDfYn",
+      "globalParams": "p2Yicb86aZig616Eav2VWG9vuXR5mEqhtzshZYBxzsV",
+      "solVault": "swqrv48gsrwpBFbftEwnP2vB4jckpvfGJfXkwaniLCC",
+      "mayhemState": "ws91DX9HBAAxGW77BZs5FogRDwpRtcUpiLBpKdPTfWu",
+      "mayhemTokenVault": "21nS9Wz9sUTQ6MkcYUtnN8aSfPA26xJJP7zqshfzCzqc",
+      "eventAuthority": "25hjHpTATmkdET17ynDhf1MCuYNDn1z7wXfVw5iaxLAK",
+      "program": "GdaQ7RHbGKGEL5Px66tQP78S67XcgxYAzFUwja71qSJP"
+    },
+    "dataHex": "d6904cec5f8b31b4080000004265616d20e29aa1040000004245414d2400000068747470733a2f2f6578616d706c652e696e76616c69642f6265616d2d76322e6a736f6e07070707070707070707070707070707070707070707070707070707070707070000250000000000000000",
+    "metas": [
+      {
+        "pubkey": "4vJ9JU1bJJE96FWSJKvHsmmFADCg4gpZQff4P3bkLKi",
+        "isSigner": true,
+        "isWritable": true
+      },
+      {
+        "pubkey": "8qbHbw2BbbTHBW1sbeqakYXVKRQM8Ne7pLK7m6CVfeR",
+        "isSigner": false,
+        "isWritable": false
+      },
+      {
+        "pubkey": "CktRuQ2mttgRGkXJtyksdKHjUdc2C4TgDzyB98oEzy8",
+        "isSigner": false,
+        "isWritable": true
+      },
+      {
+        "pubkey": "GgBaCs3NCBuZN12kCJgAW63ydqohFkHEdfdEXBPzLHq",
+        "isSigner": false,
+        "isWritable": true
+      },
+      {
+        "pubkey": "LbUiWL3xVV8hTFYBVdbTNrpDo41NKS6o3LHHuDzjfcY",
+        "isSigner": false,
+        "isWritable": false
+      },
+      {
+        "pubkey": "QWmroo4YnnMqYW3cnxWkFdaTxGD3P7vMSzwMHGbUzwF",
+        "isSigner": true,
+        "isWritable": true
+      },
+      {
+        "pubkey": "YMN9Qj5jPNp7j14VPcML1B6xGgcPWVZUGLFU3Mnyfaf",
+        "isSigner": false,
+        "isWritable": false
+      },
+      {
+        "pubkey": "cGfHiC6Kgg3FpFZvgwGcswsCRtp4aBP2fzuXRQPizuN",
+        "isSigner": false,
+        "isWritable": false
+      },
+      {
+        "pubkey": "gBxS1f6uyyGPuW5MzGBukidSb71jdsCb5fZaoSzULE5",
+        "isSigner": false,
+        "isWritable": false
+      },
+      {
+        "pubkey": "k7FaK87WHGVXzkaoHb7CdVPgkKDQhZ29VLDeBVbDfYn",
+        "isSigner": false,
+        "isWritable": true
+      },
+      {
+        "pubkey": "p2Yicb86aZig616Eav2VWG9vuXR5mEqhtzshZYBxzsV",
+        "isSigner": false,
+        "isWritable": false
+      },
+      {
+        "pubkey": "swqrv48gsrwpBFbftEwnP2vB4jckpvfGJfXkwaniLCC",
+        "isSigner": false,
+        "isWritable": true
+      },
+      {
+        "pubkey": "ws91DX9HBAAxGW77BZs5FogRDwpRtcUpiLBpKdPTfWu",
+        "isSigner": false,
+        "isWritable": true
+      },
+      {
+        "pubkey": "21nS9Wz9sUTQ6MkcYUtnN8aSfPA26xJJP7zqshfzCzqc",
+        "isSigner": false,
+        "isWritable": true
+      },
+      {
+        "pubkey": "25hjHpTATmkdET17ynDhf1MCuYNDn1z7wXfVw5iaxLAK",
+        "isSigner": false,
+        "isWritable": false
+      },
+      {
+        "pubkey": "GdaQ7RHbGKGEL5Px66tQP78S67XcgxYAzFUwja71qSJP",
+        "isSigner": false,
+        "isWritable": false
+      }
+    ]
+  }
+}

@@ -1,0 +1,1625 @@
+{
+  "sourceCommit": "b8120a8a58b1375ba3b8f0d2a590c49923e18021",
+  "fixtureOnly": true,
+  "provenance": "Synthetic values serialized by actual locked beam-program Anchor Event::data, independently compared with a source-layout writer; no handlers or chain data.",
+  "anchorRun": {
+    "kind": "Actual independent root execution of reviewed own Rust event producer",
+    "exitCode": 0,
+    "head": "b8120a8a58b1375ba3b8f0d2a590c49923e18021",
+    "sourceSha256": "412f0a68a7cb233fef8dd5eae1752bf424573826b025020e8fb408f5aaf8dc32",
+    "stdoutSha256": "03dd6980312409e1e0aa330d99326482c6b1b7d8a57a89f7def8045c9749be37",
+    "stdoutBytes": 4136,
+    "stderrSha256": "f02fbe60d04454dfc0113b082557cbadf5220031aed7a3a56799cb6d0866f2e3",
+    "eventIds": [
+      "create-unicode",
+      "create-empty",
+      "trade-mixed",
+      "trade-empty",
+      "trade-sequential"
+    ],
+    "eventLengths": [
+      319,
+      272,
+      466,
+      387,
+      493
+    ],
+    "noHandlersOrNetworkOrTransactions": true,
+    "cargo": "1.89.0",
+    "rustc": "1.94.1",
+    "command": "cargo run --locked --manifest-path programs/beam/Cargo.toml --example beam_events_fixture",
+    "compileEnv": {
+      "CARGO_HOME": "/tmp/beam-20261101/cargo-home",
+      "CARGO_TARGET_DIR": "/tmp/beam-20261101/target",
+      "RUSTFLAGS": "-C debuginfo=0"
+    },
+    "stdoutFile": "events-anchor.json",
+    "receiptFile": "events-anchor.receipt.json"
+  },
+  "sourceWitnesses": {
+    "eventFile": {
+      "path": "programs/beam/src/lib.rs",
+      "baselineSha256": "a410881812cd75e5f5b242ceb49faf8a73bc3ed01db1e76fbe1d989f084f5443",
+      "definitions": {
+        "CreateEvent": {
+          "definitionSha256": "fd0e227d86c0e8c59e4c303c94c655355b31c3fd846417df5f405af0f4975c4e",
+          "fields": [
+            {
+              "rustName": "name",
+              "name": "name",
+              "type": "String"
+            },
+            {
+              "rustName": "symbol",
+              "name": "symbol",
+              "type": "String"
+            },
+            {
+              "rustName": "uri",
+              "name": "uri",
+              "type": "String"
+            },
+            {
+              "rustName": "mint",
+              "name": "mint",
+              "type": "Pubkey"
+            },
+            {
+              "rustName": "bonding_curve",
+              "name": "bondingCurve",
+              "type": "Pubkey"
+            },
+            {
+              "rustName": "user",
+              "name": "user",
+              "type": "Pubkey"
+            },
+            {
+              "rustName": "creator",
+              "name": "creator",
+              "type": "Pubkey"
+            },
+            {
+              "rustName": "timestamp",
+              "name": "timestamp",
+              "type": "i64"
+            },
+            {
+              "rustName": "virtual_token_reserves",
+              "name": "virtualTokenReserves",
+              "type": "u64"
+            },
+            {
+              "rustName": "virtual_sol_reserves",
+              "name": "virtualSolReserves",
+              "type": "u64"
+            },
+            {
+              "rustName": "real_token_reserves",
+              "name": "realTokenReserves",
+              "type": "u64"
+            },
+            {
+              "rustName": "token_total_supply",
+              "name": "tokenTotalSupply",
+              "type": "u64"
+            },
+            {
+              "rustName": "token_program",
+              "name": "tokenProgram",
+              "type": "Pubkey"
+            },
+            {
+              "rustName": "is_mayhem_mode",
+              "name": "isMayhemMode",
+              "type": "bool"
+            },
+            {
+              "rustName": "is_cashback_enabled",
+              "name": "isCashbackEnabled",
+              "type": "bool"
+            },
+            {
+              "rustName": "quote_mint",
+              "name": "quoteMint",
+              "type": "Pubkey"
+            },
+            {
+              "rustName": "virtual_quote_reserves",
+              "name": "virtualQuoteReserves",
+              "type": "u64"
+            },
+            {
+              "rustName": "creator_fee_bps",
+              "name": "creatorFeeBps",
+              "type": "u64"
+            },
+            {
+              "rustName": "is_holder_reward",
+              "name": "isHolderReward",
+              "type": "bool"
+            },
+            {
+              "rustName": "depth",
+              "name": "depth",
+              "type": "u8"
+            }
+          ]
+        },
+        "TradeEvent": {
+          "definitionSha256": "b91f38d5e318ee22c1329dc39a897750961bcec7a263fd748f220ca48179ed61",
+          "fields": [
+            {
+              "rustName": "mint",
+              "name": "mint",
+              "type": "Pubkey"
+            },
+            {
+              "rustName": "sol_amount",
+              "name": "solAmount",
+              "type": "u64"
+            },
+            {
+              "rustName": "token_amount",
+              "name": "tokenAmount",
+              "type": "u64"
+            },
+            {
+              "rustName": "is_buy",
+              "name": "isBuy",
+              "type": "bool"
+            },
+            {
+              "rustName": "user",
+              "name": "user",
+              "type": "Pubkey"
+            },
+            {
+              "rustName": "timestamp",
+              "name": "timestamp",
+              "type": "i64"
+            },
+            {
+              "rustName": "virtual_sol_reserves",
+              "name": "virtualSolReserves",
+              "type": "u64"
+            },
+            {
+              "rustName": "virtual_token_reserves",
+              "name": "virtualTokenReserves",
+              "type": "u64"
+            },
+            {
+              "rustName": "real_sol_reserves",
+              "name": "realSolReserves",
+              "type": "u64"
+            },
+            {
+              "rustName": "real_token_reserves",
+              "name": "realTokenReserves",
+              "type": "u64"
+            },
+            {
+              "rustName": "fee_recipient",
+              "name": "feeRecipient",
+              "type": "Pubkey"
+            },
+            {
+              "rustName": "fee_basis_points",
+              "name": "feeBasisPoints",
+              "type": "u64"
+            },
+            {
+              "rustName": "fee",
+              "name": "fee",
+              "type": "u64"
+            },
+            {
+              "rustName": "creator",
+              "name": "creator",
+              "type": "Pubkey"
+            },
+            {
+              "rustName": "creator_fee_basis_points",
+              "name": "creatorFeeBasisPoints",
+              "type": "u64"
+            },
+            {
+              "rustName": "creator_fee",
+              "name": "creatorFee",
+              "type": "u64"
+            },
+            {
+              "rustName": "track_volume",
+              "name": "trackVolume",
+              "type": "bool"
+            },
+            {
+              "rustName": "total_unclaimed_tokens",
+              "name": "totalUnclaimedTokens",
+              "type": "u64"
+            },
+            {
+              "rustName": "total_claimed_tokens",
+              "name": "totalClaimedTokens",
+              "type": "u64"
+            },
+            {
+              "rustName": "current_sol_volume",
+              "name": "currentSolVolume",
+              "type": "u64"
+            },
+            {
+              "rustName": "last_update_timestamp",
+              "name": "lastUpdateTimestamp",
+              "type": "i64"
+            },
+            {
+              "rustName": "ix_name",
+              "name": "ixName",
+              "type": "String"
+            },
+            {
+              "rustName": "mayhem_mode",
+              "name": "mayhemMode",
+              "type": "bool"
+            },
+            {
+              "rustName": "cashback_fee_basis_points",
+              "name": "cashbackFeeBasisPoints",
+              "type": "u64"
+            },
+            {
+              "rustName": "cashback",
+              "name": "cashback",
+              "type": "u64"
+            },
+            {
+              "rustName": "buyback_fee_basis_points",
+              "name": "buybackFeeBasisPoints",
+              "type": "u64"
+            },
+            {
+              "rustName": "buyback_fee",
+              "name": "buybackFee",
+              "type": "u64"
+            },
+            {
+              "rustName": "shareholders",
+              "name": "shareholders",
+              "type": "Vec<Shareholder>"
+            },
+            {
+              "rustName": "quote_mint",
+              "name": "quoteMint",
+              "type": "Pubkey"
+            },
+            {
+              "rustName": "quote_amount",
+              "name": "quoteAmount",
+              "type": "u64"
+            },
+            {
+              "rustName": "virtual_quote_reserves",
+              "name": "virtualQuoteReserves",
+              "type": "u64"
+            },
+            {
+              "rustName": "real_quote_reserves",
+              "name": "realQuoteReserves",
+              "type": "u64"
+            },
+            {
+              "rustName": "holder_rewards_bps",
+              "name": "holderRewardsBps",
+              "type": "u64"
+            },
+            {
+              "rustName": "holder_rewards",
+              "name": "holderRewards",
+              "type": "u64"
+            },
+            {
+              "rustName": "creator_fee_unclaimed",
+              "name": "creatorFeeUnclaimed",
+              "type": "u64"
+            },
+            {
+              "rustName": "unparsed_trailing_field",
+              "name": "unparsedTrailingField",
+              "type": "u64"
+            }
+          ]
+        }
+      }
+    },
+    "shareholderIdl": {
+      "path": "programs/beam/idls/pump_fees.json",
+      "baselineSha256": "6b9fa3eccc6e06273076a47b581f9fcb9e531bb7c3c88acbcd44db55a4002b29",
+      "definition": {
+        "name": "Shareholder",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "address",
+              "type": "pubkey"
+            },
+            {
+              "name": "share_bps",
+              "type": "u16"
+            }
+          ]
+        }
+      }
+    },
+    "reexport": {
+      "path": "programs/beam/src/trade_types.rs",
+      "selectedSha256": "9a70d8db6f3cf318a91e2e0852614427aeb35e3dbd0a7e95e4b9aaad46e184f9"
+    },
+    "defaultEventDiscriminator": "SHA-256(UTF8(\"event:\" + exact Rust struct name))[0..8]",
+    "lockedDependencies": {
+      "anchor-lang": "0.31.1",
+      "anchor-attribute-event": "0.31.2",
+      "anchor-derive-serde": "0.31.2",
+      "borsh": "0.10.4"
+    },
+    "crateChecksums": {
+      "anchor-attribute-event@0.31.2": "7fb2e11a313bd117800be14f7ad786c03a3f89faf3159cdc2e5326bcc6b5ea04",
+      "borsh@0.10.4": "115e54d64eb62cdebad391c19efc9dce4981c690c85a33a12199d99bb9546fee"
+    }
+  },
+  "cases": [
+    {
+      "id": "create-unicode",
+      "eventName": "CreateEvent",
+      "expected": {
+        "name": "Beam 🚀",
+        "symbol": "﻿B\u0000",
+        "uri": "https://example.invalid/🛸.json",
+        "mint": "4vJ9JU1bJJE96FWSJKvHsmmFADCg4gpZQff4P3bkLKi",
+        "bondingCurve": "8qbHbw2BbbTHBW1sbeqakYXVKRQM8Ne7pLK7m6CVfeR",
+        "user": "CktRuQ2mttgRGkXJtyksdKHjUdc2C4TgDzyB98oEzy8",
+        "creator": "GgBaCs3NCBuZN12kCJgAW63ydqohFkHEdfdEXBPzLHq",
+        "timestamp": "-9223372036854775808",
+        "virtualTokenReserves": "18446744073709551615",
+        "virtualSolReserves": "9007199254740993",
+        "realTokenReserves": "1",
+        "tokenTotalSupply": "0",
+        "tokenProgram": "LbUiWL3xVV8hTFYBVdbTNrpDo41NKS6o3LHHuDzjfcY",
+        "isMayhemMode": true,
+        "isCashbackEnabled": false,
+        "quoteMint": "QWmroo4YnnMqYW3cnxWkFdaTxGD3P7vMSzwMHGbUzwF",
+        "virtualQuoteReserves": "42",
+        "creatorFeeBps": "65535",
+        "isHolderReward": true,
+        "depth": 255
+      },
+      "fields": [
+        {
+          "rustName": "name",
+          "name": "name",
+          "type": "String",
+          "offset": 8,
+          "byteLength": 13
+        },
+        {
+          "rustName": "symbol",
+          "name": "symbol",
+          "type": "String",
+          "offset": 21,
+          "byteLength": 9
+        },
+        {
+          "rustName": "uri",
+          "name": "uri",
+          "type": "String",
+          "offset": 30,
+          "byteLength": 37
+        },
+        {
+          "rustName": "mint",
+          "name": "mint",
+          "type": "Pubkey",
+          "offset": 67,
+          "byteLength": 32
+        },
+        {
+          "rustName": "bonding_curve",
+          "name": "bondingCurve",
+          "type": "Pubkey",
+          "offset": 99,
+          "byteLength": 32
+        },
+        {
+          "rustName": "user",
+          "name": "user",
+          "type": "Pubkey",
+          "offset": 131,
+          "byteLength": 32
+        },
+        {
+          "rustName": "creator",
+          "name": "creator",
+          "type": "Pubkey",
+          "offset": 163,
+          "byteLength": 32
+        },
+        {
+          "rustName": "timestamp",
+          "name": "timestamp",
+          "type": "i64",
+          "offset": 195,
+          "byteLength": 8
+        },
+        {
+          "rustName": "virtual_token_reserves",
+          "name": "virtualTokenReserves",
+          "type": "u64",
+          "offset": 203,
+          "byteLength": 8
+        },
+        {
+          "rustName": "virtual_sol_reserves",
+          "name": "virtualSolReserves",
+          "type": "u64",
+          "offset": 211,
+          "byteLength": 8
+        },
+        {
+          "rustName": "real_token_reserves",
+          "name": "realTokenReserves",
+          "type": "u64",
+          "offset": 219,
+          "byteLength": 8
+        },
+        {
+          "rustName": "token_total_supply",
+          "name": "tokenTotalSupply",
+          "type": "u64",
+          "offset": 227,
+          "byteLength": 8
+        },
+        {
+          "rustName": "token_program",
+          "name": "tokenProgram",
+          "type": "Pubkey",
+          "offset": 235,
+          "byteLength": 32
+        },
+        {
+          "rustName": "is_mayhem_mode",
+          "name": "isMayhemMode",
+          "type": "bool",
+          "offset": 267,
+          "byteLength": 1
+        },
+        {
+          "rustName": "is_cashback_enabled",
+          "name": "isCashbackEnabled",
+          "type": "bool",
+          "offset": 268,
+          "byteLength": 1
+        },
+        {
+          "rustName": "quote_mint",
+          "name": "quoteMint",
+          "type": "Pubkey",
+          "offset": 269,
+          "byteLength": 32
+        },
+        {
+          "rustName": "virtual_quote_reserves",
+          "name": "virtualQuoteReserves",
+          "type": "u64",
+          "offset": 301,
+          "byteLength": 8
+        },
+        {
+          "rustName": "creator_fee_bps",
+          "name": "creatorFeeBps",
+          "type": "u64",
+          "offset": 309,
+          "byteLength": 8
+        },
+        {
+          "rustName": "is_holder_reward",
+          "name": "isHolderReward",
+          "type": "bool",
+          "offset": 317,
+          "byteLength": 1
+        },
+        {
+          "rustName": "depth",
+          "name": "depth",
+          "type": "u8",
+          "offset": 318,
+          "byteLength": 1
+        }
+      ],
+      "dataHex": "1b72a94ddeeb6376090000004265616d20f09f9a8005000000efbbbf42002100000068747470733a2f2f6578616d706c652e696e76616c69642ff09f9bb82e6a736f6e01010101010101010101010101010101010101010101010101010101010101010202020202020202020202020202020202020202020202020202020202020202030303030303030303030303030303030303030303030303030303030303030304040404040404040404040404040404040404040404040404040404040404040000000000000080ffffffffffffffff0100000000002000010000000000000000000000000000000505050505050505050505050505050505050505050505050505050505050505010006060606060606060606060606060606060606060606060606060606060606062a00000000000000ffff00000000000001ff"
+    },
+    {
+      "id": "create-empty",
+      "eventName": "CreateEvent",
+      "expected": {
+        "name": "",
+        "symbol": "",
+        "uri": "",
+        "mint": "11111111111111111111111111111111",
+        "bondingCurve": "11111111111111111111111111111111",
+        "user": "11111111111111111111111111111111",
+        "creator": "11111111111111111111111111111111",
+        "timestamp": "9223372036854775807",
+        "virtualTokenReserves": "0",
+        "virtualSolReserves": "0",
+        "realTokenReserves": "0",
+        "tokenTotalSupply": "0",
+        "tokenProgram": "JEKNVnkbo3jma5nREBBJCDoXFVeKkD56V3xKrvRmWxFG",
+        "isMayhemMode": false,
+        "isCashbackEnabled": true,
+        "quoteMint": "11111111111111111111111111111111",
+        "virtualQuoteReserves": "0",
+        "creatorFeeBps": "0",
+        "isHolderReward": false,
+        "depth": 0
+      },
+      "fields": [
+        {
+          "rustName": "name",
+          "name": "name",
+          "type": "String",
+          "offset": 8,
+          "byteLength": 4
+        },
+        {
+          "rustName": "symbol",
+          "name": "symbol",
+          "type": "String",
+          "offset": 12,
+          "byteLength": 4
+        },
+        {
+          "rustName": "uri",
+          "name": "uri",
+          "type": "String",
+          "offset": 16,
+          "byteLength": 4
+        },
+        {
+          "rustName": "mint",
+          "name": "mint",
+          "type": "Pubkey",
+          "offset": 20,
+          "byteLength": 32
+        },
+        {
+          "rustName": "bonding_curve",
+          "name": "bondingCurve",
+          "type": "Pubkey",
+          "offset": 52,
+          "byteLength": 32
+        },
+        {
+          "rustName": "user",
+          "name": "user",
+          "type": "Pubkey",
+          "offset": 84,
+          "byteLength": 32
+        },
+        {
+          "rustName": "creator",
+          "name": "creator",
+          "type": "Pubkey",
+          "offset": 116,
+          "byteLength": 32
+        },
+        {
+          "rustName": "timestamp",
+          "name": "timestamp",
+          "type": "i64",
+          "offset": 148,
+          "byteLength": 8
+        },
+        {
+          "rustName": "virtual_token_reserves",
+          "name": "virtualTokenReserves",
+          "type": "u64",
+          "offset": 156,
+          "byteLength": 8
+        },
+        {
+          "rustName": "virtual_sol_reserves",
+          "name": "virtualSolReserves",
+          "type": "u64",
+          "offset": 164,
+          "byteLength": 8
+        },
+        {
+          "rustName": "real_token_reserves",
+          "name": "realTokenReserves",
+          "type": "u64",
+          "offset": 172,
+          "byteLength": 8
+        },
+        {
+          "rustName": "token_total_supply",
+          "name": "tokenTotalSupply",
+          "type": "u64",
+          "offset": 180,
+          "byteLength": 8
+        },
+        {
+          "rustName": "token_program",
+          "name": "tokenProgram",
+          "type": "Pubkey",
+          "offset": 188,
+          "byteLength": 32
+        },
+        {
+          "rustName": "is_mayhem_mode",
+          "name": "isMayhemMode",
+          "type": "bool",
+          "offset": 220,
+          "byteLength": 1
+        },
+        {
+          "rustName": "is_cashback_enabled",
+          "name": "isCashbackEnabled",
+          "type": "bool",
+          "offset": 221,
+          "byteLength": 1
+        },
+        {
+          "rustName": "quote_mint",
+          "name": "quoteMint",
+          "type": "Pubkey",
+          "offset": 222,
+          "byteLength": 32
+        },
+        {
+          "rustName": "virtual_quote_reserves",
+          "name": "virtualQuoteReserves",
+          "type": "u64",
+          "offset": 254,
+          "byteLength": 8
+        },
+        {
+          "rustName": "creator_fee_bps",
+          "name": "creatorFeeBps",
+          "type": "u64",
+          "offset": 262,
+          "byteLength": 8
+        },
+        {
+          "rustName": "is_holder_reward",
+          "name": "isHolderReward",
+          "type": "bool",
+          "offset": 270,
+          "byteLength": 1
+        },
+        {
+          "rustName": "depth",
+          "name": "depth",
+          "type": "u8",
+          "offset": 271,
+          "byteLength": 1
+        }
+      ],
+      "dataHex": "1b72a94ddeeb63760000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffff7f0000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "id": "trade-mixed",
+      "eventName": "TradeEvent",
+      "expected": {
+        "mint": "US517G5965aydkZ46HS38QLi7UQiSojurfbQfKCELFx",
+        "solAmount": "18446744073709551615",
+        "tokenAmount": "9007199254740995",
+        "isBuy": true,
+        "user": "YMN9Qj5jPNp7j14VPcML1B6xGgcPWVZUGLFU3Mnyfaf",
+        "timestamp": "-9223372036854775808",
+        "virtualSolReserves": "0",
+        "virtualTokenReserves": "1",
+        "realSolReserves": "2",
+        "realTokenReserves": "3",
+        "feeRecipient": "cGfHiC6Kgg3FpFZvgwGcswsCRtp4aBP2fzuXRQPizuN",
+        "feeBasisPoints": "50",
+        "fee": "17",
+        "creator": "gBxS1f6uyyGPuW5MzGBukidSb71jdsCb5fZaoSzULE5",
+        "creatorFeeBasisPoints": "30",
+        "creatorFee": "19",
+        "trackVolume": false,
+        "totalUnclaimedTokens": "18446744073709551615",
+        "totalClaimedTokens": "9",
+        "currentSolVolume": "9007199254740993",
+        "lastUpdateTimestamp": "9223372036854775807",
+        "ixName": "﻿buy\u0000🚀",
+        "mayhemMode": true,
+        "cashbackFeeBasisPoints": "11",
+        "cashback": "12",
+        "buybackFeeBasisPoints": "13",
+        "buybackFee": "14",
+        "shareholders": [
+          {
+            "address": "k7FaK87WHGVXzkaoHb7CdVPgkKDQhZ29VLDeBVbDfYn",
+            "shareBps": 0
+          },
+          {
+            "address": "p2Yicb86aZig616Eav2VWG9vuXR5mEqhtzshZYBxzsV",
+            "shareBps": 65535
+          }
+        ],
+        "quoteMint": "swqrv48gsrwpBFbftEwnP2vB4jckpvfGJfXkwaniLCC",
+        "quoteAmount": "18446744073709551615",
+        "virtualQuoteReserves": "15",
+        "realQuoteReserves": "16",
+        "holderRewardsBps": "17",
+        "holderRewards": "18",
+        "creatorFeeUnclaimed": "19",
+        "unparsedTrailingField": "18446744073709551615"
+      },
+      "fields": [
+        {
+          "rustName": "mint",
+          "name": "mint",
+          "type": "Pubkey",
+          "offset": 8,
+          "byteLength": 32
+        },
+        {
+          "rustName": "sol_amount",
+          "name": "solAmount",
+          "type": "u64",
+          "offset": 40,
+          "byteLength": 8
+        },
+        {
+          "rustName": "token_amount",
+          "name": "tokenAmount",
+          "type": "u64",
+          "offset": 48,
+          "byteLength": 8
+        },
+        {
+          "rustName": "is_buy",
+          "name": "isBuy",
+          "type": "bool",
+          "offset": 56,
+          "byteLength": 1
+        },
+        {
+          "rustName": "user",
+          "name": "user",
+          "type": "Pubkey",
+          "offset": 57,
+          "byteLength": 32
+        },
+        {
+          "rustName": "timestamp",
+          "name": "timestamp",
+          "type": "i64",
+          "offset": 89,
+          "byteLength": 8
+        },
+        {
+          "rustName": "virtual_sol_reserves",
+          "name": "virtualSolReserves",
+          "type": "u64",
+          "offset": 97,
+          "byteLength": 8
+        },
+        {
+          "rustName": "virtual_token_reserves",
+          "name": "virtualTokenReserves",
+          "type": "u64",
+          "offset": 105,
+          "byteLength": 8
+        },
+        {
+          "rustName": "real_sol_reserves",
+          "name": "realSolReserves",
+          "type": "u64",
+          "offset": 113,
+          "byteLength": 8
+        },
+        {
+          "rustName": "real_token_reserves",
+          "name": "realTokenReserves",
+          "type": "u64",
+          "offset": 121,
+          "byteLength": 8
+        },
+        {
+          "rustName": "fee_recipient",
+          "name": "feeRecipient",
+          "type": "Pubkey",
+          "offset": 129,
+          "byteLength": 32
+        },
+        {
+          "rustName": "fee_basis_points",
+          "name": "feeBasisPoints",
+          "type": "u64",
+          "offset": 161,
+          "byteLength": 8
+        },
+        {
+          "rustName": "fee",
+          "name": "fee",
+          "type": "u64",
+          "offset": 169,
+          "byteLength": 8
+        },
+        {
+          "rustName": "creator",
+          "name": "creator",
+          "type": "Pubkey",
+          "offset": 177,
+          "byteLength": 32
+        },
+        {
+          "rustName": "creator_fee_basis_points",
+          "name": "creatorFeeBasisPoints",
+          "type": "u64",
+          "offset": 209,
+          "byteLength": 8
+        },
+        {
+          "rustName": "creator_fee",
+          "name": "creatorFee",
+          "type": "u64",
+          "offset": 217,
+          "byteLength": 8
+        },
+        {
+          "rustName": "track_volume",
+          "name": "trackVolume",
+          "type": "bool",
+          "offset": 225,
+          "byteLength": 1
+        },
+        {
+          "rustName": "total_unclaimed_tokens",
+          "name": "totalUnclaimedTokens",
+          "type": "u64",
+          "offset": 226,
+          "byteLength": 8
+        },
+        {
+          "rustName": "total_claimed_tokens",
+          "name": "totalClaimedTokens",
+          "type": "u64",
+          "offset": 234,
+          "byteLength": 8
+        },
+        {
+          "rustName": "current_sol_volume",
+          "name": "currentSolVolume",
+          "type": "u64",
+          "offset": 242,
+          "byteLength": 8
+        },
+        {
+          "rustName": "last_update_timestamp",
+          "name": "lastUpdateTimestamp",
+          "type": "i64",
+          "offset": 250,
+          "byteLength": 8
+        },
+        {
+          "rustName": "ix_name",
+          "name": "ixName",
+          "type": "String",
+          "offset": 258,
+          "byteLength": 15
+        },
+        {
+          "rustName": "mayhem_mode",
+          "name": "mayhemMode",
+          "type": "bool",
+          "offset": 273,
+          "byteLength": 1
+        },
+        {
+          "rustName": "cashback_fee_basis_points",
+          "name": "cashbackFeeBasisPoints",
+          "type": "u64",
+          "offset": 274,
+          "byteLength": 8
+        },
+        {
+          "rustName": "cashback",
+          "name": "cashback",
+          "type": "u64",
+          "offset": 282,
+          "byteLength": 8
+        },
+        {
+          "rustName": "buyback_fee_basis_points",
+          "name": "buybackFeeBasisPoints",
+          "type": "u64",
+          "offset": 290,
+          "byteLength": 8
+        },
+        {
+          "rustName": "buyback_fee",
+          "name": "buybackFee",
+          "type": "u64",
+          "offset": 298,
+          "byteLength": 8
+        },
+        {
+          "rustName": "shareholders",
+          "name": "shareholders",
+          "type": "Vec<Shareholder>",
+          "offset": 306,
+          "byteLength": 72
+        },
+        {
+          "rustName": "quote_mint",
+          "name": "quoteMint",
+          "type": "Pubkey",
+          "offset": 378,
+          "byteLength": 32
+        },
+        {
+          "rustName": "quote_amount",
+          "name": "quoteAmount",
+          "type": "u64",
+          "offset": 410,
+          "byteLength": 8
+        },
+        {
+          "rustName": "virtual_quote_reserves",
+          "name": "virtualQuoteReserves",
+          "type": "u64",
+          "offset": 418,
+          "byteLength": 8
+        },
+        {
+          "rustName": "real_quote_reserves",
+          "name": "realQuoteReserves",
+          "type": "u64",
+          "offset": 426,
+          "byteLength": 8
+        },
+        {
+          "rustName": "holder_rewards_bps",
+          "name": "holderRewardsBps",
+          "type": "u64",
+          "offset": 434,
+          "byteLength": 8
+        },
+        {
+          "rustName": "holder_rewards",
+          "name": "holderRewards",
+          "type": "u64",
+          "offset": 442,
+          "byteLength": 8
+        },
+        {
+          "rustName": "creator_fee_unclaimed",
+          "name": "creatorFeeUnclaimed",
+          "type": "u64",
+          "offset": 450,
+          "byteLength": 8
+        },
+        {
+          "rustName": "unparsed_trailing_field",
+          "name": "unparsedTrailingField",
+          "type": "u64",
+          "offset": 458,
+          "byteLength": 8
+        }
+      ],
+      "dataHex": "bddb7fd34ee661ee0707070707070707070707070707070707070707070707070707070707070707ffffffffffffffff0300000000002000010808080808080808080808080808080808080808080808080808080808080808000000000000008000000000000000000100000000000000020000000000000003000000000000000909090909090909090909090909090909090909090909090909090909090909320000000000000011000000000000000a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a1e00000000000000130000000000000000ffffffffffffffff09000000000000000100000000002000ffffffffffffff7f0b000000efbbbf62757900f09f9a80010b000000000000000c000000000000000d000000000000000e00000000000000020000000b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b00000c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0cffff0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0dffffffffffffffff0f000000000000001000000000000000110000000000000012000000000000001300000000000000ffffffffffffffff"
+    },
+    {
+      "id": "trade-empty",
+      "eventName": "TradeEvent",
+      "expected": {
+        "mint": "11111111111111111111111111111111",
+        "solAmount": "0",
+        "tokenAmount": "0",
+        "isBuy": false,
+        "user": "11111111111111111111111111111111",
+        "timestamp": "0",
+        "virtualSolReserves": "0",
+        "virtualTokenReserves": "0",
+        "realSolReserves": "0",
+        "realTokenReserves": "0",
+        "feeRecipient": "11111111111111111111111111111111",
+        "feeBasisPoints": "0",
+        "fee": "0",
+        "creator": "11111111111111111111111111111111",
+        "creatorFeeBasisPoints": "0",
+        "creatorFee": "0",
+        "trackVolume": true,
+        "totalUnclaimedTokens": "0",
+        "totalClaimedTokens": "0",
+        "currentSolVolume": "0",
+        "lastUpdateTimestamp": "0",
+        "ixName": "",
+        "mayhemMode": false,
+        "cashbackFeeBasisPoints": "0",
+        "cashback": "0",
+        "buybackFeeBasisPoints": "0",
+        "buybackFee": "0",
+        "shareholders": [],
+        "quoteMint": "11111111111111111111111111111111",
+        "quoteAmount": "0",
+        "virtualQuoteReserves": "0",
+        "realQuoteReserves": "0",
+        "holderRewardsBps": "0",
+        "holderRewards": "0",
+        "creatorFeeUnclaimed": "0",
+        "unparsedTrailingField": "0"
+      },
+      "fields": [
+        {
+          "rustName": "mint",
+          "name": "mint",
+          "type": "Pubkey",
+          "offset": 8,
+          "byteLength": 32
+        },
+        {
+          "rustName": "sol_amount",
+          "name": "solAmount",
+          "type": "u64",
+          "offset": 40,
+          "byteLength": 8
+        },
+        {
+          "rustName": "token_amount",
+          "name": "tokenAmount",
+          "type": "u64",
+          "offset": 48,
+          "byteLength": 8
+        },
+        {
+          "rustName": "is_buy",
+          "name": "isBuy",
+          "type": "bool",
+          "offset": 56,
+          "byteLength": 1
+        },
+        {
+          "rustName": "user",
+          "name": "user",
+          "type": "Pubkey",
+          "offset": 57,
+          "byteLength": 32
+        },
+        {
+          "rustName": "timestamp",
+          "name": "timestamp",
+          "type": "i64",
+          "offset": 89,
+          "byteLength": 8
+        },
+        {
+          "rustName": "virtual_sol_reserves",
+          "name": "virtualSolReserves",
+          "type": "u64",
+          "offset": 97,
+          "byteLength": 8
+        },
+        {
+          "rustName": "virtual_token_reserves",
+          "name": "virtualTokenReserves",
+          "type": "u64",
+          "offset": 105,
+          "byteLength": 8
+        },
+        {
+          "rustName": "real_sol_reserves",
+          "name": "realSolReserves",
+          "type": "u64",
+          "offset": 113,
+          "byteLength": 8
+        },
+        {
+          "rustName": "real_token_reserves",
+          "name": "realTokenReserves",
+          "type": "u64",
+          "offset": 121,
+          "byteLength": 8
+        },
+        {
+          "rustName": "fee_recipient",
+          "name": "feeRecipient",
+          "type": "Pubkey",
+          "offset": 129,
+          "byteLength": 32
+        },
+        {
+          "rustName": "fee_basis_points",
+          "name": "feeBasisPoints",
+          "type": "u64",
+          "offset": 161,
+          "byteLength": 8
+        },
+        {
+          "rustName": "fee",
+          "name": "fee",
+          "type": "u64",
+          "offset": 169,
+          "byteLength": 8
+        },
+        {
+          "rustName": "creator",
+          "name": "creator",
+          "type": "Pubkey",
+          "offset": 177,
+          "byteLength": 32
+        },
+        {
+          "rustName": "creator_fee_basis_points",
+          "name": "creatorFeeBasisPoints",
+          "type": "u64",
+          "offset": 209,
+          "byteLength": 8
+        },
+        {
+          "rustName": "creator_fee",
+          "name": "creatorFee",
+          "type": "u64",
+          "offset": 217,
+          "byteLength": 8
+        },
+        {
+          "rustName": "track_volume",
+          "name": "trackVolume",
+          "type": "bool",
+          "offset": 225,
+          "byteLength": 1
+        },
+        {
+          "rustName": "total_unclaimed_tokens",
+          "name": "totalUnclaimedTokens",
+          "type": "u64",
+          "offset": 226,
+          "byteLength": 8
+        },
+        {
+          "rustName": "total_claimed_tokens",
+          "name": "totalClaimedTokens",
+          "type": "u64",
+          "offset": 234,
+          "byteLength": 8
+        },
+        {
+          "rustName": "current_sol_volume",
+          "name": "currentSolVolume",
+          "type": "u64",
+          "offset": 242,
+          "byteLength": 8
+        },
+        {
+          "rustName": "last_update_timestamp",
+          "name": "lastUpdateTimestamp",
+          "type": "i64",
+          "offset": 250,
+          "byteLength": 8
+        },
+        {
+          "rustName": "ix_name",
+          "name": "ixName",
+          "type": "String",
+          "offset": 258,
+          "byteLength": 4
+        },
+        {
+          "rustName": "mayhem_mode",
+          "name": "mayhemMode",
+          "type": "bool",
+          "offset": 262,
+          "byteLength": 1
+        },
+        {
+          "rustName": "cashback_fee_basis_points",
+          "name": "cashbackFeeBasisPoints",
+          "type": "u64",
+          "offset": 263,
+          "byteLength": 8
+        },
+        {
+          "rustName": "cashback",
+          "name": "cashback",
+          "type": "u64",
+          "offset": 271,
+          "byteLength": 8
+        },
+        {
+          "rustName": "buyback_fee_basis_points",
+          "name": "buybackFeeBasisPoints",
+          "type": "u64",
+          "offset": 279,
+          "byteLength": 8
+        },
+        {
+          "rustName": "buyback_fee",
+          "name": "buybackFee",
+          "type": "u64",
+          "offset": 287,
+          "byteLength": 8
+        },
+        {
+          "rustName": "shareholders",
+          "name": "shareholders",
+          "type": "Vec<Shareholder>",
+          "offset": 295,
+          "byteLength": 4
+        },
+        {
+          "rustName": "quote_mint",
+          "name": "quoteMint",
+          "type": "Pubkey",
+          "offset": 299,
+          "byteLength": 32
+        },
+        {
+          "rustName": "quote_amount",
+          "name": "quoteAmount",
+          "type": "u64",
+          "offset": 331,
+          "byteLength": 8
+        },
+        {
+          "rustName": "virtual_quote_reserves",
+          "name": "virtualQuoteReserves",
+          "type": "u64",
+          "offset": 339,
+          "byteLength": 8
+        },
+        {
+          "rustName": "real_quote_reserves",
+          "name": "realQuoteReserves",
+          "type": "u64",
+          "offset": 347,
+          "byteLength": 8
+        },
+        {
+          "rustName": "holder_rewards_bps",
+          "name": "holderRewardsBps",
+          "type": "u64",
+          "offset": 355,
+          "byteLength": 8
+        },
+        {
+          "rustName": "holder_rewards",
+          "name": "holderRewards",
+          "type": "u64",
+          "offset": 363,
+          "byteLength": 8
+        },
+        {
+          "rustName": "creator_fee_unclaimed",
+          "name": "creatorFeeUnclaimed",
+          "type": "u64",
+          "offset": 371,
+          "byteLength": 8
+        },
+        {
+          "rustName": "unparsed_trailing_field",
+          "name": "unparsedTrailingField",
+          "type": "u64",
+          "offset": 379,
+          "byteLength": 8
+        }
+      ],
+      "dataHex": "bddb7fd34ee661ee00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "id": "trade-sequential",
+      "eventName": "TradeEvent",
+      "expected": {
+        "mint": "2RJD1KnDRGEkvuFfAGrJ7PD28LRE9LRDjZznDywagzmr",
+        "solAmount": "1",
+        "tokenAmount": "2",
+        "isBuy": false,
+        "user": "2VDW9dFE1ZXz4zWAbaBDQFynNVdRpQ73HyfSHMzBSL6Z",
+        "timestamp": "-3",
+        "virtualSolReserves": "4",
+        "virtualTokenReserves": "5",
+        "realSolReserves": "6",
+        "realTokenReserves": "7",
+        "feeRecipient": "2Z8oHviEbrqDD5kg2sW8h8kYceqdVTnrrPL6Lk2nBfRG",
+        "feeBasisPoints": "8",
+        "fee": "9",
+        "creator": "2d46SEBFCA8SMB1BUAq3z1XJrp3qAXUgQnzkQ85Nvzjy",
+        "creatorFeeBasisPoints": "10",
+        "creatorFee": "11",
+        "trackVolume": true,
+        "totalUnclaimedTokens": "12",
+        "totalClaimedTokens": "13",
+        "currentSolVolume": "14",
+        "lastUpdateTimestamp": "-15",
+        "ixName": "sell",
+        "mayhemMode": false,
+        "cashbackFeeBasisPoints": "16",
+        "cashback": "17",
+        "buybackFeeBasisPoints": "18",
+        "buybackFee": "19",
+        "shareholders": [
+          {
+            "address": "EWn7dE93GeQJu72WEkEmC5MZpm5FhiJzkcJEf1xpRdWP",
+            "shareBps": 0
+          },
+          {
+            "address": "EahQmXc3rwhY3CH1g3ZgUx8L4vHTNmzpK1xtiQ1RAxq6",
+            "shareBps": 1
+          },
+          {
+            "address": "Eechuq54TEzmBHXX7Ltbmpu6K5Vf3qgdsRdYmn41vJ9o",
+            "shareBps": 65535
+          }
+        ],
+        "quoteMint": "2gyPaXeFnTRfVGFguU9yGtJ56yG2qbAVyCfQTW7ygL4g",
+        "quoteAmount": "20",
+        "virtualQuoteReserves": "21",
+        "realQuoteReserves": "22",
+        "holderRewardsBps": "23",
+        "holderRewards": "24",
+        "creatorFeeUnclaimed": "25",
+        "unparsedTrailingField": "26"
+      },
+      "fields": [
+        {
+          "rustName": "mint",
+          "name": "mint",
+          "type": "Pubkey",
+          "offset": 8,
+          "byteLength": 32
+        },
+        {
+          "rustName": "sol_amount",
+          "name": "solAmount",
+          "type": "u64",
+          "offset": 40,
+          "byteLength": 8
+        },
+        {
+          "rustName": "token_amount",
+          "name": "tokenAmount",
+          "type": "u64",
+          "offset": 48,
+          "byteLength": 8
+        },
+        {
+          "rustName": "is_buy",
+          "name": "isBuy",
+          "type": "bool",
+          "offset": 56,
+          "byteLength": 1
+        },
+        {
+          "rustName": "user",
+          "name": "user",
+          "type": "Pubkey",
+          "offset": 57,
+          "byteLength": 32
+        },
+        {
+          "rustName": "timestamp",
+          "name": "timestamp",
+          "type": "i64",
+          "offset": 89,
+          "byteLength": 8
+        },
+        {
+          "rustName": "virtual_sol_reserves",
+          "name": "virtualSolReserves",
+          "type": "u64",
+          "offset": 97,
+          "byteLength": 8
+        },
+        {
+          "rustName": "virtual_token_reserves",
+          "name": "virtualTokenReserves",
+          "type": "u64",
+          "offset": 105,
+          "byteLength": 8
+        },
+        {
+          "rustName": "real_sol_reserves",
+          "name": "realSolReserves",
+          "type": "u64",
+          "offset": 113,
+          "byteLength": 8
+        },
+        {
+          "rustName": "real_token_reserves",
+          "name": "realTokenReserves",
+          "type": "u64",
+          "offset": 121,
+          "byteLength": 8
+        },
+        {
+          "rustName": "fee_recipient",
+          "name": "feeRecipient",
+          "type": "Pubkey",
+          "offset": 129,
+          "byteLength": 32
+        },
+        {
+          "rustName": "fee_basis_points",
+          "name": "feeBasisPoints",
+          "type": "u64",
+          "offset": 161,
+          "byteLength": 8
+        },
+        {
+          "rustName": "fee",
+          "name": "fee",
+          "type": "u64",
+          "offset": 169,
+          "byteLength": 8
+        },
+        {
+          "rustName": "creator",
+          "name": "creator",
+          "type": "Pubkey",
+          "offset": 177,
+          "byteLength": 32
+        },
+        {
+          "rustName": "creator_fee_basis_points",
+          "name": "creatorFeeBasisPoints",
+          "type": "u64",
+          "offset": 209,
+          "byteLength": 8
+        },
+        {
+          "rustName": "creator_fee",
+          "name": "creatorFee",
+          "type": "u64",
+          "offset": 217,
+          "byteLength": 8
+        },
+        {
+          "rustName": "track_volume",
+          "name": "trackVolume",
+          "type": "bool",
+          "offset": 225,
+          "byteLength": 1
+        },
+        {
+          "rustName": "total_unclaimed_tokens",
+          "name": "totalUnclaimedTokens",
+          "type": "u64",
+          "offset": 226,
+          "byteLength": 8
+        },
+        {
+          "rustName": "total_claimed_tokens",
+          "name": "totalClaimedTokens",
+          "type": "u64",
+          "offset": 234,
+          "byteLength": 8
+        },
+        {
+          "rustName": "current_sol_volume",
+          "name": "currentSolVolume",
+          "type": "u64",
+          "offset": 242,
+          "byteLength": 8
+        },
+        {
+          "rustName": "last_update_timestamp",
+          "name": "lastUpdateTimestamp",
+          "type": "i64",
+          "offset": 250,
+          "byteLength": 8
+        },
+        {
+          "rustName": "ix_name",
+          "name": "ixName",
+          "type": "String",
+          "offset": 258,
+          "byteLength": 8
+        },
+        {
+          "rustName": "mayhem_mode",
+          "name": "mayhemMode",
+          "type": "bool",
+          "offset": 266,
+          "byteLength": 1
+        },
+        {
+          "rustName": "cashback_fee_basis_points",
+          "name": "cashbackFeeBasisPoints",
+          "type": "u64",
+          "offset": 267,
+          "byteLength": 8
+        },
+        {
+          "rustName": "cashback",
+          "name": "cashback",
+          "type": "u64",
+          "offset": 275,
+          "byteLength": 8
+        },
+        {
+          "rustName": "buyback_fee_basis_points",
+          "name": "buybackFeeBasisPoints",
+          "type": "u64",
+          "offset": 283,
+          "byteLength": 8
+        },
+        {
+          "rustName": "buyback_fee",
+          "name": "buybackFee",
+          "type": "u64",
+          "offset": 291,
+          "byteLength": 8
+        },
+        {
+          "rustName": "shareholders",
+          "name": "shareholders",
+          "type": "Vec<Shareholder>",
+          "offset": 299,
+          "byteLength": 106
+        },
+        {
+          "rustName": "quote_mint",
+          "name": "quoteMint",
+          "type": "Pubkey",
+          "offset": 405,
+          "byteLength": 32
+        },
+        {
+          "rustName": "quote_amount",
+          "name": "quoteAmount",
+          "type": "u64",
+          "offset": 437,
+          "byteLength": 8
+        },
+        {
+          "rustName": "virtual_quote_reserves",
+          "name": "virtualQuoteReserves",
+          "type": "u64",
+          "offset": 445,
+          "byteLength": 8
+        },
+        {
+          "rustName": "real_quote_reserves",
+          "name": "realQuoteReserves",
+          "type": "u64",
+          "offset": 453,
+          "byteLength": 8
+        },
+        {
+          "rustName": "holder_rewards_bps",
+          "name": "holderRewardsBps",
+          "type": "u64",
+          "offset": 461,
+          "byteLength": 8
+        },
+        {
+          "rustName": "holder_rewards",
+          "name": "holderRewards",
+          "type": "u64",
+          "offset": 469,
+          "byteLength": 8
+        },
+        {
+          "rustName": "creator_fee_unclaimed",
+          "name": "creatorFeeUnclaimed",
+          "type": "u64",
+          "offset": 477,
+          "byteLength": 8
+        },
+        {
+          "rustName": "unparsed_trailing_field",
+          "name": "unparsedTrailingField",
+          "type": "u64",
+          "offset": 485,
+          "byteLength": 8
+        }
+      ],
+      "dataHex": "bddb7fd34ee661ee151515151515151515151515151515151515151515151515151515151515151501000000000000000200000000000000001616161616161616161616161616161616161616161616161616161616161616fdffffffffffffff040000000000000005000000000000000600000000000000070000000000000017171717171717171717171717171717171717171717171717171717171717170800000000000000090000000000000018181818181818181818181818181818181818181818181818181818181818180a000000000000000b00000000000000010c000000000000000d000000000000000e00000000000000f1ffffffffffffff0400000073656c6c00100000000000000011000000000000001200000000000000130000000000000003000000c8c8c8c8c8c8c8c8c8c8c8c8c8c8c8c8c8c8c8c8c8c8c8c8c8c8c8c8c8c8c8c80000c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c90100cacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacaffff19191919191919191919191919191919191919191919191919191919191919191400000000000000150000000000000016000000000000001700000000000000180000000000000019000000000000001a00000000000000"
+    }
+  ]
+}
