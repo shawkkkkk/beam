@@ -6,14 +6,21 @@ additional archive restrictions. Do not alter the pinned archive for Beam work.
 
 ## Start with the current work
 
+As of the 1 November 2026 maintainer check, Beam's Slop listing was paused
+with a security scan queued. Its current state was not verifiable on
+2 November 2026. Check the live listing and maintainer direction before
+starting feature work or treating a task as available. Documentation and
+review activity can continue within the scope approved by maintainers;
+neither a Slop state change nor automatic task closure approves a GitHub PR.
+
 1. Read `README.md`, `docs/STATUS.md`, `docs/ECONOMICS.md`, `docs/TASKS.md`,
    and `CONTRIBUTING.md`. Check the working tree, remote branches, and open
    pull requests before choosing a task. Inspect the intended target branch.
 2. Use `programs/beam` as the editable Anchor program. Its retained Pump Main
    modules, Beam policy/economics/Raydium modules, and compatibility tests are
    the contract baseline. Do not start a second launchpad implementation.
-3. Choose one bounded task and record its scope, base commit, intended
-   behavior, tests, and remaining risks in the pull request description.
+3. Claim one bounded lane after checking its open PRs. Record scope, base
+   commit, intended behavior, tests, and remaining risks in the PR description.
    Check `docs/TASKS.md` and active pull requests to avoid duplicate work.
 4. Work in a separate branch. Do not rewrite another contributor's branch or
    merge competing architectures or fee policies without a reviewed decision.
@@ -79,8 +86,9 @@ Do not deploy to a live network, use real wallets, sign live transactions,
 trade, move funds, collect secrets, or launch live services in a pull request.
 A release requires a separate maintainer-controlled process. Respect branch
 protections and leave unresolved or untested work in draft state. Before any
-merge, check CI on the exact head commit and satisfy required formal approvals.
-Do not self-approve or bypass repository rules.
+merge, follow the [maintainer review sequence](CONTRIBUTING.md#maintainer-review-and-merge)
+on the exact head and combined target tree, and satisfy required formal
+approvals. Do not self-approve or bypass repository rules.
 
 If Beam is registered on Slop, report a suspected exploitable issue through
 Slop's current private security-report workflow. Otherwise use GitHub private
