@@ -1,0 +1,446 @@
+{
+  "ammV4": {
+    "associatedTokenProgram": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+    "beamInstruction": null,
+    "createPoolFeeDestination": "7YttLkHDoNj9wyDur5pM1ejNaAvT9X4eqaYcHQqtj2G5",
+    "devnetCreatePoolFeeDestination": "9y8ENuuZ3b19quffx9hQvRVygG5ky6snHfRvGpuSfeJy",
+    "devnetProgramId": "DRaya7Kj3aMWQSy19kSjvmuwq9docCHofyP9kanQGaav",
+    "initialize2": {
+      "accountCount": 19,
+      "accountNames": [
+        "token_program",
+        "associated_token_program",
+        "system_program",
+        "rent",
+        "amm",
+        "authority",
+        "lp_mint",
+        "coin_mint",
+        "pc_mint",
+        "coin_vault",
+        "pc_vault",
+        "target_orders",
+        "config",
+        "create_pool_fee_destination",
+        "market_seed",
+        "user_wallet",
+        "user_coin_source",
+        "user_pc_source",
+        "user_lp_ata"
+      ],
+      "accounts": {
+        "amm": "F3RamKgVS8GK8j6RtVnLHnMCcd3ZJtzqE8Diyjetyu9c",
+        "associatedTokenProgram": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+        "authority": "5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1",
+        "coinMint": "36VASLSKLFD2KokjXG7V28veZvXEsyHRKefLonPaAKzv",
+        "coinVault": "81Sby2AMhVgUKEkBrdJwQg2bAx7dyay3cU8fcbJc7RXn",
+        "config": "9DCxsMizn3H1hprZ7xWe6LDzeUeZBksYFpBWBtSf1PQX",
+        "createPoolFeeDestination": "7YttLkHDoNj9wyDur5pM1ejNaAvT9X4eqaYcHQqtj2G5",
+        "lpMint": "GRwhptJhCRuaohG6Jr7juginSeYyhuaZHuXX9F2eYwyo",
+        "marketSeed": "3EKkiwNLWqoUbzFkPrmKbtUB4EweE6f4STzevYUmezeL",
+        "pcMint": "3AQTaduKvYWFTu1ExZSQK1hQp5jSZ2yEt4KzsASAufKd",
+        "pcVault": "2Y6JtaWfJUyshijNFyqxvUU1HJL14Hw2vYePm3bf8ZS7",
+        "rent": "SysvarRent111111111111111111111111111111111",
+        "systemProgram": "11111111111111111111111111111111",
+        "targetOrders": "4DDDYJXNLhvdQ5SYvnE9ygkULFSegLy9TQk74pJyHiBq",
+        "tokenProgram": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+        "userCoinSource": "3NAM1YJMhSPvtAkmGTRABe1hYZN3aE2hZHKy3JZy9fHk",
+        "userLpAta": "EgE5njTxKP1MZ7JCNb7nRomU4KMRDpFG6ugDM1VqGvub",
+        "userPcSource": "3S5e9qmNHjhA2G1Ghkk5UWnTniaFFHiX7gzd6gcZtzcT",
+        "userWallet": "3JF3sEqM796hk5WFqA6EtmEwJQ9quALszsfJyvXNQKy3"
+      },
+      "dataHex": "01fe0000000000000000e803000000000000d007000000000000",
+      "initCoinAmount": "2000",
+      "initPcAmount": "1000",
+      "metas": [
+        {
+          "isSigner": false,
+          "isWritable": false,
+          "pubkey": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "isSigner": false,
+          "isWritable": false,
+          "pubkey": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "isSigner": false,
+          "isWritable": false,
+          "pubkey": "11111111111111111111111111111111"
+        },
+        {
+          "isSigner": false,
+          "isWritable": false,
+          "pubkey": "SysvarRent111111111111111111111111111111111"
+        },
+        {
+          "isSigner": false,
+          "isWritable": true,
+          "pubkey": "F3RamKgVS8GK8j6RtVnLHnMCcd3ZJtzqE8Diyjetyu9c"
+        },
+        {
+          "isSigner": false,
+          "isWritable": false,
+          "pubkey": "5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1"
+        },
+        {
+          "isSigner": false,
+          "isWritable": true,
+          "pubkey": "GRwhptJhCRuaohG6Jr7juginSeYyhuaZHuXX9F2eYwyo"
+        },
+        {
+          "isSigner": false,
+          "isWritable": false,
+          "pubkey": "36VASLSKLFD2KokjXG7V28veZvXEsyHRKefLonPaAKzv"
+        },
+        {
+          "isSigner": false,
+          "isWritable": false,
+          "pubkey": "3AQTaduKvYWFTu1ExZSQK1hQp5jSZ2yEt4KzsASAufKd"
+        },
+        {
+          "isSigner": false,
+          "isWritable": true,
+          "pubkey": "81Sby2AMhVgUKEkBrdJwQg2bAx7dyay3cU8fcbJc7RXn"
+        },
+        {
+          "isSigner": false,
+          "isWritable": true,
+          "pubkey": "2Y6JtaWfJUyshijNFyqxvUU1HJL14Hw2vYePm3bf8ZS7"
+        },
+        {
+          "isSigner": false,
+          "isWritable": true,
+          "pubkey": "4DDDYJXNLhvdQ5SYvnE9ygkULFSegLy9TQk74pJyHiBq"
+        },
+        {
+          "isSigner": false,
+          "isWritable": false,
+          "pubkey": "9DCxsMizn3H1hprZ7xWe6LDzeUeZBksYFpBWBtSf1PQX"
+        },
+        {
+          "isSigner": false,
+          "isWritable": true,
+          "pubkey": "7YttLkHDoNj9wyDur5pM1ejNaAvT9X4eqaYcHQqtj2G5"
+        },
+        {
+          "isSigner": false,
+          "isWritable": false,
+          "pubkey": "3EKkiwNLWqoUbzFkPrmKbtUB4EweE6f4STzevYUmezeL"
+        },
+        {
+          "isSigner": true,
+          "isWritable": true,
+          "pubkey": "3JF3sEqM796hk5WFqA6EtmEwJQ9quALszsfJyvXNQKy3"
+        },
+        {
+          "isSigner": false,
+          "isWritable": true,
+          "pubkey": "3NAM1YJMhSPvtAkmGTRABe1hYZN3aE2hZHKy3JZy9fHk"
+        },
+        {
+          "isSigner": false,
+          "isWritable": true,
+          "pubkey": "3S5e9qmNHjhA2G1Ghkk5UWnTniaFFHiX7gzd6gcZtzcT"
+        },
+        {
+          "isSigner": false,
+          "isWritable": true,
+          "pubkey": "EgE5njTxKP1MZ7JCNb7nRomU4KMRDpFG6ugDM1VqGvub"
+        }
+      ],
+      "nonce": 254,
+      "openTime": "0",
+      "tag": 1
+    },
+    "pin": "91739d8d9f5cf347e0ce14ebe4d2bb7069fb31b6",
+    "pr38": "Draft PR #38 validates this pinned processor with a local 23-account probe. It does not add a Beam migration instruction. Regenerate this section from that instruction's accounts if one lands.",
+    "programId": "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8",
+    "source": "programs/beam/src/beam_amm_v4.rs",
+    "status": "abi-only"
+  },
+  "cpmm": {
+    "beamMigrationReceipt": {
+      "dataHex": "fff1832a8da8818b06060606060606060606060606060606060606060606060606060606060606060e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0a0000000000000073000000000000000a0000000000000063000000000000000400000000000000",
+      "expected": {
+        "lpBurned": "99",
+        "migrationFee": "10",
+        "mint": "QWmroo4YnnMqYW3cnxWkFdaTxGD3P7vMSzwMHGbUzwF",
+        "pool": "ws91DX9HBAAxGW77BZs5FogRDwpRtcUpiLBpKdPTfWu",
+        "quoteAmount": "115",
+        "setupSpent": "4",
+        "tokenAmount": "10"
+      }
+    },
+    "beamRaydiumConfig": {
+      "dataHex": "a6f9d450733927c00404040404040404040404040404040404040404040404040404040404040404161616161616161616161616161616161616161616161616161616161616161600",
+      "expected": {
+        "ammConfig": "GgBaCs3NCBuZN12kCJgAW63ydqohFkHEdfdEXBPzLHq",
+        "enabled": false,
+        "raydiumProgram": "2VDW9dFE1ZXz4zWAbaBDQFynNVdRpQ73HyfSHMzBSL6Z"
+      }
+    },
+    "beamRaydiumMigration": {
+      "dataHex": "cdbfb3569837904106060606060606060606060606060606060606060606060606060606060606060e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0a0000000000000073000000000000000a000000000000006300000000000000",
+      "expected": {
+        "lpBurned": "99",
+        "migrationFee": "10",
+        "mint": "QWmroo4YnnMqYW3cnxWkFdaTxGD3P7vMSzwMHGbUzwF",
+        "pool": "ws91DX9HBAAxGW77BZs5FogRDwpRtcUpiLBpKdPTfWu",
+        "quoteAmount": "115",
+        "tokenAmount": "10"
+      }
+    },
+    "configureRaydium": {
+      "accounts": {
+        "ammConfig": "GgBaCs3NCBuZN12kCJgAW63ydqohFkHEdfdEXBPzLHq",
+        "authority": "8qbHbw2BbbTHBW1sbeqakYXVKRQM8Ne7pLK7m6CVfeR",
+        "config": "CktRuQ2mttgRGkXJtyksdKHjUdc2C4TgDzyB98oEzy8",
+        "global": "4vJ9JU1bJJE96FWSJKvHsmmFADCg4gpZQff4P3bkLKi",
+        "systemProgram": "11111111111111111111111111111111"
+      },
+      "dataHex": "67174dbb4ce19c2f",
+      "metas": [
+        {
+          "isSigner": false,
+          "isWritable": false,
+          "pubkey": "4vJ9JU1bJJE96FWSJKvHsmmFADCg4gpZQff4P3bkLKi"
+        },
+        {
+          "isSigner": true,
+          "isWritable": true,
+          "pubkey": "8qbHbw2BbbTHBW1sbeqakYXVKRQM8Ne7pLK7m6CVfeR"
+        },
+        {
+          "isSigner": false,
+          "isWritable": true,
+          "pubkey": "CktRuQ2mttgRGkXJtyksdKHjUdc2C4TgDzyB98oEzy8"
+        },
+        {
+          "isSigner": false,
+          "isWritable": false,
+          "pubkey": "GgBaCs3NCBuZN12kCJgAW63ydqohFkHEdfdEXBPzLHq"
+        },
+        {
+          "isSigner": false,
+          "isWritable": false,
+          "pubkey": "11111111111111111111111111111111"
+        }
+      ]
+    },
+    "execution": "fail-closed",
+    "migrateRaydium": {
+      "accounts": {
+        "ammConfig": "GgBaCs3NCBuZN12kCJgAW63ydqohFkHEdfdEXBPzLHq",
+        "associatedTokenProgram": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+        "authorityBase": "k7FaK87WHGVXzkaoHb7CdVPgkKDQhZ29VLDeBVbDfYn",
+        "authorityLp": "25hjHpTATmkdET17ynDhf1MCuYNDn1z7wXfVw5iaxLAK",
+        "authorityWsol": "p2Yicb86aZig616Eav2VWG9vuXR5mEqhtzshZYBxzsV",
+        "baseTokenProgram": "2RJD1KnDRGEkvuFfAGrJ7PD28LRE9LRDjZznDywagzmr",
+        "bondingCurve": "US517G5965aydkZ46HS38QLi7UQiSojurfbQfKCELFx",
+        "config": "CktRuQ2mttgRGkXJtyksdKHjUdc2C4TgDzyB98oEzy8",
+        "createPoolFee": "2Z8oHviEbrqDD5kg2sW8h8kYceqdVTnrrPL6Lk2nBfRG",
+        "curveTokenVault": "YMN9Qj5jPNp7j14VPcML1B6xGgcPWVZUGLFU3Mnyfaf",
+        "global": "4vJ9JU1bJJE96FWSJKvHsmmFADCg4gpZQff4P3bkLKi",
+        "lpMint": "21nS9Wz9sUTQ6MkcYUtnN8aSfPA26xJJP7zqshfzCzqc",
+        "migrationAuthority": "gBxS1f6uyyGPuW5MzGBukidSb71jdsCb5fZaoSzULE5",
+        "mint": "QWmroo4YnnMqYW3cnxWkFdaTxGD3P7vMSzwMHGbUzwF",
+        "observation": "2HTciirCEfeJeikeHgCTXdfVe1zpoD3ackfU7DrPCL8S",
+        "pool": "ws91DX9HBAAxGW77BZs5FogRDwpRtcUpiLBpKdPTfWu",
+        "raydiumAuthority": "swqrv48gsrwpBFbftEwnP2vB4jckpvfGJfXkwaniLCC",
+        "raydiumProgram": "2VDW9dFE1ZXz4zWAbaBDQFynNVdRpQ73HyfSHMzBSL6Z",
+        "receipt": "2MNus2KCpxwXnp19iyXNpWSFtBD2UGjQBAL8AbtywfT9",
+        "rent": "SysvarRent111111111111111111111111111111111",
+        "systemProgram": "11111111111111111111111111111111",
+        "tokenProgram": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+        "user": "cGfHiC6Kgg3FpFZvgwGcswsCRtp4aBP2fzuXRQPizuN",
+        "vault0": "29d2S7vB453rNYFdR5Ycwt7y9haRT5fwVwL9zTmBhfV2",
+        "vault1": "2DYKaRPBeNM5WdW8rNsYEktjPrnd89Mm4Lzp3qonSzoj",
+        "withdrawAuthority": "LbUiWL3xVV8hTFYBVdbTNrpDo41NKS6o3LHHuDzjfcY",
+        "wsolMint": "So11111111111111111111111111111111111111112"
+      },
+      "dataHex": "c6609e027257b40160e3160000000000",
+      "metas": [
+        {
+          "isSigner": false,
+          "isWritable": false,
+          "pubkey": "4vJ9JU1bJJE96FWSJKvHsmmFADCg4gpZQff4P3bkLKi"
+        },
+        {
+          "isSigner": false,
+          "isWritable": true,
+          "pubkey": "LbUiWL3xVV8hTFYBVdbTNrpDo41NKS6o3LHHuDzjfcY"
+        },
+        {
+          "isSigner": false,
+          "isWritable": false,
+          "pubkey": "QWmroo4YnnMqYW3cnxWkFdaTxGD3P7vMSzwMHGbUzwF"
+        },
+        {
+          "isSigner": false,
+          "isWritable": true,
+          "pubkey": "US517G5965aydkZ46HS38QLi7UQiSojurfbQfKCELFx"
+        },
+        {
+          "isSigner": false,
+          "isWritable": true,
+          "pubkey": "YMN9Qj5jPNp7j14VPcML1B6xGgcPWVZUGLFU3Mnyfaf"
+        },
+        {
+          "isSigner": true,
+          "isWritable": true,
+          "pubkey": "cGfHiC6Kgg3FpFZvgwGcswsCRtp4aBP2fzuXRQPizuN"
+        },
+        {
+          "isSigner": false,
+          "isWritable": false,
+          "pubkey": "CktRuQ2mttgRGkXJtyksdKHjUdc2C4TgDzyB98oEzy8"
+        },
+        {
+          "isSigner": false,
+          "isWritable": false,
+          "pubkey": "GgBaCs3NCBuZN12kCJgAW63ydqohFkHEdfdEXBPzLHq"
+        },
+        {
+          "isSigner": false,
+          "isWritable": false,
+          "pubkey": "2VDW9dFE1ZXz4zWAbaBDQFynNVdRpQ73HyfSHMzBSL6Z"
+        },
+        {
+          "isSigner": false,
+          "isWritable": true,
+          "pubkey": "gBxS1f6uyyGPuW5MzGBukidSb71jdsCb5fZaoSzULE5"
+        },
+        {
+          "isSigner": false,
+          "isWritable": true,
+          "pubkey": "k7FaK87WHGVXzkaoHb7CdVPgkKDQhZ29VLDeBVbDfYn"
+        },
+        {
+          "isSigner": false,
+          "isWritable": false,
+          "pubkey": "So11111111111111111111111111111111111111112"
+        },
+        {
+          "isSigner": false,
+          "isWritable": true,
+          "pubkey": "p2Yicb86aZig616Eav2VWG9vuXR5mEqhtzshZYBxzsV"
+        },
+        {
+          "isSigner": false,
+          "isWritable": false,
+          "pubkey": "swqrv48gsrwpBFbftEwnP2vB4jckpvfGJfXkwaniLCC"
+        },
+        {
+          "isSigner": false,
+          "isWritable": true,
+          "pubkey": "ws91DX9HBAAxGW77BZs5FogRDwpRtcUpiLBpKdPTfWu"
+        },
+        {
+          "isSigner": false,
+          "isWritable": true,
+          "pubkey": "21nS9Wz9sUTQ6MkcYUtnN8aSfPA26xJJP7zqshfzCzqc"
+        },
+        {
+          "isSigner": false,
+          "isWritable": true,
+          "pubkey": "25hjHpTATmkdET17ynDhf1MCuYNDn1z7wXfVw5iaxLAK"
+        },
+        {
+          "isSigner": false,
+          "isWritable": true,
+          "pubkey": "29d2S7vB453rNYFdR5Ycwt7y9haRT5fwVwL9zTmBhfV2"
+        },
+        {
+          "isSigner": false,
+          "isWritable": true,
+          "pubkey": "2DYKaRPBeNM5WdW8rNsYEktjPrnd89Mm4Lzp3qonSzoj"
+        },
+        {
+          "isSigner": false,
+          "isWritable": true,
+          "pubkey": "2Z8oHviEbrqDD5kg2sW8h8kYceqdVTnrrPL6Lk2nBfRG"
+        },
+        {
+          "isSigner": false,
+          "isWritable": true,
+          "pubkey": "2HTciirCEfeJeikeHgCTXdfVe1zpoD3ackfU7DrPCL8S"
+        },
+        {
+          "isSigner": false,
+          "isWritable": true,
+          "pubkey": "2MNus2KCpxwXnp19iyXNpWSFtBD2UGjQBAL8AbtywfT9"
+        },
+        {
+          "isSigner": false,
+          "isWritable": false,
+          "pubkey": "2RJD1KnDRGEkvuFfAGrJ7PD28LRE9LRDjZznDywagzmr"
+        },
+        {
+          "isSigner": false,
+          "isWritable": false,
+          "pubkey": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "isSigner": false,
+          "isWritable": false,
+          "pubkey": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "isSigner": false,
+          "isWritable": false,
+          "pubkey": "11111111111111111111111111111111"
+        },
+        {
+          "isSigner": false,
+          "isWritable": false,
+          "pubkey": "SysvarRent111111111111111111111111111111111"
+        }
+      ],
+      "setupBudget": "1500000"
+    },
+    "note": "Raydium CPMM is not the selected venue. These entries keep the fail-closed Beam instruction encodings. The account metas use synthetic keys, not the compiled devnet or mainnet CPMM ids.",
+    "selectedVenue": false,
+    "setRaydiumEnabled": {
+      "accounts": {
+        "authority": "8qbHbw2BbbTHBW1sbeqakYXVKRQM8Ne7pLK7m6CVfeR",
+        "config": "CktRuQ2mttgRGkXJtyksdKHjUdc2C4TgDzyB98oEzy8",
+        "global": "4vJ9JU1bJJE96FWSJKvHsmmFADCg4gpZQff4P3bkLKi"
+      },
+      "enabledFalseDataHex": "2227bc1a92e2d37a00",
+      "enabledTrueDataHex": "2227bc1a92e2d37a01",
+      "metas": [
+        {
+          "isSigner": false,
+          "isWritable": false,
+          "pubkey": "4vJ9JU1bJJE96FWSJKvHsmmFADCg4gpZQff4P3bkLKi"
+        },
+        {
+          "isSigner": true,
+          "isWritable": false,
+          "pubkey": "8qbHbw2BbbTHBW1sbeqakYXVKRQM8Ne7pLK7m6CVfeR"
+        },
+        {
+          "isSigner": false,
+          "isWritable": true,
+          "pubkey": "CktRuQ2mttgRGkXJtyksdKHjUdc2C4TgDzyB98oEzy8"
+        }
+      ]
+    },
+    "status": "superseded",
+    "supersededProgramIds": [
+      {
+        "createPoolFee": "3oE58BKVt8KuYkGxx8zBojugnymWmBiyafWgMrnb6eYy",
+        "feature": "raydium-devnet",
+        "program": "DRaycpLY18LhpbydsBWbVJtxpNv9oXPgjRSfpF2bWpYb"
+      },
+      {
+        "createPoolFee": "DNXgeM9EiiaAbaWvwjHj9fQQLAX5ZsfHyvmYUNRAdNC8",
+        "feature": "without raydium-devnet",
+        "program": "CPMMoo8L3F4NbTegBCKVNunggL7H1ZpdTHKxQB5qKP1C"
+      }
+    ]
+  },
+  "fixtureOnly": true,
+  "programId": "GdaQ7RHbGKGEL5Px66tQP78S67XcgxYAzFUwja71qSJP"
+}

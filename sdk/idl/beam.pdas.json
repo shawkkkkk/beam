@@ -1,0 +1,677 @@
+{
+  "components": {
+    "creator": "CktRuQ2mttgRGkXJtyksdKHjUdc2C4TgDzyB98oEzy8",
+    "market": "GgBaCs3NCBuZN12kCJgAW63ydqohFkHEdfdEXBPzLHq",
+    "metaplex": "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s",
+    "mint": "4vJ9JU1bJJE96FWSJKvHsmmFADCg4gpZQff4P3bkLKi",
+    "pool": "LbUiWL3xVV8hTFYBVdbTNrpDo41NKS6o3LHHuDzjfcY",
+    "pool_authority": "QWmroo4YnnMqYW3cnxWkFdaTxGD3P7vMSzwMHGbUzwF",
+    "quote_mint": "YMN9Qj5jPNp7j14VPcML1B6xGgcPWVZUGLFU3Mnyfaf",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "user": "8qbHbw2BbbTHBW1sbeqakYXVKRQM8Ne7pLK7m6CVfeR",
+    "wallet": "cGfHiC6Kgg3FpFZvgwGcswsCRtp4aBP2fzuXRQPizuN"
+  },
+  "fixedAddresses": [
+    {
+      "address": "GdaQ7RHbGKGEL5Px66tQP78S67XcgxYAzFUwja71qSJP",
+      "name": "beam",
+      "role": "undeployed-placeholder"
+    },
+    {
+      "address": "HekwehzsN9PT9hRFfMHi7vyYSwmsUhgu6QENHqTngKxq",
+      "name": "idl-account",
+      "role": "anchor-idl-address"
+    },
+    {
+      "address": "11111111111111111111111111111111",
+      "name": "system",
+      "role": "fixed"
+    },
+    {
+      "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+      "name": "token",
+      "role": "fixed"
+    },
+    {
+      "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+      "name": "associated-token",
+      "role": "fixed"
+    },
+    {
+      "address": "SysvarRent111111111111111111111111111111111",
+      "name": "rent",
+      "role": "fixed"
+    },
+    {
+      "address": "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8",
+      "name": "amm-v4-mainnet",
+      "role": "pinned-amm-v4"
+    },
+    {
+      "address": "DRaya7Kj3aMWQSy19kSjvmuwq9docCHofyP9kanQGaav",
+      "name": "amm-v4-devnet",
+      "role": "pinned-amm-v4"
+    },
+    {
+      "address": "7YttLkHDoNj9wyDur5pM1ejNaAvT9X4eqaYcHQqtj2G5",
+      "name": "amm-v4-mainnet-create-pool-fee",
+      "role": "pinned-amm-v4"
+    },
+    {
+      "address": "9y8ENuuZ3b19quffx9hQvRVygG5ky6snHfRvGpuSfeJy",
+      "name": "amm-v4-devnet-create-pool-fee",
+      "role": "pinned-amm-v4"
+    },
+    {
+      "address": "DRaycpLY18LhpbydsBWbVJtxpNv9oXPgjRSfpF2bWpYb",
+      "name": "cpmm-devnet",
+      "role": "superseded"
+    },
+    {
+      "address": "3oE58BKVt8KuYkGxx8zBojugnymWmBiyafWgMrnb6eYy",
+      "name": "cpmm-devnet-create-pool-fee",
+      "role": "superseded"
+    },
+    {
+      "address": "CPMMoo8L3F4NbTegBCKVNunggL7H1ZpdTHKxQB5qKP1C",
+      "name": "cpmm-mainnet",
+      "role": "superseded"
+    },
+    {
+      "address": "DNXgeM9EiiaAbaWvwjHj9fQQLAX5ZsfHyvmYUNRAdNC8",
+      "name": "cpmm-mainnet-create-pool-fee",
+      "role": "superseded"
+    },
+    {
+      "address": "pfeeUxB6jkeY1Hxd7CsFCAjcbHA9rWtchMGdZ6VojVZ",
+      "name": "pump-fees",
+      "role": "retained-dependency"
+    },
+    {
+      "address": "pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA",
+      "name": "pump-amm",
+      "role": "retained-dependency"
+    },
+    {
+      "address": "MAyhSmzXzV1pTf7LsNkrNwkWKTo4ougAJ1PPg47MD4e",
+      "name": "mayhem",
+      "role": "retained-dependency"
+    },
+    {
+      "address": "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s",
+      "name": "metaplex",
+      "role": "retained-dependency"
+    }
+  ],
+  "note": "Seed catalog read from programs/beam account constraints and beam_amm_v4. The generated IDL omits PDAs because Anchor's resolver does not compile for this source. Example addresses use the synthetic keys named in components.",
+  "pdas": [
+    {
+      "example": {
+        "address": "7Nj6JgwZFvXAb6ruJCCQ1B7PbkBdve2TSmGzr4ak3grz",
+        "bump": 254
+      },
+      "name": "global",
+      "program": "beam",
+      "seeds": [
+        {
+          "kind": "const",
+          "utf8": "global"
+        }
+      ]
+    },
+    {
+      "example": {
+        "address": "8vhPd7Bb7jo8GdfGMVLp1oDHoNUa5c5TFtmJWcCEprBJ",
+        "bump": 254
+      },
+      "name": "beam-raydium-config",
+      "program": "beam",
+      "seeds": [
+        {
+          "kind": "const",
+          "utf8": "beam-raydium-config"
+        }
+      ]
+    },
+    {
+      "example": {
+        "address": "HqGBAAJonUpTYPPn4Q3G57GKVWdhZtZ5rXXovFwyPZW5",
+        "bump": 255
+      },
+      "name": "bonding-curve",
+      "program": "beam",
+      "seeds": [
+        {
+          "kind": "const",
+          "utf8": "bonding-curve"
+        },
+        {
+          "kind": "pubkey",
+          "name": "mint"
+        }
+      ]
+    },
+    {
+      "example": {
+        "address": "4XAQBxcwrz3XkP2eVk3BysF92qUGrd4Bg9LSNB7v5BHJ",
+        "bump": 255
+      },
+      "name": "pool-authority",
+      "program": "beam",
+      "seeds": [
+        {
+          "kind": "const",
+          "utf8": "pool-authority"
+        },
+        {
+          "kind": "pubkey",
+          "name": "mint"
+        }
+      ]
+    },
+    {
+      "example": {
+        "address": "A4gijaKTbPnzLByqgeFit7WGQCweEWB5yPqibdPineti",
+        "bump": 255
+      },
+      "name": "beam-migration",
+      "program": "beam",
+      "seeds": [
+        {
+          "kind": "const",
+          "utf8": "beam-migration"
+        },
+        {
+          "kind": "pubkey",
+          "name": "mint"
+        }
+      ]
+    },
+    {
+      "example": {
+        "address": "HG2KLxzVoShR5F9keaHqwpPSKBACaX9H65k1SHTr868E",
+        "bump": 255
+      },
+      "name": "mint-authority",
+      "program": "beam",
+      "seeds": [
+        {
+          "kind": "const",
+          "utf8": "mint-authority"
+        }
+      ]
+    },
+    {
+      "example": {
+        "address": "BiQAAMQuo5kmEP2UCnZWQL5VMjbFNzJPMtchSGvWhRJw",
+        "bump": 255
+      },
+      "name": "creator-vault",
+      "program": "beam",
+      "seeds": [
+        {
+          "kind": "const",
+          "utf8": "creator-vault"
+        },
+        {
+          "kind": "pubkey",
+          "name": "creator"
+        }
+      ]
+    },
+    {
+      "example": {
+        "address": "Gq38KF9tCWEaFnow3kBRHd6HYU3voui9tAWMCMs39hei",
+        "bump": 255
+      },
+      "name": "event-authority",
+      "program": "beam",
+      "seeds": [
+        {
+          "kind": "const",
+          "utf8": "__event_authority"
+        }
+      ]
+    },
+    {
+      "example": {
+        "address": "4syTy14TTMEeeDHM7WAq2wEeR6wwhCbghoXDa2YVy9Xn",
+        "bump": 255
+      },
+      "name": "global-volume-accumulator",
+      "program": "beam",
+      "seeds": [
+        {
+          "kind": "const",
+          "utf8": "global_volume_accumulator"
+        }
+      ]
+    },
+    {
+      "example": {
+        "address": "4TkharLuvJyS8kSCpWGxnM1Mi69sjoxzo9LPYibsihtD",
+        "bump": 255
+      },
+      "name": "user-volume-accumulator",
+      "program": "beam",
+      "seeds": [
+        {
+          "kind": "const",
+          "utf8": "user_volume_accumulator"
+        },
+        {
+          "kind": "pubkey",
+          "name": "user"
+        }
+      ]
+    },
+    {
+      "example": {
+        "address": "xb1KaXxDv6zTjhQ3Xx6fx4b6b9YNJJ3nnuL2nMbpn4m",
+        "bump": 255
+      },
+      "name": "holder-rewards",
+      "program": "beam",
+      "seeds": [
+        {
+          "kind": "const",
+          "utf8": "holder-rewards"
+        },
+        {
+          "kind": "pubkey",
+          "name": "mint"
+        }
+      ]
+    },
+    {
+      "example": {
+        "address": "AU2eJtGcPUSZfJGvVezifXQebrso1UKDGbV4QdF2ZThN",
+        "bump": 255
+      },
+      "name": "quote-control",
+      "program": "beam",
+      "seeds": [
+        {
+          "kind": "const",
+          "utf8": "quote-control"
+        }
+      ]
+    },
+    {
+      "example": {
+        "address": "EqLRdmVRqvjpewqdt8pfndkwccAaLpmGfvTwS6ggQn6f",
+        "bump": 255
+      },
+      "name": "program-signer",
+      "program": "beam",
+      "seeds": []
+    },
+    {
+      "example": {
+        "address": "bEQ2ZBPu3E5s8y4rzytQvpRGN5NqNsYBjWk7StNjKfi",
+        "bump": 255
+      },
+      "name": "associated-token",
+      "program": "associated-token",
+      "seeds": [
+        {
+          "kind": "pubkey",
+          "name": "wallet"
+        },
+        {
+          "kind": "pubkey",
+          "name": "token_program"
+        },
+        {
+          "kind": "pubkey",
+          "name": "mint"
+        }
+      ]
+    },
+    {
+      "example": {
+        "address": "A9e7KK1odkd3Zxc9YnF7Rsd7sCDiFQHgsCPVK3qZYRu2",
+        "bump": 254
+      },
+      "name": "metadata",
+      "program": "metaplex",
+      "seeds": [
+        {
+          "kind": "const",
+          "utf8": "metadata"
+        },
+        {
+          "kind": "pubkey",
+          "name": "metaplex"
+        },
+        {
+          "kind": "pubkey",
+          "name": "mint"
+        }
+      ]
+    },
+    {
+      "example": {
+        "address": "3izuekVczzXaV6oXXWa4PhyUkEUiy2PANe3bXCZAsGm6",
+        "bump": 252
+      },
+      "name": "fee-config",
+      "program": "pump-fees",
+      "seeds": [
+        {
+          "kind": "const",
+          "utf8": "fee_config"
+        },
+        {
+          "kind": "beam-program-id"
+        }
+      ]
+    },
+    {
+      "example": {
+        "address": "5LXE7Bn4UoYdCNcrjUbakaCZz7ox1TqLa843FBUrsgmK",
+        "bump": 254
+      },
+      "name": "sharing-config",
+      "program": "pump-fees",
+      "seeds": [
+        {
+          "kind": "const",
+          "utf8": "sharing-config"
+        },
+        {
+          "kind": "pubkey",
+          "name": "mint"
+        }
+      ]
+    },
+    {
+      "example": {
+        "address": "ADyA8hdefvWN2dbGGWFotbzWxrAvLW83WG6QCVXvJKqw",
+        "bump": 255
+      },
+      "name": "pump-amm-global-config",
+      "program": "pump-amm",
+      "seeds": [
+        {
+          "kind": "const",
+          "utf8": "global_config"
+        }
+      ]
+    },
+    {
+      "example": {
+        "address": "GS4CU59F31iL7aR2Q8zVS8DRrcRnXX1yjQ66TqNVQnaR",
+        "bump": 255
+      },
+      "name": "pump-amm-event-authority",
+      "program": "pump-amm",
+      "seeds": [
+        {
+          "kind": "const",
+          "utf8": "__event_authority"
+        }
+      ]
+    },
+    {
+      "example": {
+        "address": "6AEwxpBZWHPJZ2yUgXELSygBmeBF7bDP5Qis4F9vWKib",
+        "bump": 255
+      },
+      "name": "pump-amm-creator-vault",
+      "program": "pump-amm",
+      "seeds": [
+        {
+          "kind": "const",
+          "utf8": "creator_vault"
+        },
+        {
+          "kind": "pubkey",
+          "name": "creator"
+        }
+      ]
+    },
+    {
+      "example": {
+        "address": "D6QxXDt6hhcCpto4HiZKkN2YQ2iZRF5R7S3caCHpUsML",
+        "bump": 252
+      },
+      "name": "pump-fees-event-authority",
+      "program": "pump-fees",
+      "seeds": [
+        {
+          "kind": "const",
+          "utf8": "__event_authority"
+        }
+      ]
+    },
+    {
+      "example": {
+        "address": "EqUe5AceGBdASqoxNNPiDyXZsm4uYC5D3SZACi3bH1kf",
+        "bump": 255
+      },
+      "name": "pump-amm-lp-mint",
+      "program": "pump-amm",
+      "seeds": [
+        {
+          "kind": "const",
+          "utf8": "pool_lp_mint"
+        },
+        {
+          "kind": "pubkey",
+          "name": "pool"
+        }
+      ]
+    },
+    {
+      "example": {
+        "address": "6x7KFrKiRsAgDioQxMXVsGrGYSjh4UFRCUx5ZQTLdtsJ",
+        "bump": 255
+      },
+      "name": "pump-amm-pool",
+      "program": "pump-amm",
+      "seeds": [
+        {
+          "kind": "const",
+          "utf8": "pool"
+        },
+        {
+          "kind": "u16-le",
+          "value": 0
+        },
+        {
+          "kind": "pubkey",
+          "name": "pool_authority"
+        },
+        {
+          "kind": "pubkey",
+          "name": "mint"
+        },
+        {
+          "kind": "pubkey",
+          "name": "quote_mint"
+        }
+      ]
+    },
+    {
+      "example": {
+        "address": "BwWK17cbHxwWBKZkUYvzxLcNQ1YVyaFezduWbtm2de6s",
+        "bump": 253
+      },
+      "name": "mayhem-sol-vault",
+      "program": "mayhem",
+      "seeds": [
+        {
+          "kind": "const",
+          "utf8": "sol-vault"
+        }
+      ]
+    },
+    {
+      "example": {
+        "address": "13ec7XdrjF3h3YcqBTFDSReRcUFwbCnJaAQspM4j6DDJ",
+        "bump": 253
+      },
+      "name": "mayhem-global-params",
+      "program": "mayhem",
+      "seeds": [
+        {
+          "kind": "const",
+          "utf8": "global-params"
+        }
+      ]
+    },
+    {
+      "example": {
+        "address": "8VfheyHXsXvkBVoupvAE1Zwf55snzLWb7Zp9bWUvJEFp",
+        "bump": 255
+      },
+      "name": "mayhem-state",
+      "program": "mayhem",
+      "seeds": [
+        {
+          "kind": "const",
+          "utf8": "mayhem-state"
+        },
+        {
+          "kind": "pubkey",
+          "name": "mint"
+        }
+      ]
+    },
+    {
+      "example": {
+        "address": "5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1",
+        "bump": 254
+      },
+      "name": "amm-v4-authority",
+      "program": "amm-v4",
+      "seeds": [
+        {
+          "kind": "const",
+          "utf8": "amm authority"
+        }
+      ]
+    },
+    {
+      "example": {
+        "address": "9DCxsMizn3H1hprZ7xWe6LDzeUeZBksYFpBWBtSf1PQX",
+        "bump": 255
+      },
+      "name": "amm-v4-config",
+      "program": "amm-v4",
+      "seeds": [
+        {
+          "kind": "const",
+          "utf8": "amm_config_account_seed"
+        }
+      ]
+    },
+    {
+      "example": {
+        "address": "EoZEiTvK1Da34gyJxQG9ryrnmpdDWy4W7BT7ZYHRTKEJ",
+        "bump": 254
+      },
+      "name": "amm-v4-amm",
+      "program": "amm-v4",
+      "seeds": [
+        {
+          "kind": "amm-v4-program-id"
+        },
+        {
+          "kind": "pubkey",
+          "name": "market"
+        },
+        {
+          "kind": "const",
+          "utf8": "amm_associated_seed"
+        }
+      ]
+    },
+    {
+      "example": {
+        "address": "5qK1A1iq6rBZMKnKP32b8Ru1FfbDc6aZ3yKYjkt3fvUA",
+        "bump": 252
+      },
+      "name": "amm-v4-lp-mint",
+      "program": "amm-v4",
+      "seeds": [
+        {
+          "kind": "amm-v4-program-id"
+        },
+        {
+          "kind": "pubkey",
+          "name": "market"
+        },
+        {
+          "kind": "const",
+          "utf8": "lp_mint_associated_seed"
+        }
+      ]
+    },
+    {
+      "example": {
+        "address": "DTRweUh1o6ssFmGi6q3FwDjXsNr9eQiUw79Ym9RMQ4pM",
+        "bump": 254
+      },
+      "name": "amm-v4-coin-vault",
+      "program": "amm-v4",
+      "seeds": [
+        {
+          "kind": "amm-v4-program-id"
+        },
+        {
+          "kind": "pubkey",
+          "name": "market"
+        },
+        {
+          "kind": "const",
+          "utf8": "coin_vault_associated_seed"
+        }
+      ]
+    },
+    {
+      "example": {
+        "address": "32uVbUaqYSwsC9df6y9trmXveDKJ4x6hUkPuuTTeyBfr",
+        "bump": 250
+      },
+      "name": "amm-v4-pc-vault",
+      "program": "amm-v4",
+      "seeds": [
+        {
+          "kind": "amm-v4-program-id"
+        },
+        {
+          "kind": "pubkey",
+          "name": "market"
+        },
+        {
+          "kind": "const",
+          "utf8": "pc_vault_associated_seed"
+        }
+      ]
+    },
+    {
+      "example": {
+        "address": "EGLXVgS1nAbYxzhigGbYoqFv3CkhokKoFbxUgN5oekDV",
+        "bump": 255
+      },
+      "name": "amm-v4-target-orders",
+      "program": "amm-v4",
+      "seeds": [
+        {
+          "kind": "amm-v4-program-id"
+        },
+        {
+          "kind": "pubkey",
+          "name": "market"
+        },
+        {
+          "kind": "const",
+          "utf8": "target_associated_seed"
+        }
+      ]
+    }
+  ],
+  "programId": "GdaQ7RHbGKGEL5Px66tQP78S67XcgxYAzFUwja71qSJP"
+}
