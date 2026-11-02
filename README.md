@@ -13,6 +13,16 @@ source-level guards and draft synthetic tests, but no Beam migration entrypoint
 or verified real Raydium CPI. The modified Beam binary cannot be byte-identical
 to Pump's binary.
 
+## Attribution / Upstream
+
+Beam uses the pump.fun ($PUMP) program work as published at [lalalune/pumpfun-source](https://github.com/lalalune/pumpfun-source), byte for byte, at commit [`5703df02131ab944408e0cf679b4bef9c22e1a3d`](https://github.com/lalalune/pumpfun-source/commit/5703df02131ab944408e0cf679b4bef9c22e1a3d).
+
+That publication is the completed community reconstruction of pump.fun's on-chain programs. pump.fun is the original program author. Shaw ([@lalalune](https://github.com/lalalune)) and the [pumpfun-source contributors](https://github.com/lalalune/pumpfun-source/graphs/contributors) published the reconstruction Beam pins. The archived MIT notice names "pump.fun contributors."
+
+`upstream/pumpfun-source` is that commit. `python3 scripts/check_fork.py` checks its 380 Git blobs against `upstream/files.json`. In the editable program `programs/beam`, the same command compares Pump Main (`programs/pump` at that commit) byte for byte: 62 retained files match, and four retained files are declared Beam edits. Five more files exist only in Beam. The whole `programs/beam` crate is that fork. Source byte identity is not a compiled Beam binary, a deployed pump.fun bytecode match, or runtime parity. Beam does not re-prove the reconstruction against deployed bytecode.
+
+The retained-file list, the declared edits, and the preserved license notices are in [Upstream attribution](docs/UPSTREAM.md). This repository has no root `LICENSE`. The archived notices stay with the snapshot. These documents do not add or choose a license.
+
 ## Contribution focus
 
 Choose one bounded gap from the [task ledger](docs/TASKS.md), check open PRs for
@@ -39,11 +49,12 @@ completion percentages or production approval.
 
 | Goal | State | Evidence and remaining work |
 | --- | --- | --- |
-| Preserve the recovered Pump source | **Merged source** | The pinned archive passes [380 Git-blob checks](docs/VALIDATION.md). Of the retained Pump package, 62 files are byte-identical and four changes are declared. This is source evidence, not Beam binary identity. |
+| Preserve the recovered Pump source | **Merged source** | The pinned archive passes [380 Git-blob checks](docs/VALIDATION.md). Of the retained Pump package, [62 files are byte-identical and four changes are declared](docs/UPSTREAM.md#what-is-byte-identical). This is source evidence, not Beam binary identity. |
 | Launch tokens and trade on the curve | **Merged development code** | [PR #1](https://github.com/shawkkkkk/beam/pull/1) contains Anchor handlers and selected host tests. Complete instruction execution and SBF behavior remain unverified. |
 | Remove Mayhem and PumpSwap | **In progress** | Mayhem creation and legacy PumpSwap entry paths fail closed; [PR #12](https://github.com/shawkkkkk/beam/pull/12) blocked a nested graduated quote. Router, creator/sharing, CTO and donation dependencies still need compatible replacements. |
 | Graduate to Raydium AMM v4 | **Blocked; guards in draft** | [Merged PR #9](https://github.com/shawkkkkk/beam/pull/9) adds source-only ABI guards. Draft [#22 → #29 → #30](docs/TASKS.md#draft-review-queue-prs-2234) and [#25 → #33 → #34](docs/TASKS.md#draft-review-queue-prs-2234) add account, funding, synthetic settlement and snapshot checks. No real migration CPI, LP-rights design or Token-2022 graduation exists. |
 | Enforce Beam fees and creator payouts | **Blocked; math and disabled policy in draft** | [PR #5](https://github.com/shawkkkkk/beam/pull/5) merged provisional 42/5/3 arithmetic. Draft [#23/#24/#26](docs/TASKS.md#draft-review-queue-prs-2234) test stricter caps and disabled state. Live collection, selected creator wallet payout and post-graduation rights are unresolved. |
+| Whole Beam binary matches Pump | **Different by design** | Beam changes the program identity, venue, Mayhem and fee code. Source matches in retained files do not establish a compiled or deployed byte match. |
 
 ### Website, frontend, and SDK
 
