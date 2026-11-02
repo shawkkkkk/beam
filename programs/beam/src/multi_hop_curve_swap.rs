@@ -204,6 +204,7 @@ pub fn execute<'info>(mut ctx: Context<'_,'_,'info,'info,MultiHopCurve<'info>>,
 
 
 
+    crate::beam_policy::legacy_amm()?;
     let mut current_mint;
     require_gt!(amount_in, 0, PumpError::BuyZeroAmount);
     let remaining_accounts = ctx.remaining_accounts; let count = remaining_accounts.len() / 5;

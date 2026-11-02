@@ -1,7 +1,7 @@
 # Validation receipt — 1 November 2026
 
 - Unmodified pinned Pump Main package: `cargo check --locked` passed.
-- `python3 scripts/check_fork.py`: 380 original archive Git blobs verified. In the editable Pump Main fork, 62 retained files are byte-identical and four are explicitly modified: manifest, lockfile, `lib.rs`, and `create_v2.rs`.
+- `python3 scripts/check_fork.py`: 380 original archive Git blobs verified. In the editable Pump Main fork, 57 retained files are byte-identical and nine are explicitly modified: `Cargo.toml`, `Cargo.lock`, `src/lib.rs`, `src/create_v2.rs`, `src/pump_quote.rs`, `src/migrate.rs`, `src/migrate_v2.rs`, `src/multi_hop_curve_swap.rs`, and `src/creator/admin_cto.rs`. `src/beam_pumpswap.rs` is an allowed addition, not a retained Pump file.
 - Default Beam configuration: 7 unit tests and 4 differential test groups passed.
 - `experimental-raydium`: the same 11 host tests passed with the then-current CPMM candidate compiled as enableable. This was an earlier development state; activation is now blocked under every feature choice.
 - Mainnet-ID configuration (`--no-default-features`): host `cargo check --locked` passed; migration gate stays off.
@@ -33,3 +33,18 @@ undecided; the inherited source currently calculates creator fees separately.
 Host tests cover arithmetic and compilation, not fee collection or an AMM v4
 CPI. The [feature ledger](FEATURES.md) tracks the missing integration and
 product behavior.
+
+## PumpSwap quote and handler-body rejection
+
+On this branch, `python3 scripts/check_fork.py` still verifies 380 archive
+blobs. The retained package is 57 byte-identical files and nine declared
+edits. Default and `experimental-raydium` `cargo test --locked` each passed
+20 unit tests and four differential groups. `cargo check --locked
+--no-default-features` passed. `node --test sdk/beam-native.test.mjs
+sdk/no-pumpswap-surface.test.mjs` passed.
+
+The new unit tests reject a decoded historical PumpSwap pool, keep legacy
+migrate / multi-hop / CTO instruction bytes equal to the reference, and check
+that those handler bodies return before their PumpSwap CPIs. They do not
+execute a Solana CPI or prove Anchor skips PDA constraints. The
+[removal audit](PUMPSWAP_REMOVAL.md) lists what is still unresolved.

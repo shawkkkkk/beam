@@ -83,7 +83,11 @@ PR ownership and touched paths at this snapshot:
    AMM v4-compatible path where the venue permits it; make unresolved cases
    explicitly unavailable. The immutable upstream archive remains only a
    provenance reference. No PumpSwap runtime fallback or claim that blocked
-   entrypoints are finished feature parity.
+   entrypoints are finished feature parity. The touchpoint table and the
+   graduated-quote / handler-body slice are in
+   [PUMPSWAP_REMOVAL.md](PUMPSWAP_REMOVAL.md). Constraint-level PDA removal,
+   an AMM v4 quote reader, post-graduation creator rights, and donation
+   creation remain.
 
 ## Website and backend contribution lanes
 

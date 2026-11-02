@@ -402,28 +402,20 @@ pub fn vault_amount(owner: &Pubkey, data: &[u8]) -> Result<u64> {
 
 
 
+/// Graduated quote accounts are not priced from a PumpSwap pool.
+/// Raydium AMM v4 uses a different pool layout and is not read here.
+pub fn graduated_quote_unavailable<T>() -> Result<T> {
+    err!(crate::beam_policy::BeamError::PumpSwapDisabled)
+}
+
 pub fn validate_pool(pool: &View<'_>, expected: &Pubkey, base: &View<'_>, quote: &View<'_>) -> Result<(u64, u128)> {
-    require_keys_eq!(*pool.key, *expected, PumpError::InvalidQuotePool);
-    require_keys_eq!(*pool.owner, AMM, PumpError::QuotePoolNotFound);
-    let state = parse_pool(pool.data)?;
-
-    require_keys_eq!(*base.key, state.base_vault, PumpError::InvalidQuotePool);
-
-
-
-
-    require_keys_eq!(*quote.key, state.quote_vault, PumpError::InvalidQuotePool);
-    let base_amount = vault_amount(base.owner, base.data)?;
-    let quote_amount = vault_amount(quote.owner, quote.data)?;
-    let quote_reserves = adjusted_quote(quote_amount, state.adjustment)?;
-    Ok((base_amount, quote_reserves))
+    // Touch every argument so a later edit cannot ignore one and still compile
+    // a successful owner check. Acceptance does not depend on the owner.
+    let _ = (pool.key, pool.owner, pool.data, expected, base.key, base.owner, base.data, quote.key, quote.owner, quote.data);
+    graduated_quote_unavailable()
 }
 pub fn pool_record(pool: &AccountInfo<'_>, expected: &Pubkey, base: &AccountInfo<'_>,
     quote: &AccountInfo<'_>) -> Result<(u64, u128)> {
-    let pool_data = pool.try_borrow_data()?;
-    let base_data = base.try_borrow_data()?;
-    let quote_data = quote.try_borrow_data()?;
-    validate_pool(&View { key: pool.key, owner: pool.owner, data: &pool_data }, expected,
-        &View { key: base.key, owner: base.owner, data: &base_data },
-        &View { key: quote.key, owner: quote.owner, data: &quote_data })
+    let _ = (pool.key, expected, base.key, quote.key);
+    graduated_quote_unavailable()
 }

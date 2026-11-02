@@ -24,14 +24,20 @@
     "Cargo.toml",
     "Cargo.lock",
     "src/lib.rs",
-    "src/create_v2.rs"
+    "src/create_v2.rs",
+    "src/pump_quote.rs",
+    "src/migrate.rs",
+    "src/migrate_v2.rs",
+    "src/multi_hop_curve_swap.rs",
+    "src/creator/admin_cto.rs"
   ],
   "allowed_added_paths": [
     "src/beam_policy.rs",
     "src/beam_raydium.rs",
     "tests/compatibility.rs",
     "src/beam_economics.rs",
-    "src/beam_amm_v4.rs"
+    "src/beam_amm_v4.rs",
+    "src/beam_pumpswap.rs"
   ],
   "deployment_status": "not deployed"
 }
