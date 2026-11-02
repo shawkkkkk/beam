@@ -1,0 +1,83 @@
+name: Manual PR review snapshot (read only)
+
+# Inert proposal: no automatic trigger and no merge or repository write action.
+on:
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: Existing Beam pull request number
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  pull-requests: read
+  checks: read
+
+jobs:
+  snapshot:
+    if: github.repository == 'shawkkkkk/beam'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Read the PR head, checks, and reviews
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ inputs.pr_number }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import re
+          import urllib.request
+
+          number = os.environ['PR_NUMBER']
+          if not re.fullmatch(r'[1-9][0-9]{0,9}', number):
+              raise SystemExit('pr_number must be a positive decimal PR number')
+          repo = os.environ['GITHUB_REPOSITORY']
+          base = f'https://api.github.com/repos/{repo}'
+          headers = {
+              'Accept': 'application/vnd.github+json',
+              'Authorization': f"Bearer {os.environ['GITHUB_TOKEN']}",
+              'X-GitHub-Api-Version': '2022-11-28',
+          }
+
+          def get(path):
+              request = urllib.request.Request(base + path, headers=headers)
+              with urllib.request.urlopen(request, timeout=20) as response:
+                  return json.load(response)
+
+          def cell(value):
+              return str(value).replace('|', '\\|').replace('\n', ' ')
+
+          pr = get(f'/pulls/{number}')
+          head = pr['head']['sha']
+          checks = get(f'/commits/{head}/check-runs?per_page=100')['check_runs']
+          reviews = get(f'/pulls/{number}/reviews?per_page=100')
+          lines = [
+              f'# PR #{number} review snapshot',
+              '',
+              f'- Head at read time: `{head}`',
+              f"- Base: `{cell(pr['base']['ref'])}`",
+              f"- Draft: `{pr['draft']}`; mergeable API value: `{pr['mergeable']}`",
+              '- This is not an approval or merge eligibility decision.',
+              '- Only the first 100 check runs and reviews are shown.',
+              '- Recheck the exact head and combined tree before any later action.',
+              '',
+              '## Check runs',
+              '',
+              '| Name | Status | Conclusion |',
+              '| --- | --- | --- |',
+          ]
+          lines += [
+              f"| {cell(item['name'])} | {cell(item['status'])} | {cell(item['conclusion'])} |"
+              for item in checks
+          ] or ['| None on first page | | |']
+          lines += ['', '## Submitted reviews', '', '| Reviewer | State | Commit |', '| --- | --- | --- |']
+          lines += [
+              f"| {cell(item['user']['login'])} | {cell(item['state'])} | {cell(item.get('commit_id'))} |"
+              for item in reviews
+          ] or ['| None on first page | | |']
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as output:
+              output.write('\n'.join(lines) + '\n')
+          PY
