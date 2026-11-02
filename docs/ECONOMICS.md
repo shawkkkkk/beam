@@ -17,6 +17,11 @@ flagship buybacks. If creator payouts are funded from that allocation, those
 uses draw from its remainder. A 50/50 split of the available amount is a
 provisional test setting, not deployed economics. Holder eligibility, the
 flagship mint, recipient vaults, and execution rules have not been selected.
+The disabled integer model and the open maintainer questions are in
+[community allocation](COMMUNITY_ALLOCATION.md). It divides a community amount
+only. Creator-from-community is a config option: holder rewards and flagship
+buybacks then share the remainder after an exact creator deduction. The model
+submits no buyback and collects no fee.
 
 ## After graduation
 

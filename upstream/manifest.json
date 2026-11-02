@@ -27,6 +27,7 @@
     "src/create_v2.rs"
   ],
   "allowed_added_paths": [
+    "src/beam_community_allocation.rs",
     "src/beam_policy.rs",
     "src/beam_raydium.rs",
     "tests/compatibility.rs",
