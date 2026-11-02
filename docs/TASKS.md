@@ -37,7 +37,7 @@ Unset owner values live only in [open owner decisions](OPEN_DECISIONS.md).
 | [PumpSwap removal, PR #36](https://github.com/shawkkkkk/beam/pull/36), open draft at `5c412dbc` | Program and docs draft on `cursor/pumpswap-removal-audit-ab4f`. | Not merged. Do not start a second removal audit. |
 | [Community allocation model, PR #37](https://github.com/shawkkkkk/beam/pull/37), open draft at `2fb5787c` | Disabled program model and `docs/COMMUNITY_ALLOCATION.md` on `cursor/community-allocation-policy-ed30`. | Not merged and not closed by the owner-decisions document. That document does not replace the program module. Unset values belong only in [open owner decisions](OPEN_DECISIONS.md). |
 | [IDL and gated-migration fixtures, PR #39](https://github.com/shawkkkkk/beam/pull/39), open draft at `e0245755` | Regenerated IDL and gated-migration fixtures on `cursor/beam-idl-gated-migration-dee1`. | Not merged. Scope 4 remains open. |
-| Owner decisions, [open owner decisions](OPEN_DECISIONS.md) | The only list of unset owner values. Curve fee, 42/5/3 split, creator source, AMM v4 pin, CPMM fail-closed, PumpSwap removal, permanent LP lock, Token-2022 curve trading, and `$BEAM` as flagship stay as written. | Documentation only. No parameter is set and no fee number changes. |
+| [Owner decisions, PR #41](https://github.com/shawkkkkk/beam/pull/41), [open owner decisions](OPEN_DECISIONS.md) | The only list of unset owner values. Curve fee, 42/5/3 split, creator source, AMM v4 pin, CPMM fail-closed, PumpSwap removal, permanent LP lock, Token-2022 curve trading, and `$BEAM` as flagship stay as written. | Documentation only. No parameter is set and no fee number changes. |
 
 PR ownership and touched paths at this snapshot:
 
