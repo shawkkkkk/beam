@@ -1,0 +1,24 @@
+[package]
+name = "beam-amm-v4-validator"
+version = "0.1.0"
+edition = "2021"
+publish = false
+description = "Local-validator CPI checks for the pinned Raydium AMM v4 Initialize2 path. Not a Beam migration entrypoint."
+
+[dependencies]
+raydium_amm = { git = "https://github.com/raydium-io/raydium-amm", rev = "91739d8d9f5cf347e0ce14ebe4d2bb7069fb31b6", default-features = false, features = ["no-entrypoint"] }
+solana-program = "=3.0.0"
+spl-associated-token-account = { version = "=8.0.0", features = ["no-entrypoint"] }
+spl-token = { version = "=9.0.0", features = ["no-entrypoint"] }
+
+[dev-dependencies]
+solana-account = "=3.0.0"
+solana-instruction = "=3.0.0"
+solana-program-entrypoint = "=3.1.0"
+solana-program-test = "=3.0.0"
+solana-pubkey = "=3.0.0"
+solana-rent = "=3.0.0"
+solana-signer = "=3.0.0"
+solana-transaction = "=3.0.0"
+
+[workspace]

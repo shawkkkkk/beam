@@ -1,0 +1,15 @@
+name: AMM v4 local validator
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  amm-v4-validator:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: tests/amm-v4-validator
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.99.1
+      - run: cargo test --locked -- --test-threads=1
