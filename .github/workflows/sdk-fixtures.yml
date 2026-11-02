@@ -1,4 +1,4 @@
-name: Native SOL ABI fixtures
+name: Local SDK and service tests
 on: [push, pull_request]
 permissions:
   contents: read
@@ -10,4 +10,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: node --test sdk/beam-native.test.mjs
+      - run: |
+          shopt -s nullglob
+          node --test sdk/*.test.mjs backend/*/*.test.mjs
