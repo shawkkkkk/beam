@@ -234,6 +234,7 @@ pub use pump_token_ext::required_quote_account_len;
 
 
 pub fn execute<'info>(ctx:Context<'_, '_, '_, 'info,MigrateV2<'info>>)->Result<()>{
+ crate::beam_policy::legacy_amm()?;
  let a=&ctx.accounts;
  crate::trade_types::prepare_bonding_curve(&a.bonding_curve,&a.system_program,&a.user)?;
  let (expected_event_authority,_)=Pubkey::find_program_address(&[b"__event_authority"],&pump_amm::ID);
@@ -652,6 +653,7 @@ fn cta_signed<'info>(a:&MigrateV2<'info>,curve:&Account<'info,crate::trade_types
 
 #[inline(never)]
 pub fn init_pump_amm_boost_v2<'info>(ctx:&Context<'_,'_,'_,'info,MigrateV2<'info>>)->Result<()>{
+ crate::beam_policy::legacy_amm()?;
  let a=&ctx.accounts;
  if a.bonding_curve.is_mayhem_mode{return Ok(());}
  let [boost,vault]=ctx.remaining_accounts else {

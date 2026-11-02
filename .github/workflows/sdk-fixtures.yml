@@ -10,4 +10,4 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: node --test sdk/beam-native.test.mjs
+      - run: node --test sdk/beam-native.test.mjs sdk/no-pumpswap-surface.test.mjs

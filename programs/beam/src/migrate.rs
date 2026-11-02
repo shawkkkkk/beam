@@ -248,6 +248,7 @@ pub struct Migrate<'info>{
 
 
 pub fn execute<'info>(ctx:Context<'_, '_, '_, 'info,Migrate<'info>>)->Result<()>{
+ crate::beam_policy::legacy_amm()?;
  let a=&ctx.accounts;crate::trade_types::prepare_bonding_curve(&a.bonding_curve,&a.system_program,&a.user)?;require!(a.bonding_curve.complete,PumpError::BondingCurveNotComplete);let migrated=a.bonding_curve.real_quote_reserves==0&&a.bonding_curve.virtual_quote_reserves==0&&a.bonding_curve.real_token_reserves==0&&a.bonding_curve.virtual_token_reserves==0;if migrated{msg!("Bonding curve already migrated");return Ok(());}
  let fee=a.global.pool_migration_fee;
  pay_migration_fee(a,&a.pool_authority,fee)?;
@@ -521,6 +522,7 @@ fn create_pool<'info>(ctx:&Context<'_,'_,'_,'info,Migrate<'info>>,base:u64,quote
 
 
 pub fn init_pump_amm_boost<'info>(ctx:&Context<'_,'_,'_,'info,Migrate<'info>>)->Result<()>{
+ crate::beam_policy::legacy_amm()?;
  let a=&ctx.accounts;
  if a.bonding_curve.is_mayhem_mode{return Ok(());}
  let [boost,vault]=ctx.remaining_accounts else {

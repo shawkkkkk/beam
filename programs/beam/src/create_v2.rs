@@ -492,7 +492,7 @@ fn record(curve: &BondingCurve, g: &Global, _mint: &Pubkey, tail: &mut &[Account
     } else {
         // A graduated ancestor needs a Raydium AMM v4 quote adapter. Do not
         // accept PumpSwap pool accounts while that adapter is unavailable.
-        err!(crate::beam_policy::BeamError::PumpSwapDisabled)
+        crate::pump_quote::graduated_quote_unavailable()
     }
 }
 // layout-pad(8)

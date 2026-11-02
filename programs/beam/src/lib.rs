@@ -1287,9 +1287,9 @@ pub enum PumpError {
     InvalidQuoteBondingCurve,
     #[msg("Quote bonding curve is not eligible as a quote: mayhem mode, or the chain's depth-0 root is quoted in a mint no list admits")]
     QuoteBondingCurveNotEligible,
-    #[msg("A quote-chain bonding curve has migrated: its pool and vault remaining accounts are required")]
+    #[msg("A graduated quote chain has no Beam pool reader; PumpSwap pool accounts are not required or accepted")]
     QuotePoolAccountsRequired,
-    #[msg("Quote pool remaining account is not an initialized pump-amm pool")]
+    #[msg("PumpSwap quote pools are disabled and are not a Beam quote source")]
     QuotePoolNotFound,
     #[msg("Quote pool or vault remaining accounts do not match derivation or are invalid")]
     InvalidQuotePool,
@@ -1299,7 +1299,7 @@ pub enum PumpError {
     CurveDepthExceeded,
     #[msg("multi-hop: hop_fees must carry one flag byte per curve hop using only the protocol and creator bits")]
     MultiHopHopFeesMismatch,
-    #[msg("A quote-chain coin's curve is complete but not yet migrated; retry once migrate_v2 creates its pool")]
+    #[msg("A quote-chain coin's curve is complete but not yet migrated; PumpSwap migration is disabled")]
     QuoteCurveAwaitingMigration,
     #[msg("multi-hop: mayhem-mode curves are not routable; use the v2 instructions")]
     MultiHopMayhemCurveNotSupported,
@@ -3219,4 +3219,5 @@ pub mod beam_policy;
 pub mod beam_economics;
 pub mod beam_amm_v4;
 pub mod beam_raydium;
+pub mod beam_pumpswap;
 pub use beam_raydium::*;
