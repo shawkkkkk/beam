@@ -1,0 +1,272 @@
+{
+  "beamMigrationReceipt": {
+    "dataHex": "fff1832a8da8818b06060606060606060606060606060606060606060606060606060606060606060e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0a0000000000000073000000000000000a0000000000000063000000000000000400000000000000",
+    "expected": {
+      "lpBurned": "99",
+      "migrationFee": "10",
+      "mint": "QWmroo4YnnMqYW3cnxWkFdaTxGD3P7vMSzwMHGbUzwF",
+      "pool": "ws91DX9HBAAxGW77BZs5FogRDwpRtcUpiLBpKdPTfWu",
+      "quoteAmount": "115",
+      "setupSpent": "4",
+      "tokenAmount": "10"
+    }
+  },
+  "beamRaydiumConfig": {
+    "dataHex": "a6f9d450733927c00404040404040404040404040404040404040404040404040404040404040404b89899792dca5234796fe77462b031df463f5ffeae367c5c0ffb246e1cb7ce0c00",
+    "expected": {
+      "ammConfig": "GgBaCs3NCBuZN12kCJgAW63ydqohFkHEdfdEXBPzLHq",
+      "enabled": false,
+      "raydiumProgram": "DRaycpLY18LhpbydsBWbVJtxpNv9oXPgjRSfpF2bWpYb"
+    }
+  },
+  "beamRaydiumMigration": {
+    "dataHex": "cdbfb3569837904106060606060606060606060606060606060606060606060606060606060606060e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0a0000000000000073000000000000000a000000000000006300000000000000",
+    "expected": {
+      "lpBurned": "99",
+      "migrationFee": "10",
+      "mint": "QWmroo4YnnMqYW3cnxWkFdaTxGD3P7vMSzwMHGbUzwF",
+      "pool": "ws91DX9HBAAxGW77BZs5FogRDwpRtcUpiLBpKdPTfWu",
+      "quoteAmount": "115",
+      "tokenAmount": "10"
+    }
+  },
+  "configureRaydium": {
+    "accounts": {
+      "ammConfig": "GgBaCs3NCBuZN12kCJgAW63ydqohFkHEdfdEXBPzLHq",
+      "authority": "8qbHbw2BbbTHBW1sbeqakYXVKRQM8Ne7pLK7m6CVfeR",
+      "config": "CktRuQ2mttgRGkXJtyksdKHjUdc2C4TgDzyB98oEzy8",
+      "global": "4vJ9JU1bJJE96FWSJKvHsmmFADCg4gpZQff4P3bkLKi",
+      "systemProgram": "11111111111111111111111111111111"
+    },
+    "dataHex": "67174dbb4ce19c2f",
+    "metas": [
+      {
+        "isSigner": false,
+        "isWritable": false,
+        "pubkey": "4vJ9JU1bJJE96FWSJKvHsmmFADCg4gpZQff4P3bkLKi"
+      },
+      {
+        "isSigner": true,
+        "isWritable": true,
+        "pubkey": "8qbHbw2BbbTHBW1sbeqakYXVKRQM8Ne7pLK7m6CVfeR"
+      },
+      {
+        "isSigner": false,
+        "isWritable": true,
+        "pubkey": "CktRuQ2mttgRGkXJtyksdKHjUdc2C4TgDzyB98oEzy8"
+      },
+      {
+        "isSigner": false,
+        "isWritable": false,
+        "pubkey": "GgBaCs3NCBuZN12kCJgAW63ydqohFkHEdfdEXBPzLHq"
+      },
+      {
+        "isSigner": false,
+        "isWritable": false,
+        "pubkey": "11111111111111111111111111111111"
+      }
+    ]
+  },
+  "createPoolFee": "3oE58BKVt8KuYkGxx8zBojugnymWmBiyafWgMrnb6eYy",
+  "execution": "fail-closed",
+  "featureSet": "default raydium-devnet",
+  "fixtureOnly": true,
+  "migrateRaydium": {
+    "accounts": {
+      "ammConfig": "GgBaCs3NCBuZN12kCJgAW63ydqohFkHEdfdEXBPzLHq",
+      "associatedTokenProgram": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+      "authorityBase": "k7FaK87WHGVXzkaoHb7CdVPgkKDQhZ29VLDeBVbDfYn",
+      "authorityLp": "25hjHpTATmkdET17ynDhf1MCuYNDn1z7wXfVw5iaxLAK",
+      "authorityWsol": "p2Yicb86aZig616Eav2VWG9vuXR5mEqhtzshZYBxzsV",
+      "baseTokenProgram": "2RJD1KnDRGEkvuFfAGrJ7PD28LRE9LRDjZznDywagzmr",
+      "bondingCurve": "US517G5965aydkZ46HS38QLi7UQiSojurfbQfKCELFx",
+      "config": "CktRuQ2mttgRGkXJtyksdKHjUdc2C4TgDzyB98oEzy8",
+      "createPoolFee": "3oE58BKVt8KuYkGxx8zBojugnymWmBiyafWgMrnb6eYy",
+      "curveTokenVault": "YMN9Qj5jPNp7j14VPcML1B6xGgcPWVZUGLFU3Mnyfaf",
+      "global": "4vJ9JU1bJJE96FWSJKvHsmmFADCg4gpZQff4P3bkLKi",
+      "lpMint": "21nS9Wz9sUTQ6MkcYUtnN8aSfPA26xJJP7zqshfzCzqc",
+      "migrationAuthority": "gBxS1f6uyyGPuW5MzGBukidSb71jdsCb5fZaoSzULE5",
+      "mint": "QWmroo4YnnMqYW3cnxWkFdaTxGD3P7vMSzwMHGbUzwF",
+      "observation": "2HTciirCEfeJeikeHgCTXdfVe1zpoD3ackfU7DrPCL8S",
+      "pool": "ws91DX9HBAAxGW77BZs5FogRDwpRtcUpiLBpKdPTfWu",
+      "raydiumAuthority": "swqrv48gsrwpBFbftEwnP2vB4jckpvfGJfXkwaniLCC",
+      "raydiumProgram": "DRaycpLY18LhpbydsBWbVJtxpNv9oXPgjRSfpF2bWpYb",
+      "receipt": "2MNus2KCpxwXnp19iyXNpWSFtBD2UGjQBAL8AbtywfT9",
+      "rent": "SysvarRent111111111111111111111111111111111",
+      "systemProgram": "11111111111111111111111111111111",
+      "tokenProgram": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+      "user": "cGfHiC6Kgg3FpFZvgwGcswsCRtp4aBP2fzuXRQPizuN",
+      "vault0": "29d2S7vB453rNYFdR5Ycwt7y9haRT5fwVwL9zTmBhfV2",
+      "vault1": "2DYKaRPBeNM5WdW8rNsYEktjPrnd89Mm4Lzp3qonSzoj",
+      "withdrawAuthority": "LbUiWL3xVV8hTFYBVdbTNrpDo41NKS6o3LHHuDzjfcY",
+      "wsolMint": "So11111111111111111111111111111111111111112"
+    },
+    "dataHex": "c6609e027257b40160e3160000000000",
+    "metas": [
+      {
+        "isSigner": false,
+        "isWritable": false,
+        "pubkey": "4vJ9JU1bJJE96FWSJKvHsmmFADCg4gpZQff4P3bkLKi"
+      },
+      {
+        "isSigner": false,
+        "isWritable": true,
+        "pubkey": "LbUiWL3xVV8hTFYBVdbTNrpDo41NKS6o3LHHuDzjfcY"
+      },
+      {
+        "isSigner": false,
+        "isWritable": false,
+        "pubkey": "QWmroo4YnnMqYW3cnxWkFdaTxGD3P7vMSzwMHGbUzwF"
+      },
+      {
+        "isSigner": false,
+        "isWritable": true,
+        "pubkey": "US517G5965aydkZ46HS38QLi7UQiSojurfbQfKCELFx"
+      },
+      {
+        "isSigner": false,
+        "isWritable": true,
+        "pubkey": "YMN9Qj5jPNp7j14VPcML1B6xGgcPWVZUGLFU3Mnyfaf"
+      },
+      {
+        "isSigner": true,
+        "isWritable": true,
+        "pubkey": "cGfHiC6Kgg3FpFZvgwGcswsCRtp4aBP2fzuXRQPizuN"
+      },
+      {
+        "isSigner": false,
+        "isWritable": false,
+        "pubkey": "CktRuQ2mttgRGkXJtyksdKHjUdc2C4TgDzyB98oEzy8"
+      },
+      {
+        "isSigner": false,
+        "isWritable": false,
+        "pubkey": "GgBaCs3NCBuZN12kCJgAW63ydqohFkHEdfdEXBPzLHq"
+      },
+      {
+        "isSigner": false,
+        "isWritable": false,
+        "pubkey": "DRaycpLY18LhpbydsBWbVJtxpNv9oXPgjRSfpF2bWpYb"
+      },
+      {
+        "isSigner": false,
+        "isWritable": true,
+        "pubkey": "gBxS1f6uyyGPuW5MzGBukidSb71jdsCb5fZaoSzULE5"
+      },
+      {
+        "isSigner": false,
+        "isWritable": true,
+        "pubkey": "k7FaK87WHGVXzkaoHb7CdVPgkKDQhZ29VLDeBVbDfYn"
+      },
+      {
+        "isSigner": false,
+        "isWritable": false,
+        "pubkey": "So11111111111111111111111111111111111111112"
+      },
+      {
+        "isSigner": false,
+        "isWritable": true,
+        "pubkey": "p2Yicb86aZig616Eav2VWG9vuXR5mEqhtzshZYBxzsV"
+      },
+      {
+        "isSigner": false,
+        "isWritable": false,
+        "pubkey": "swqrv48gsrwpBFbftEwnP2vB4jckpvfGJfXkwaniLCC"
+      },
+      {
+        "isSigner": false,
+        "isWritable": true,
+        "pubkey": "ws91DX9HBAAxGW77BZs5FogRDwpRtcUpiLBpKdPTfWu"
+      },
+      {
+        "isSigner": false,
+        "isWritable": true,
+        "pubkey": "21nS9Wz9sUTQ6MkcYUtnN8aSfPA26xJJP7zqshfzCzqc"
+      },
+      {
+        "isSigner": false,
+        "isWritable": true,
+        "pubkey": "25hjHpTATmkdET17ynDhf1MCuYNDn1z7wXfVw5iaxLAK"
+      },
+      {
+        "isSigner": false,
+        "isWritable": true,
+        "pubkey": "29d2S7vB453rNYFdR5Ycwt7y9haRT5fwVwL9zTmBhfV2"
+      },
+      {
+        "isSigner": false,
+        "isWritable": true,
+        "pubkey": "2DYKaRPBeNM5WdW8rNsYEktjPrnd89Mm4Lzp3qonSzoj"
+      },
+      {
+        "isSigner": false,
+        "isWritable": true,
+        "pubkey": "3oE58BKVt8KuYkGxx8zBojugnymWmBiyafWgMrnb6eYy"
+      },
+      {
+        "isSigner": false,
+        "isWritable": true,
+        "pubkey": "2HTciirCEfeJeikeHgCTXdfVe1zpoD3ackfU7DrPCL8S"
+      },
+      {
+        "isSigner": false,
+        "isWritable": true,
+        "pubkey": "2MNus2KCpxwXnp19iyXNpWSFtBD2UGjQBAL8AbtywfT9"
+      },
+      {
+        "isSigner": false,
+        "isWritable": false,
+        "pubkey": "2RJD1KnDRGEkvuFfAGrJ7PD28LRE9LRDjZznDywagzmr"
+      },
+      {
+        "isSigner": false,
+        "isWritable": false,
+        "pubkey": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+      },
+      {
+        "isSigner": false,
+        "isWritable": false,
+        "pubkey": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+      },
+      {
+        "isSigner": false,
+        "isWritable": false,
+        "pubkey": "11111111111111111111111111111111"
+      },
+      {
+        "isSigner": false,
+        "isWritable": false,
+        "pubkey": "SysvarRent111111111111111111111111111111111"
+      }
+    ],
+    "setupBudget": "1500000"
+  },
+  "programId": "GdaQ7RHbGKGEL5Px66tQP78S67XcgxYAzFUwja71qSJP",
+  "raydiumProgram": "DRaycpLY18LhpbydsBWbVJtxpNv9oXPgjRSfpF2bWpYb",
+  "setRaydiumEnabled": {
+    "accounts": {
+      "authority": "8qbHbw2BbbTHBW1sbeqakYXVKRQM8Ne7pLK7m6CVfeR",
+      "config": "CktRuQ2mttgRGkXJtyksdKHjUdc2C4TgDzyB98oEzy8",
+      "global": "4vJ9JU1bJJE96FWSJKvHsmmFADCg4gpZQff4P3bkLKi"
+    },
+    "enabledFalseDataHex": "2227bc1a92e2d37a00",
+    "enabledTrueDataHex": "2227bc1a92e2d37a01",
+    "metas": [
+      {
+        "isSigner": false,
+        "isWritable": false,
+        "pubkey": "4vJ9JU1bJJE96FWSJKvHsmmFADCg4gpZQff4P3bkLKi"
+      },
+      {
+        "isSigner": true,
+        "isWritable": false,
+        "pubkey": "8qbHbw2BbbTHBW1sbeqakYXVKRQM8Ne7pLK7m6CVfeR"
+      },
+      {
+        "isSigner": false,
+        "isWritable": true,
+        "pubkey": "CktRuQ2mttgRGkXJtyksdKHjUdc2C4TgDzyB98oEzy8"
+      }
+    ]
+  }
+}

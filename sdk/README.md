@@ -1,5 +1,22 @@
 # Beam native-SOL ABI fixtures
 
+`idl/beam.json` is the Anchor 0.31 IDL regenerated from `programs/beam` under
+the default `raydium-devnet` feature, without PDA/address resolution. The
+Anchor module name remains `pump_recovered`; the address is the undeployed
+Beam placeholder. Regenerate it with `scripts/assemble_beam_idl.py` from an
+`idl-build` test log. The dependency files in `programs/beam/idls/` are not
+this program's IDL.
+
+`fixtures/gated-migration.json` is host serialization of the fail-closed
+`configure_raydium`, `set_raydium_enabled`, and `migrate_raydium` instructions
+and of `BeamRaydiumConfig`, `BeamMigrationReceipt`, and `BeamRaydiumMigration`.
+`enabled: true` remains representable in the ABI. The handler still rejects
+it. This fixture does not activate migration or target Raydium AMM v4.
+
+`programs/beam/tests/idl_compatibility.rs` checks that IDL against the program
+types, the legacy `fixtures/native-sol.json` encodings, and the gated
+migration fixture.
+
 `beam-native.mjs` is a dependency-free, local-only encoder for the retained
 legacy `create`, `buy`, and `sell` instruction data and ordered Anchor account
 metas at Beam contract commit `65c96b5`. It also decodes the raw

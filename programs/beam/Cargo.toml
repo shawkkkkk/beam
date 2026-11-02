@@ -12,6 +12,8 @@ experimental-raydium = []
 no-entrypoint = []
 cpi = ["no-entrypoint"]
 no-idl = []
+# Host-only Anchor IDL generation. Not a default feature and not a deploy flag.
+idl-build = ["anchor-lang/idl-build", "anchor-spl/idl-build"]
 no-log-ix-name = []
 anchor-debug = []
 custom-heap = []
@@ -31,3 +33,4 @@ codegen-units = 1
 
 [dev-dependencies]
 pump-reference = { package = "pump-recovered", path = "../../upstream/pumpfun-source/programs/pump", features = ["no-entrypoint"] }
+serde_json = "1.0.154"
