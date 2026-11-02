@@ -222,8 +222,10 @@ fn migration_fixture() -> Value {
     let associated_token_program = anchor_spl::associated_token::ID;
     let rent = anchor_lang::solana_program::sysvar::rent::ID;
     let wsol_mint = anchor_spl::token::spl_token::native_mint::ID;
-    let raydium_program = beam::RAYDIUM_ID;
-    let create_pool_fee = beam::CREATE_POOL_FEE;
+    // Caller-supplied stand-ins. The compiled CPMM ids are superseded and are
+    // recorded separately; they are not the accounts in this fixture.
+    let raydium_program = repeat(22);
+    let create_pool_fee = repeat(23);
 
     let configure_names = ["global", "authority", "config", "amm_config", "system_program"];
     let configure_accounts = beam::accounts::ConfigureRaydium {
@@ -332,13 +334,15 @@ fn migration_fixture() -> Value {
     };
     let event_bytes = Event::data(&migration_event);
 
-    json!({
-        "fixtureOnly": true,
+    let cpmm = json!({
+        "status": "superseded",
         "execution": "fail-closed",
-        "featureSet": "default raydium-devnet",
-        "programId": beam::ID.to_string(),
-        "raydiumProgram": raydium_program.to_string(),
-        "createPoolFee": create_pool_fee.to_string(),
+        "selectedVenue": false,
+        "note": "Raydium CPMM is not the selected venue. These entries keep the fail-closed Beam instruction encodings. The account metas use synthetic keys, not the compiled devnet or mainnet CPMM ids.",
+        "supersededProgramIds": [
+            {"feature": "raydium-devnet", "program": CPMM_DEVNET_PROGRAM, "createPoolFee": CPMM_DEVNET_FEE},
+            {"feature": "without raydium-devnet", "program": CPMM_MAINNET_PROGRAM, "createPoolFee": CPMM_MAINNET_FEE}
+        ],
         "configureRaydium": {
             "dataHex": hex(&configure_data),
             "accounts": accounts_object(&configure_names, &configure_metas),
@@ -386,6 +390,86 @@ fn migration_fixture() -> Value {
                 "migrationFee": "10",
                 "lpBurned": "99",
             }
+        }
+    });
+    json!({
+        "fixtureOnly": true,
+        "programId": beam::ID.to_string(),
+        "cpmm": cpmm,
+        "ammV4": amm_v4_section(),
+    })
+}
+
+const CPMM_DEVNET_PROGRAM: &str = "DRaycpLY18LhpbydsBWbVJtxpNv9oXPgjRSfpF2bWpYb";
+const CPMM_DEVNET_FEE: &str = "3oE58BKVt8KuYkGxx8zBojugnymWmBiyafWgMrnb6eYy";
+const CPMM_MAINNET_PROGRAM: &str = "CPMMoo8L3F4NbTegBCKVNunggL7H1ZpdTHKxQB5qKP1C";
+const CPMM_MAINNET_FEE: &str = "DNXgeM9EiiaAbaWvwjHj9fQQLAX5ZsfHyvmYUNRAdNC8";
+
+fn amm_v4_section() -> Value {
+    use beam::beam_amm_v4::{
+        derive_pool_addresses, initialize2_instruction, user_lp_ata, Initialize2Accounts, Initialize2Args,
+        MintKey, ASSOCIATED_TOKEN_PROGRAM_ID, DEVNET_CREATE_POOL_FEE_DESTINATION, DEVNET_PROGRAM_ID,
+        MAINNET_CREATE_POOL_FEE_DESTINATION, MAINNET_PROGRAM_ID, SPL_TOKEN_PROGRAM_ID,
+        INITIALIZE2_ACCOUNT_COUNT,
+    };
+    let mut accounts = Initialize2Accounts {
+        coin_mint: MintKey { key: repeat(31), owner: SPL_TOKEN_PROGRAM_ID },
+        pc_mint: MintKey { key: repeat(32), owner: SPL_TOKEN_PROGRAM_ID },
+        market_seed: repeat(33),
+        user_wallet: repeat(34),
+        user_coin_source: repeat(35),
+        user_pc_source: repeat(36),
+        user_lp_ata: repeat(37),
+    };
+    let derived = derive_pool_addresses(&MAINNET_PROGRAM_ID, &accounts.market_seed).unwrap();
+    accounts.user_lp_ata = user_lp_ata(&accounts.user_wallet, &derived.lp_mint);
+    let args = Initialize2Args { open_time: 0, init_pc_amount: 1_000, init_coin_amount: 2_000 };
+    let ix = initialize2_instruction(MAINNET_PROGRAM_ID, &accounts, args).unwrap();
+    let names = [
+        "token_program",
+        "associated_token_program",
+        "system_program",
+        "rent",
+        "amm",
+        "authority",
+        "lp_mint",
+        "coin_mint",
+        "pc_mint",
+        "coin_vault",
+        "pc_vault",
+        "target_orders",
+        "config",
+        "create_pool_fee_destination",
+        "market_seed",
+        "user_wallet",
+        "user_coin_source",
+        "user_pc_source",
+        "user_lp_ata",
+    ];
+    assert_eq!(names.len(), INITIALIZE2_ACCOUNT_COUNT);
+    assert_eq!(ix.accounts.len(), names.len());
+    json!({
+        "status": "abi-only",
+        "beamInstruction": Value::Null,
+        "source": "programs/beam/src/beam_amm_v4.rs",
+        "pin": "91739d8d9f5cf347e0ce14ebe4d2bb7069fb31b6",
+        "pr38": "Draft PR #38 validates this pinned processor with a local 23-account probe. It does not add a Beam migration instruction. Regenerate this section from that instruction's accounts if one lands.",
+        "programId": MAINNET_PROGRAM_ID.to_string(),
+        "createPoolFeeDestination": MAINNET_CREATE_POOL_FEE_DESTINATION.to_string(),
+        "devnetProgramId": DEVNET_PROGRAM_ID.to_string(),
+        "devnetCreatePoolFeeDestination": DEVNET_CREATE_POOL_FEE_DESTINATION.to_string(),
+        "associatedTokenProgram": ASSOCIATED_TOKEN_PROGRAM_ID.to_string(),
+        "initialize2": {
+            "tag": 1,
+            "accountCount": INITIALIZE2_ACCOUNT_COUNT,
+            "openTime": "0",
+            "initPcAmount": "1000",
+            "initCoinAmount": "2000",
+            "nonce": derived.nonce,
+            "dataHex": hex(&ix.data),
+            "accountNames": names,
+            "accounts": accounts_object(&names, &ix.accounts),
+            "metas": meta_json(&ix.accounts),
         }
     })
 }
@@ -814,8 +898,6 @@ fn retained_blocked_interfaces_keep_reference_encodings() {
     }
 }
 
-// The golden file records the default `raydium-devnet` program and fee ids.
-#[cfg(feature = "raydium-devnet")]
 #[test]
 fn gated_migration_fixture_matches_idl_and_anchor_accounts() {
     let idl = load_json("sdk/idl/beam.json");
@@ -823,18 +905,33 @@ fn gated_migration_fixture_matches_idl_and_anchor_accounts() {
     let fixture = load_json("sdk/fixtures/gated-migration.json");
     assert_eq!(fixture, fresh);
     assert_eq!(fixture["programId"], idl["address"]);
-    assert_eq!(fixture["execution"], "fail-closed");
-    assert_ne!(fixture["raydiumProgram"], beam::ID.to_string());
+    let cpmm = &fixture["cpmm"];
+    assert_eq!(cpmm["status"], "superseded");
+    assert_eq!(cpmm["execution"], "fail-closed");
+    assert_eq!(cpmm["selectedVenue"], false);
+    let compiled = beam::RAYDIUM_ID.to_string();
+    let compiled_fee = beam::CREATE_POOL_FEE.to_string();
+    let superseded_programs = [CPMM_DEVNET_PROGRAM, CPMM_MAINNET_PROGRAM];
+    let superseded_fees = [CPMM_DEVNET_FEE, CPMM_MAINNET_FEE];
+    assert!(superseded_programs.contains(&compiled.as_str()));
+    assert!(superseded_fees.contains(&compiled_fee.as_str()));
+    assert_ne!(compiled, beam::beam_amm_v4::MAINNET_PROGRAM_ID.to_string());
+    for section in ["configureRaydium", "setRaydiumEnabled", "migrateRaydium"] {
+        let metas = cpmm[section]["metas"].to_string();
+        for id in superseded_programs.into_iter().chain(superseded_fees) {
+            assert!(!metas.contains(id), "{section} still uses superseded id {id}");
+        }
+    }
 
     let configure = instruction(&idl, "configure_raydium");
-    let configure_data = hex_decode(fixture["configureRaydium"]["dataHex"].as_str().unwrap());
+    let configure_data = hex_decode(cpmm["configureRaydium"]["dataHex"].as_str().unwrap());
     assert_data(configure, &configure_data);
     assert!(configure["args"].as_array().unwrap().is_empty());
     assert_eq!(configure_data.len(), 8);
 
     let enabled = instruction(&idl, "set_raydium_enabled");
-    let enabled_false = hex_decode(fixture["setRaydiumEnabled"]["enabledFalseDataHex"].as_str().unwrap());
-    let enabled_true = hex_decode(fixture["setRaydiumEnabled"]["enabledTrueDataHex"].as_str().unwrap());
+    let enabled_false = hex_decode(cpmm["setRaydiumEnabled"]["enabledFalseDataHex"].as_str().unwrap());
+    let enabled_true = hex_decode(cpmm["setRaydiumEnabled"]["enabledTrueDataHex"].as_str().unwrap());
     assert_data(enabled, &enabled_false);
     assert_eq!(enabled["args"][0]["name"], "enabled");
     assert_eq!(enabled["args"][0]["type"], "bool");
@@ -845,7 +942,7 @@ fn gated_migration_fixture_matches_idl_and_anchor_accounts() {
     assert_eq!(&enabled_true[..8], &enabled_false[..8]);
 
     let migrate = instruction(&idl, "migrate_raydium");
-    let migrate_data = hex_decode(fixture["migrateRaydium"]["dataHex"].as_str().unwrap());
+    let migrate_data = hex_decode(cpmm["migrateRaydium"]["dataHex"].as_str().unwrap());
     assert_data(migrate, &migrate_data);
     assert_eq!(migrate["args"][0]["name"], "setup_budget");
     assert_eq!(migrate["args"][0]["type"], "u64");
@@ -882,21 +979,23 @@ fn gated_migration_fixture_matches_idl_and_anchor_accounts() {
         "system_program",
         "rent",
     ];
-    assert_metas(configure, &configure_names, &metas_of(&fixture["configureRaydium"]));
-    assert_metas(enabled, &enabled_names, &metas_of(&fixture["setRaydiumEnabled"]));
-    assert_metas(migrate, &migrate_names, &metas_of(&fixture["migrateRaydium"]));
+    assert_metas(configure, &configure_names, &metas_of(&cpmm["configureRaydium"]));
+    assert_metas(enabled, &enabled_names, &metas_of(&cpmm["setRaydiumEnabled"]));
+    assert_metas(migrate, &migrate_names, &metas_of(&cpmm["migrateRaydium"]));
 
-    // Anchor's seed resolver emits expressions that do not compile for this
-    // reconstructed program, so the checked-in IDL has no PDA or address
-    // resolution. Fixed program ids still live on the account metas.
     for account in migrate["accounts"].as_array().unwrap() {
         assert!(account.get("pda").is_none(), "{}", account["name"]);
         assert!(account.get("address").is_none(), "{}", account["name"]);
     }
-    let raydium = fixture["migrateRaydium"]["accounts"]["raydiumProgram"].as_str().unwrap();
-    let fee = fixture["migrateRaydium"]["accounts"]["createPoolFee"].as_str().unwrap();
-    assert_eq!(raydium, beam::RAYDIUM_ID.to_string());
-    assert_eq!(fee, beam::CREATE_POOL_FEE.to_string());
+    let amm_v4 = &fixture["ammV4"];
+    assert_eq!(amm_v4["status"], "abi-only");
+    assert!(amm_v4["beamInstruction"].is_null());
+    assert_eq!(amm_v4["programId"], beam::beam_amm_v4::MAINNET_PROGRAM_ID.to_string());
+    assert_eq!(amm_v4["initialize2"]["accountCount"], 19);
+    let ix_data = hex_decode(amm_v4["initialize2"]["dataHex"].as_str().unwrap());
+    assert_eq!(ix_data[0], 1);
+    assert_eq!(ix_data.len(), 26);
+    assert_ne!(amm_v4["programId"], compiled);
 
     assert_eq!(
         field_names(&idl, "BeamRaydiumConfig"),
@@ -916,14 +1015,319 @@ fn gated_migration_fixture_matches_idl_and_anchor_accounts() {
             .map(str::to_string)
             .collect::<Vec<_>>()
     );
-    let config_bytes = hex_decode(fixture["beamRaydiumConfig"]["dataHex"].as_str().unwrap());
+    let config_bytes = hex_decode(cpmm["beamRaydiumConfig"]["dataHex"].as_str().unwrap());
     let config = beam::BeamRaydiumConfig::try_deserialize(&mut &config_bytes[..]).unwrap();
     assert!(!config.enabled);
-    assert_eq!(config.raydium_program, beam::RAYDIUM_ID);
+    assert_ne!(config.raydium_program, beam::RAYDIUM_ID);
+    assert!(superseded_programs.iter().all(|id| config.raydium_program.to_string() != *id));
     assert_eq!(&config_bytes[..8], beam::BeamRaydiumConfig::DISCRIMINATOR);
-    let event_bytes = hex_decode(fixture["beamRaydiumMigration"]["dataHex"].as_str().unwrap());
+    let event_bytes = hex_decode(cpmm["beamRaydiumMigration"]["dataHex"].as_str().unwrap());
     assert_eq!(&event_bytes[..8], beam::BeamRaydiumMigration::DISCRIMINATOR);
     assert_eq!(event_bytes.len(), 8 + 32 + 32 + 8 * 4);
+}
+
+#[test]
+fn beam_error_codes_are_seven_thousand_plus_discriminant() {
+    use beam::beam_policy::BeamError;
+    let idl = load_json("sdk/idl/beam.json");
+    let cases = [
+        (BeamError::MayhemDisabled, 0, "MayhemDisabled"),
+        (BeamError::PumpSwapDisabled, 1, "PumpSwapDisabled"),
+        (BeamError::MigrationNotEnabled, 2, "MigrationNotEnabled"),
+        (BeamError::InvalidRaydiumAccount, 3, "InvalidRaydiumAccount"),
+        (BeamError::InvalidMigrationBalance, 4, "InvalidMigrationBalance"),
+        (BeamError::UnsupportedMint, 5, "UnsupportedMint"),
+        (BeamError::InvalidMigrationResult, 6, "InvalidMigrationResult"),
+    ];
+    for (err, discriminant, name) in cases {
+        assert_eq!(err as u32, discriminant, "{name}");
+        let runtime = anchor_code(err);
+        assert_eq!(runtime, 7000 + u64::from(discriminant), "{name}");
+        assert_eq!(error_code(&idl, name), runtime, "{name}");
+    }
+    assert_eq!(beam::PumpError::NotAuthorized as u32, 0);
+    assert_eq!(anchor_code(beam::PumpError::NotAuthorized), 6000);
+    assert_eq!(error_code(&idl, "NotAuthorized"), 6000);
+}
+
+#[derive(Clone, Copy)]
+enum SeedPart {
+    Const(&'static [u8]),
+    Key(&'static str),
+    BeamId,
+    U16Le(u16),
+    AmmProgram,
+}
+
+struct PdaSpec {
+    name: &'static str,
+    program: &'static str,
+    seeds: Vec<SeedPart>,
+}
+
+fn spec(name: &'static str, program: &'static str, seeds: Vec<SeedPart>) -> PdaSpec {
+    PdaSpec { name, program, seeds }
+}
+
+fn pda_specs() -> Vec<PdaSpec> {
+    use SeedPart::*;
+    let c = |bytes: &'static [u8]| Const(bytes);
+    vec![
+        spec("global", "beam", vec![c(b"global")]),
+        spec("beam-raydium-config", "beam", vec![c(b"beam-raydium-config")]),
+        spec("bonding-curve", "beam", vec![c(b"bonding-curve"), Key("mint")]),
+        spec("pool-authority", "beam", vec![c(b"pool-authority"), Key("mint")]),
+        spec("beam-migration", "beam", vec![c(b"beam-migration"), Key("mint")]),
+        spec("mint-authority", "beam", vec![c(b"mint-authority")]),
+        spec("creator-vault", "beam", vec![c(b"creator-vault"), Key("creator")]),
+        spec("event-authority", "beam", vec![c(b"__event_authority")]),
+        spec("global-volume-accumulator", "beam", vec![c(b"global_volume_accumulator")]),
+        spec("user-volume-accumulator", "beam", vec![c(b"user_volume_accumulator"), Key("user")]),
+        spec("holder-rewards", "beam", vec![c(b"holder-rewards"), Key("mint")]),
+        spec("quote-control", "beam", vec![c(b"quote-control")]),
+        spec("program-signer", "beam", vec![]),
+        spec("associated-token", "associated-token", vec![Key("wallet"), Key("token_program"), Key("mint")]),
+        spec("metadata", "metaplex", vec![c(b"metadata"), Key("metaplex"), Key("mint")]),
+        spec("fee-config", "pump-fees", vec![c(b"fee_config"), BeamId]),
+        spec("sharing-config", "pump-fees", vec![c(b"sharing-config"), Key("mint")]),
+        spec("pump-amm-global-config", "pump-amm", vec![c(b"global_config")]),
+        spec("pump-amm-event-authority", "pump-amm", vec![c(b"__event_authority")]),
+        spec("pump-amm-creator-vault", "pump-amm", vec![c(b"creator_vault"), Key("creator")]),
+        spec("pump-fees-event-authority", "pump-fees", vec![c(b"__event_authority")]),
+        spec("pump-amm-lp-mint", "pump-amm", vec![c(b"pool_lp_mint"), Key("pool")]),
+        spec("pump-amm-pool", "pump-amm", vec![c(b"pool"), U16Le(0), Key("pool_authority"), Key("mint"), Key("quote_mint")]),
+        spec("mayhem-sol-vault", "mayhem", vec![c(b"sol-vault")]),
+        spec("mayhem-global-params", "mayhem", vec![c(b"global-params")]),
+        spec("mayhem-state", "mayhem", vec![c(b"mayhem-state"), Key("mint")]),
+        spec("amm-v4-authority", "amm-v4", vec![c(b"amm authority")]),
+        spec("amm-v4-config", "amm-v4", vec![c(b"amm_config_account_seed")]),
+        spec("amm-v4-amm", "amm-v4", vec![AmmProgram, Key("market"), c(b"amm_associated_seed")]),
+        spec("amm-v4-lp-mint", "amm-v4", vec![AmmProgram, Key("market"), c(b"lp_mint_associated_seed")]),
+        spec("amm-v4-coin-vault", "amm-v4", vec![AmmProgram, Key("market"), c(b"coin_vault_associated_seed")]),
+        spec("amm-v4-pc-vault", "amm-v4", vec![AmmProgram, Key("market"), c(b"pc_vault_associated_seed")]),
+        spec("amm-v4-target-orders", "amm-v4", vec![AmmProgram, Key("market"), c(b"target_associated_seed")]),
+    ]
+}
+
+fn pda_component(name: &str) -> Pubkey {
+    match name {
+        "mint" => repeat(1),
+        "user" => repeat(2),
+        "creator" => repeat(3),
+        "market" => repeat(4),
+        "pool" => repeat(5),
+        "pool_authority" => repeat(6),
+        "quote_mint" => repeat(8),
+        "wallet" => repeat(9),
+        "token_program" => beam::beam_amm_v4::SPL_TOKEN_PROGRAM_ID,
+        "metaplex" => beam::METAPLEX,
+        other => panic!("unknown pda component {other}"),
+    }
+}
+
+fn pda_program(name: &str) -> Pubkey {
+    match name {
+        "beam" => beam::ID,
+        "amm-v4" => beam::beam_amm_v4::MAINNET_PROGRAM_ID,
+        "associated-token" => beam::beam_amm_v4::ASSOCIATED_TOKEN_PROGRAM_ID,
+        "metaplex" => beam::METAPLEX,
+        "pump-fees" => beam::distribution::FEES,
+        "pump-amm" => beam::pump_quote::AMM,
+        "mayhem" => beam::MAYHEM_ID,
+        other => panic!("unknown pda program {other}"),
+    }
+}
+
+fn derive_spec(spec: &PdaSpec) -> (Pubkey, u8) {
+    let owned: Vec<Vec<u8>> = spec.seeds.iter().map(|part| match part {
+        SeedPart::Const(bytes) => bytes.to_vec(),
+        SeedPart::Key(name) => pda_component(name).to_bytes().to_vec(),
+        SeedPart::BeamId => beam::ID.to_bytes().to_vec(),
+        SeedPart::U16Le(value) => value.to_le_bytes().to_vec(),
+        SeedPart::AmmProgram => beam::beam_amm_v4::MAINNET_PROGRAM_ID.to_bytes().to_vec(),
+    }).collect();
+    let refs: Vec<&[u8]> = owned.iter().map(Vec::as_slice).collect();
+    Pubkey::find_program_address(&refs, &pda_program(spec.program))
+}
+
+fn seed_json(part: &SeedPart) -> Value {
+    match part {
+        SeedPart::Const(bytes) => json!({"kind": "const", "utf8": std::str::from_utf8(bytes).unwrap()}),
+        SeedPart::Key(name) => json!({"kind": "pubkey", "name": name}),
+        SeedPart::BeamId => json!({"kind": "beam-program-id"}),
+        SeedPart::U16Le(value) => json!({"kind": "u16-le", "value": value}),
+        SeedPart::AmmProgram => json!({"kind": "amm-v4-program-id"}),
+    }
+}
+
+fn pda_sidecar() -> Value {
+    let pdas: Vec<Value> = pda_specs().iter().map(|spec| {
+        let (address, bump) = derive_spec(spec);
+        json!({
+            "name": spec.name,
+            "program": spec.program,
+            "seeds": spec.seeds.iter().map(seed_json).collect::<Vec<_>>(),
+            "example": {"address": address.to_string(), "bump": bump},
+        })
+    }).collect();
+    json!({
+        "note": "Seed catalog read from programs/beam account constraints and beam_amm_v4. The generated IDL omits PDAs because Anchor's resolver does not compile for this source. Example addresses use the synthetic keys named in components.",
+        "programId": beam::ID.to_string(),
+        "components": {
+            "mint": repeat(1).to_string(),
+            "user": repeat(2).to_string(),
+            "creator": repeat(3).to_string(),
+            "market": repeat(4).to_string(),
+            "pool": repeat(5).to_string(),
+            "pool_authority": repeat(6).to_string(),
+            "quote_mint": repeat(8).to_string(),
+            "wallet": repeat(9).to_string(),
+            "token_program": beam::beam_amm_v4::SPL_TOKEN_PROGRAM_ID.to_string(),
+            "metaplex": beam::METAPLEX.to_string(),
+        },
+        "fixedAddresses": [
+            {"name": "beam", "address": beam::ID.to_string(), "role": "undeployed-placeholder"},
+            {"name": "idl-account", "address": anchor_lang::idl::IdlAccount::address(&beam::ID).to_string(), "role": "anchor-idl-address"},
+            {"name": "system", "address": anchor_lang::system_program::ID.to_string(), "role": "fixed"},
+            {"name": "token", "address": anchor_spl::token::ID.to_string(), "role": "fixed"},
+            {"name": "associated-token", "address": anchor_spl::associated_token::ID.to_string(), "role": "fixed"},
+            {"name": "rent", "address": anchor_lang::solana_program::sysvar::rent::ID.to_string(), "role": "fixed"},
+            {"name": "amm-v4-mainnet", "address": beam::beam_amm_v4::MAINNET_PROGRAM_ID.to_string(), "role": "pinned-amm-v4"},
+            {"name": "amm-v4-devnet", "address": beam::beam_amm_v4::DEVNET_PROGRAM_ID.to_string(), "role": "pinned-amm-v4"},
+            {"name": "amm-v4-mainnet-create-pool-fee", "address": beam::beam_amm_v4::MAINNET_CREATE_POOL_FEE_DESTINATION.to_string(), "role": "pinned-amm-v4"},
+            {"name": "amm-v4-devnet-create-pool-fee", "address": beam::beam_amm_v4::DEVNET_CREATE_POOL_FEE_DESTINATION.to_string(), "role": "pinned-amm-v4"},
+            {"name": "cpmm-devnet", "address": CPMM_DEVNET_PROGRAM, "role": "superseded"},
+            {"name": "cpmm-devnet-create-pool-fee", "address": CPMM_DEVNET_FEE, "role": "superseded"},
+            {"name": "cpmm-mainnet", "address": CPMM_MAINNET_PROGRAM, "role": "superseded"},
+            {"name": "cpmm-mainnet-create-pool-fee", "address": CPMM_MAINNET_FEE, "role": "superseded"},
+            {"name": "pump-fees", "address": beam::distribution::FEES.to_string(), "role": "retained-dependency"},
+            {"name": "pump-amm", "address": beam::pump_quote::AMM.to_string(), "role": "retained-dependency"},
+            {"name": "mayhem", "address": beam::MAYHEM_ID.to_string(), "role": "retained-dependency"},
+            {"name": "metaplex", "address": beam::METAPLEX.to_string(), "role": "retained-dependency"},
+        ],
+        "pdas": pdas,
+    })
+}
+
+fn seed_clause_bodies(source: &str) -> Vec<String> {
+    let mut bodies = Vec::new();
+    let mut rest = source;
+    while let Some(index) = rest.find("seeds") {
+        let after = &rest[index + "seeds".len()..];
+        let trimmed = after.trim_start();
+        if !trimmed.starts_with('=') {
+            rest = &rest[index + "seeds".len()..];
+            continue;
+        }
+        let trimmed = trimmed[1..].trim_start();
+        if !trimmed.starts_with('[') {
+            rest = &rest[index + "seeds".len()..];
+            continue;
+        }
+        let mut depth = 0;
+        let mut end = 0;
+        for (offset, ch) in trimmed.char_indices() {
+            match ch {
+                '[' => depth += 1,
+                ']' => {
+                    depth -= 1;
+                    if depth == 0 {
+                        end = offset;
+                        break;
+                    }
+                }
+                _ => {}
+            }
+        }
+        bodies.push(trimmed[1..end].to_string());
+        rest = &trimmed[end + 1..];
+    }
+    bodies
+}
+
+fn const_bytes_in_clause(body: &str) -> Vec<Vec<u8>> {
+    let mut found = Vec::new();
+    let bytes = body.as_bytes();
+    let mut i = 0;
+    while i < bytes.len() {
+        if body[i..].starts_with("b\"") {
+            let mut value = Vec::new();
+            i += 2;
+            while i < bytes.len() && bytes[i] != b'"' {
+                value.push(bytes[i]);
+                i += 1;
+            }
+            found.push(value);
+        } else if body[i..].starts_with("&[") && body[i + 2..].chars().next().is_some_and(|ch| ch.is_ascii_digit()) {
+            let start = i + 2;
+            let end = body[start..].find(']').unwrap() + start;
+            let nums: Vec<u8> = body[start..end].split(',').map(|part| part.trim().parse().unwrap()).collect();
+            found.push(nums);
+            i = end;
+        }
+        i += 1;
+    }
+    found
+}
+
+#[test]
+fn pda_sidecar_matches_program_derivation_and_source_seeds() {
+    let fresh = pda_sidecar();
+    assert_eq!(load_json("sdk/idl/beam.pdas.json"), fresh);
+    let market = repeat(4);
+    let derived = beam::beam_amm_v4::derive_pool_addresses(&beam::beam_amm_v4::MAINNET_PROGRAM_ID, &market).unwrap();
+    let specs = pda_specs();
+    let by_name = |name: &str| specs.iter().find(|spec| spec.name == name).unwrap();
+    assert_eq!(derive_spec(by_name("amm-v4-authority")).0, derived.authority);
+    assert_eq!(derive_spec(by_name("amm-v4-authority")).1, derived.nonce);
+    assert_eq!(derive_spec(by_name("amm-v4-config")).0, derived.config);
+    assert_eq!(derive_spec(by_name("amm-v4-amm")).0, derived.amm);
+    assert_eq!(derive_spec(by_name("amm-v4-lp-mint")).0, derived.lp_mint);
+    assert_eq!(derive_spec(by_name("amm-v4-coin-vault")).0, derived.coin_vault);
+    assert_eq!(derive_spec(by_name("amm-v4-pc-vault")).0, derived.pc_vault);
+    assert_eq!(derive_spec(by_name("amm-v4-target-orders")).0, derived.target_orders);
+    assert_eq!(
+        anchor_lang::idl::IdlAccount::address(&beam::ID).to_string(),
+        fresh["fixedAddresses"].as_array().unwrap().iter().find(|item| item["name"] == "idl-account").unwrap()["address"]
+    );
+    let mut literals = std::collections::BTreeSet::new();
+    for spec in pda_specs() {
+        for part in spec.seeds {
+            if let SeedPart::Const(bytes) = part {
+                literals.insert(bytes.to_vec());
+            }
+        }
+    }
+    let mut saw_quote_control = false;
+    let mut saw_empty = false;
+    for path in std::fs::read_dir(repo_file("programs/beam/src")).unwrap().flatten() {
+        let file_type = path.file_type().unwrap();
+        let files = if file_type.is_dir() {
+            std::fs::read_dir(path.path()).unwrap().flatten().map(|entry| entry.path()).collect::<Vec<_>>()
+        } else if path.path().extension().is_some_and(|ext| ext == "rs") {
+            vec![path.path()]
+        } else {
+            Vec::new()
+        };
+        for file in files {
+            if file.extension().is_none_or(|ext| ext != "rs") { continue; }
+            let source = fs::read_to_string(&file).unwrap();
+            for body in seed_clause_bodies(&source) {
+                if body.trim().is_empty() { saw_empty = true; }
+                if body.contains("QUOTE_CONTROL_SEED") { saw_quote_control = true; }
+                for bytes in const_bytes_in_clause(&body) {
+                    assert!(literals.contains(&bytes), "{} missing seed {}", file.display(), String::from_utf8_lossy(&bytes));
+                }
+            }
+        }
+    }
+    assert!(saw_quote_control);
+    assert!(saw_empty);
+    let amm_source = fs::read_to_string(repo_file("programs/beam/src/beam_amm_v4.rs")).unwrap();
+    for literal in ["amm authority", "amm_associated_seed", "lp_mint_associated_seed", "coin_vault_associated_seed", "pc_vault_associated_seed", "target_associated_seed", "amm_config_account_seed"] {
+        assert!(amm_source.contains(&format!("b\"{literal}\"")), "{literal}");
+        assert!(literals.contains(&literal.as_bytes().to_vec()), "{literal}");
+    }
 }
 
 fn metas_of(section: &Value) -> Vec<AccountMeta> {
