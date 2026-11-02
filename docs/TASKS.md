@@ -27,7 +27,7 @@ feature work from this ledger. See [contribution status](STATUS.md#contribution-
 | [Fixture indexer, PR #16](https://github.com/shawkkkkk/beam/pull/16), open draft | Synthetic block replay and bounded queries under `backend/indexer/`. | No live chain feed; reconcile its schema with PR #17 before integration. |
 | [Read-only web adapter, PR #17](https://github.com/shawkkkkk/beam/pull/17), open draft | Unverified data boundary under `web/src/indexerAdapter.ts` and local tests. | Separate from PR #16's backend; agree on schema/freshness semantics before integration. |
 | [CreateV2 SDK, PR #18](https://github.com/shawkkkkk/beam/pull/18), open draft | Local CreateV2 encoder and account builder in `sdk/beam-native.mjs`. | No RPC, signing or live CreateV2; PR #20 owns raw Create/Trade event decoding. |
-| [Progress docs, PR #19](https://github.com/shawkkkkk/beam/pull/19), open draft | README, CONTRIBUTING, STATUS and TASKS contributor progress sync. | Documentation only; reflects current main `4e32d30` plus separate draft ownership. |
+| [Progress docs, PR #19](https://github.com/shawkkkkk/beam/pull/19), merged as `7dab121` | README, CONTRIBUTING, STATUS and TASKS contributor progress sync, integrated with PR #40's upstream attribution. | Documentation only; it does not activate draft features. |
 | [Raw event SDK, PR #20](https://github.com/shawkkkkk/beam/pull/20), open draft | Strict CreateEvent and TradeEvent decoders under `sdk/beam-events.mjs`. | No live indexer or client state; coordinate event schema with PR #16. |
 | [Livestream backend, PR #21](https://github.com/shawkkkkk/beam/pull/21), open draft | Local authorization, moderation and retention lifecycle under `backend/livestream/` with mock provider. | No media provider, playable stream, live account, durable moderation or website player. |
 
@@ -62,7 +62,7 @@ PR ownership and touched paths at this snapshot:
   `web/src/indexerAdapter.ts` and its web test. Coordinate schema with PR #16.
 - Open PR #18 — `@shawkkkkk`, `codex/beam-sdk-create-v2`:
   `sdk/beam-native.mjs`, CreateV2 fixture and tests; no raw event decoder.
-- Open PR #19 — `@shawkkkkk`, `codex/beam-progress-docs`:
+- Merged PR #19 — `@shawkkkkk`, `codex/beam-progress-docs`:
   README, CONTRIBUTING and contributor progress documentation only.
 - Open PR #20 — `@shawkkkkk`, `codex/beam-sdk-events-20261101`:
   `sdk/beam-events.mjs`, raw Create/Trade fixtures, tests and SDK CI.
@@ -72,9 +72,9 @@ PR ownership and touched paths at this snapshot:
 ## Draft review queue: PRs #22–#34
 
 Snapshot: 2 November 2026, against `main` `4e32d302f5dfe7650030db9cbde0bcc5edf9aaaf`.
-This documentation update is stacked on draft #19 so its progress-table
-changes can be reviewed first; review this guide's incremental diff after #19,
-then recheck the combined tree when the dependency lands.
+Draft [PR #35](https://github.com/shawkkkkk/beam/pull/35) follows merged #19.
+Review its incremental guidance and README diff against current `main`, then
+recheck the combined tree before merging it.
 The head hashes below are exact Git PR-head refs at this snapshot. All listed
 PRs are drafts; a passing local test or hosted check does not imply merge,
 activation, complete integration, or production safety. Recheck heads, target
