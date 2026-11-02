@@ -21,6 +21,7 @@ feature work from this ledger. See [contribution status](STATUS.md#contribution-
 | [AMM v4 ABI, PR #9](https://github.com/shawkkkkk/beam/pull/9), merged at `c8dc348` | Source-only `Initialize2` data/account/PDA guards for the official pinned AMM v4 source. | No migration CPI, LP disposition or Token-2022 graduation. |
 | [Creator-funding clarity, PR #11](https://github.com/shawkkkkk/beam/pull/11), merged at `9a6ede9` | Records that the 42/5/3-bps allocation does not decide whether creator payouts use its community share or add a separate charge. | No live fee collection or all-in fee quote. |
 | [Nested quote guard, PR #12](https://github.com/shawkkkkk/beam/pull/12), merged at `4e32d30` | Graduated `create_v2` quote fails closed before reading PumpSwap pool accounts. | No AMM v4 quote, venue migration or fee routing; other PumpSwap assumptions still need an audit. |
+| [AMM v4 local validator, PR #38](https://github.com/shawkkkkk/beam/pull/38), merged at `ae3b3b61582750de5f62a6b0e6ea768b0a19c3a6` | Separate `tests/amm-v4-validator/` crate invokes pinned Raydium source `Initialize2` through a synthetic local probe; selected balances, fee debit, replay, rollback and Token-2022 rejection are tested. | Does not invoke Beam migration, validate deployed Raydium bytecode, decide LP/creator rights or enable graduation. See [validation](VALIDATION.md#amm-v4-local-source-processor-cpi-pr-38). |
 | [Legacy creator SDK, PR #13](https://github.com/shawkkkkk/beam/pull/13), open draft | Local collection builder, creator event decoder and rent/balance preview under `sdk/beam-creator*`; review is pending. | No authenticated state, payout-wallet change, RPC, signing or live claim. Avoid duplicate creator SDK work. |
 | [Charity backend, PR #14](https://github.com/shawkkkkk/beam/pull/14), open draft | Disabled local registry and donation mock under `backend/charity/`. | No authorized provider, settlement or real donation. |
 | [Callouts backend, PR #15](https://github.com/shawkkkkk/beam/pull/15), open draft | Local moderation service with mock adapters under `backend/callouts/`. | No live callout provider or payment. |
@@ -159,7 +160,8 @@ precise specification and isolated adversarial tests.
    principal and collect ongoing fees, then test those permissions. Current
    CPMM LP burning supplies no recurring LP-fee income. Keep migration disabled
    until the design and tests resolve this.
-3. **Raydium AMM v4 migration validation.** Exercise actual CPIs, pool identity,
+3. **Raydium AMM v4 migration validation.** Build on PR #38's pinned-source
+   local CPI fixture to exercise the actual Beam migration handler, pool identity,
    config/mint/vault/reserve deltas, fee liabilities, donated balances,
    precreated accounts, replay rejection, and rollback on a local validator.
    Record the pinned AMM v4 program/config used. Use its current 19-account

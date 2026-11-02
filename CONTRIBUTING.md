@@ -118,6 +118,17 @@ synthetic accounts and valueless balances; it does not execute captured
 original Pump binaries or prove real Raydium CPI behavior. The normal
 `programs/beam` tests above do not run this separate manifest.
 
+The merged AMM v4 validator is another separate crate. With Rust 1.99.1,
+run its pinned-source local CPI tests from the repository root:
+
+```sh
+cargo test --locked --manifest-path tests/amm-v4-validator/Cargo.toml -- --test-threads=1
+```
+
+These tests invoke the pinned Raydium Rust processor through a synthetic
+local probe. They do not execute Beam's migration handler or verify deployed
+Raydium bytecode. See the [validator scope](tests/amm-v4-validator/README.md).
+
 Host tests, mock accounts, and local simulations are welcome. Do not deploy to
 a live network, use real wallets, sign live transactions, transfer funds, or
 handle credentials as part of a normal contribution. If Beam is registered on

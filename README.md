@@ -9,9 +9,10 @@ where the venue and independently built services permit it.
 **Current result:** an undeployed Anchor source fork, local ABI fixtures, and a
 sample-data website preview. Beam is not audited or ready for live use. The
 superseded Raydium CPMM migration is blocked in every build. AMM v4 has
-source-level guards and draft synthetic tests, but no Beam migration entrypoint
-or verified real Raydium CPI. The modified Beam binary cannot be byte-identical
-to Pump's binary.
+source-level guards, draft synthetic Beam tests, and a merged local test that
+invokes the pinned Raydium source processor. There is no Beam migration
+entrypoint or deployed-program validation. The modified Beam binary cannot be
+byte-identical to Pump's binary.
 
 ## Attribution / Upstream
 
@@ -52,7 +53,7 @@ completion percentages or production approval.
 | Preserve the recovered Pump source | **Merged source** | The pinned archive passes [380 Git-blob checks](docs/VALIDATION.md). Of the retained Pump package, [62 files are byte-identical and four changes are declared](docs/UPSTREAM.md#what-is-byte-identical). This is source evidence, not Beam binary identity. |
 | Launch tokens and trade on the curve | **Merged development code** | [PR #1](https://github.com/shawkkkkk/beam/pull/1) contains Anchor handlers and selected host tests. Complete instruction execution and SBF behavior remain unverified. |
 | Remove Mayhem and PumpSwap | **In progress** | Mayhem creation and legacy PumpSwap entry paths fail closed; [PR #12](https://github.com/shawkkkkk/beam/pull/12) blocked a nested graduated quote. Router, creator/sharing, CTO and donation dependencies still need compatible replacements. |
-| Graduate to Raydium AMM v4 | **Blocked; guards in draft** | [Merged PR #9](https://github.com/shawkkkkk/beam/pull/9) adds source-only ABI guards. Draft [#22 → #29 → #30](docs/TASKS.md#draft-review-queue-prs-2234) and [#25 → #33 → #34](docs/TASKS.md#draft-review-queue-prs-2234) add account, funding, synthetic settlement and snapshot checks. No real migration CPI, LP-rights design or Token-2022 graduation exists. |
+| Graduate to Raydium AMM v4 | **Blocked; partial test evidence** | [Merged PR #9](https://github.com/shawkkkkk/beam/pull/9) adds source-only ABI guards. [Merged PR #38](https://github.com/shawkkkkk/beam/pull/38) invokes the pinned Raydium source processor through a local synthetic probe. Draft [#22 → #29 → #30](docs/TASKS.md#draft-review-queue-prs-2234) and [#25 → #33 → #34](docs/TASKS.md#draft-review-queue-prs-2234) add Beam account, funding, mock settlement and snapshot checks. No Beam migration CPI, LP-rights design or Token-2022 graduation exists. |
 | Enforce Beam fees and creator payouts | **Blocked; math and disabled policy in draft** | [PR #5](https://github.com/shawkkkkk/beam/pull/5) merged provisional 42/5/3 arithmetic. Draft [#23/#24/#26](docs/TASKS.md#draft-review-queue-prs-2234) test stricter caps and disabled state. Live collection, selected creator wallet payout and post-graduation rights are unresolved. |
 | Whole Beam binary matches Pump | **Different by design** | Beam changes the program identity, venue, Mayhem and fee code. Source matches in retained files do not establish a compiled or deployed byte match. |
 
@@ -80,7 +81,7 @@ and the [dated PR dependency queue](docs/TASKS.md) for more detail.
 
 | Requirement | Current boundary |
 | --- | --- |
-| Verified AMM v4 migration and liquidity | Draft guards and synthetic local-bank tests do not execute the real Raydium program. Authenticate account state and receipts, test rollback and replay, and decide LP custody/fee rights before enabling migration. |
+| Verified AMM v4 migration and liquidity | Merged PR #38 invokes the pinned Raydium source processor through a local probe and tests selected rollback and replay cases. It does not execute Beam's migration handler or validate deployed Raydium bytecode. Authenticate Beam account state and receipts, and decide LP custody/fee rights before enabling migration. |
 | Token compatibility | Raydium AMM v4 accepts classic SPL Token mints; Beam's curve also retains restricted Token-2022 support. A safe graduation plan for those launches is unresolved. |
 | Enforced and disclosed fees | Beam's proposed allocation is not wired into trades. Decide creator funding, vault authority, community distribution, migration charges and all-in quote behavior. |
 | Complete client and services | Regenerate the Beam IDL; add authenticated indexer, wallet/client and authorized creator, charity, callout and media integrations. Sample data and mocks cannot be presented as live observations. |
@@ -92,7 +93,7 @@ and the [dated PR dependency queue](docs/TASKS.md) for more detail.
 | --- | --- | --- |
 | Community Pump reconstruction | [`upstream/pumpfun-source`](upstream/pumpfun-source/README.md), pinned at [`5703df0`](https://github.com/lalalune/pumpfun-source/tree/5703df02131ab944408e0cf679b4bef9c22e1a3d) | Pristine reference archive with retained notices; upstream's historical reconstruction claim is not a Beam binary match. |
 | Editable Beam contract | [`programs/beam`](programs/beam/Cargo.toml) | Anchor development code, declared source differences and selected host tests; no complete runtime parity or deployment. |
-| Raydium references | Historical [CPMM `3d69122`](https://github.com/raydium-io/raydium-cp-swap/tree/3d69122790e97cd6aff24e8ba95940793773f58c); selected AMM v4 [source `91739d8`](https://github.com/raydium-io/raydium-amm/tree/91739d8d9f5cf347e0ce14ebe4d2bb7069fb31b6) | Source pins for ABI research. CPMM is superseded and disabled; AMM v4 source is not a verified deployed-bytecode or CPI receipt. |
+| Raydium references | Historical [CPMM `3d69122`](https://github.com/raydium-io/raydium-cp-swap/tree/3d69122790e97cd6aff24e8ba95940793773f58c); selected AMM v4 [source `91739d8`](https://github.com/raydium-io/raydium-amm/tree/91739d8d9f5cf347e0ce14ebe4d2bb7069fb31b6) | CPMM is superseded and disabled. [PR #38](https://github.com/shawkkkkk/beam/pull/38) provides local CPI evidence for the pinned AMM v4 source processor, not deployed-bytecode or Beam-handler validation. |
 | Local client and UI | [`sdk/`](sdk/README.md), [`web/`](web/README.md) | ABI fixtures and sample-data preview; no wallet, RPC-authenticated market data or transaction service. |
 | Backend drafts | [Task ledger](docs/TASKS.md#website-and-backend-contribution-lanes) | Local fixture indexer, charity, callout and livestream work in unmerged PRs, not services on `main`. |
 

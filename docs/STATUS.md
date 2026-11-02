@@ -16,6 +16,7 @@
 - Fee-allocation arithmetic and selected host differential tests.
 - [PR #7](https://github.com/shawkkkkk/beam/pull/7) merged native-SOL create/buy/sell ABI fixtures and local encoders. They do not resolve live accounts, sign or submit transactions. Draft [PR #13](https://github.com/shawkkkkk/beam/pull/13) owns legacy creator-fee fixtures, [PR #18](https://github.com/shawkkkkk/beam/pull/18) owns CreateV2 construction, and [PR #20](https://github.com/shawkkkkk/beam/pull/20) owns raw Create/Trade event decoding; these are not part of this main-branch snapshot.
 - [PR #6](https://github.com/shawkkkkk/beam/pull/6) merged a Beam-branded website preview with sample market data and browser-local drafts. It has no wallet, chain feed, metadata upload, donation, callout or livestream service.
+- [PR #38](https://github.com/shawkkkkk/beam/pull/38) merged a separate local validator that invokes the pinned Raydium AMM v4 Rust source processor through a synthetic CPI probe. It does not invoke Beam migration or validate deployed Raydium bytecode.
 
 Separate draft [PR #21](https://github.com/shawkkkkk/beam/pull/21) owns a
 local mock livestream authorization and moderation lifecycle under
@@ -83,9 +84,13 @@ Host compilation checks Rust/Anchor types. Differential tests cover selected quo
 
 These checks do not establish full instruction execution parity, SBF byte identity, CPI success, current-chain behavior or security. Source equality is separate from program-binary equality.
 
-Any isolated local-bank harness uses synthetic accounts and valueless balances
-to exercise Beam code. It does not execute captured original Pump binaries,
-prove Raydium CPI behavior or submit a transaction to a live network.
+The draft local-bank harness uses synthetic accounts and valueless balances
+with mock processors to exercise selected Beam helper paths. Separately,
+[merged PR #38](https://github.com/shawkkkkk/beam/pull/38) invokes the pinned
+Raydium AMM v4 Rust source processor through a local CPI probe and tests
+selected rollback/replay cases. Neither test executes captured original Pump
+binaries, the Beam migration handler, or deployed Raydium bytecode, nor submits
+a transaction to a live network.
 
 Upstream declares the reconstruction complete and removed captured binaries and its research toolchain. This branch pins the final source; it does not independently re-prove the historical reconstruction claim.
 
