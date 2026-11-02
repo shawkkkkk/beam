@@ -13,7 +13,8 @@
 - Standard SPL Token and a restricted Token-2022 metadata extension subset were supported by the superseded CPMM candidate. AMM v4 does not accept Token-2022 mints; those curve launches need a separately reviewed graduation plan rather than silent removal.
 - Inherited Global migration-fee behavior retained. Test-only Beam curve-fee arithmetic now reflects the requested 42/5/3 bps community/treasury/founder split; it does not rewrite inherited creator or migration fees or enforce a live rate.
 - Source-only [AMM v4 ABI guards](../programs/beam/src/beam_amm_v4.rs) encode the pinned 19-account `Initialize2` path and reject Token-2022 mint owners. They are not called by a Beam instruction and do not migrate a token.
-- Fee-allocation arithmetic and selected host differential tests.
+- Fee-allocation arithmetic and selected host differential tests. The curve policy is 0.50% all-in, split 42/5/3 bps community/treasury/founder, with creators paid from the 42 bps community share. The creator basis-point count is unset. See [open owner decisions](OPEN_DECISIONS.md).
+- [PR #38](https://github.com/shawkkkkk/beam/pull/38) merged `tests/amm-v4-validator`, a local banks run of the pinned 19-account `Initialize2` processor. It does not add a Beam migration instruction or enable graduation. LP stays locked permanently. Token-2022 migration stays rejected.
 - [PR #7](https://github.com/shawkkkkk/beam/pull/7) merged native-SOL create/buy/sell ABI fixtures and local encoders. They do not resolve live accounts, sign or submit transactions. Draft [PR #13](https://github.com/shawkkkkk/beam/pull/13) owns legacy creator-fee fixtures, [PR #18](https://github.com/shawkkkkk/beam/pull/18) owns CreateV2 construction, and [PR #20](https://github.com/shawkkkkk/beam/pull/20) owns raw Create/Trade event decoding; these are not part of this main-branch snapshot.
 - [PR #6](https://github.com/shawkkkkk/beam/pull/6) merged a Beam-branded website preview with sample market data and browser-local drafts. It has no wallet, chain feed, metadata upload, donation, callout or livestream service.
 
@@ -37,7 +38,7 @@ stacked review order. A passing draft test does not make its feature live.
 ## Outstanding before use
 
 1. Beam-controlled fee configuration and vaults. Pump's inherited fee-program namespaces/authority assumptions must be replaced or rehosted. Source compatibility does not establish that Pump's deployed fee program accepts Beam's ID.
-2. Replace the superseded CPMM candidate with an independently verified Raydium AMM v4 adapter. AMM v4 accepts classic SPL Token mints only, while Beam's retained curve also supports restricted Token-2022 mints; do not silently delete those launches or route them to an unsupported pool. Design principal-lock/fee-rights integration for recurring community buybacks and post-graduation creator claims; current candidate burns LP. Keep migration gated until the final venue, policy and tests are implemented.
+2. Replace the superseded CPMM candidate with an independently verified Raydium AMM v4 adapter. The venue stays Raydium AMM v4 (`raydium-io/raydium-amm` `91739d8d9f5cf347e0ce14ebe4d2bb7069fb31b6`, program `675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8`, 19-account `Initialize2`). CPMM stays fail-closed. AMM v4 accepts classic SPL Token mints only. Token-2022 trades on the curve and is rejected for migration until a safe plan lands. LP is locked permanently; the current candidate's burn is not a fee claim, and a lock does not add a withdrawal path. Any post-graduation Beam fee is unset ([open owner decisions](OPEN_DECISIONS.md)). Keep migration gated.
 3. Non-SOL migration, Raydium AMM v4 quote-chain routing, AMM-dependent creator/sharing/CTO operations, and compatible donation creation/collection. [Merged PR #12](https://github.com/shawkkkkk/beam/pull/12) makes a nested graduated `create_v2` PumpSwap quote fail closed; it does not quote AMM v4. Remove all active PumpSwap runtime, PDA and ownership assumptions outside the immutable upstream archive; fail-closed handlers are interim gaps, not the finished behavior.
 4. Regenerated Beam IDL, complete wallet builders, real indexer and production UI. The merged native-SOL fixture encoder is only a local construction layer; retained dependency IDLs are reference interfaces, not a finalized Beam client API.
    Preserve creator-fee recipient selection and build independent, authorized services for donation choices, callouts, and livestreaming. The pinned on-chain source does not supply those off-chain products. See the [feature matrix](FEATURES.md).
@@ -54,15 +55,17 @@ was closed unmerged because its contract and fee policy conflict with the
 current `programs/beam` baseline. Its reviewed sample-data website was
 carried into merged [PR #6](https://github.com/shawkkkkk/beam/pull/6).
 
-Creator payouts and creator-selected wallet behavior remain requirements,
-while funding from the community share versus an additional charge is
-undecided. The ordinary proposed allocation is 42/5/3 basis points for
-community/treasury/founder: 50 basis points total, including 8 basis points
-under platform control. The optional disabled, three-second buy-side quote
+Creator payouts and creator-selected wallet behavior remain requirements.
+They are paid from the 42 bps community share. The curve fee is 0.50%
+all-in: 42/5/3 basis points for community/treasury/founder, including 8
+basis points under platform control. The creator basis-point count and the
+other unset values are only in [open owner decisions](OPEN_DECISIONS.md).
+The optional disabled, three-second buy-side quote
 prototype models an initial 99% fee of gross buyer debit. A 99% fee on net
 base would be about 49.75% of gross (0.99 / 1.99), so it is not the same rule.
-Its launch surcharge is separate from ordinary allocation, with no recipient
-or withdrawal path in the prototype. There is no enabled contract path, live
+Its launch surcharge is separate from ordinary allocation. Its recipient is
+unset in [open owner decisions](OPEN_DECISIONS.md), and the prototype has no
+withdrawal path. There is no enabled contract path, live
 trade, sell-handler change or promised outcome.
 
 ## Contribution and security status

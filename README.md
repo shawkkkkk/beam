@@ -21,7 +21,7 @@ That publication is the completed community reconstruction of pump.fun's on-chai
 
 `upstream/pumpfun-source` is that commit. `python3 scripts/check_fork.py` checks its 380 Git blobs against `upstream/files.json`. In the editable program `programs/beam`, the same command compares Pump Main (`programs/pump` at that commit) byte for byte: 62 retained files match, and four retained files are declared Beam edits. Five more files exist only in Beam. The whole `programs/beam` crate is that fork. Source byte identity is not a compiled Beam binary, a deployed pump.fun bytecode match, or runtime parity. Beam does not re-prove the reconstruction against deployed bytecode.
 
-The retained-file list, the declared edits, and the preserved license notices are in [Upstream attribution](docs/UPSTREAM.md). This repository has no root `LICENSE`. The archived notices stay with the snapshot. These documents do not add or choose a license.
+The retained-file list, the declared edits, and the preserved license notices are in [Upstream attribution](docs/UPSTREAM.md). This repository has no root `LICENSE`. That choice is unset in [open decisions](docs/OPEN_DECISIONS.md). The archived notices stay with the snapshot. These documents do not add or choose a license.
 
 ## Contribution focus
 
@@ -52,8 +52,8 @@ completion percentages or production approval.
 | Preserve the recovered Pump source | **Merged source** | The pinned archive passes [380 Git-blob checks](docs/VALIDATION.md). Of the retained Pump package, [62 files are byte-identical and four changes are declared](docs/UPSTREAM.md#what-is-byte-identical). This is source evidence, not Beam binary identity. |
 | Launch tokens and trade on the curve | **Merged development code** | [PR #1](https://github.com/shawkkkkk/beam/pull/1) contains Anchor handlers and selected host tests. Complete instruction execution and SBF behavior remain unverified. |
 | Remove Mayhem and PumpSwap | **In progress** | Mayhem creation and legacy PumpSwap entry paths fail closed; [PR #12](https://github.com/shawkkkkk/beam/pull/12) blocked a nested graduated quote. Router, creator/sharing, CTO and donation dependencies still need compatible replacements. |
-| Graduate to Raydium AMM v4 | **Blocked; guards in draft** | [Merged PR #9](https://github.com/shawkkkkk/beam/pull/9) adds source-only ABI guards. Draft [#22 → #29 → #30](docs/TASKS.md#draft-review-queue-prs-2234) and [#25 → #33 → #34](docs/TASKS.md#draft-review-queue-prs-2234) add account, funding, synthetic settlement and snapshot checks. No real migration CPI, LP-rights design or Token-2022 graduation exists. |
-| Enforce Beam fees and creator payouts | **Blocked; math and disabled policy in draft** | [PR #5](https://github.com/shawkkkkk/beam/pull/5) merged provisional 42/5/3 arithmetic. Draft [#23/#24/#26](docs/TASKS.md#draft-review-queue-prs-2234) test stricter caps and disabled state. Live collection, selected creator wallet payout and post-graduation rights are unresolved. |
+| Graduate to Raydium AMM v4 | **Blocked** | [Merged PR #9](https://github.com/shawkkkkk/beam/pull/9) adds source-only ABI guards. [Merged PR #38](https://github.com/shawkkkkk/beam/pull/38) runs the pinned 19-account `Initialize2` processor in a local banks test and does not add a Beam migration instruction. Draft [#22 → #29 → #30](docs/TASKS.md#draft-review-queue-prs-2234) and [#25 → #33 → #34](docs/TASKS.md#draft-review-queue-prs-2234) add further guards and synthetic checks. LP is locked permanently. CPMM fails closed. Token-2022 still trades on the curve and is rejected for migration. |
+| Enforce Beam fees and creator payouts | **Blocked; math only** | [PR #5](https://github.com/shawkkkkk/beam/pull/5) merged provisional 42/5/3 arithmetic. The curve fee is 0.50% all-in, and creators are paid from the 42 bps community share. The creator basis-point count is unset ([open decisions](docs/OPEN_DECISIONS.md)). Draft [#23/#24/#26](docs/TASKS.md#draft-review-queue-prs-2234) test stricter caps and disabled state. Live collection is not wired. |
 | Whole Beam binary matches Pump | **Different by design** | Beam changes the program identity, venue, Mayhem and fee code. Source matches in retained files do not establish a compiled or deployed byte match. |
 
 ### Website, frontend, and SDK
@@ -80,9 +80,9 @@ and the [dated PR dependency queue](docs/TASKS.md) for more detail.
 
 | Requirement | Current boundary |
 | --- | --- |
-| Verified AMM v4 migration and liquidity | Draft guards and synthetic local-bank tests do not execute the real Raydium program. Authenticate account state and receipts, test rollback and replay, and decide LP custody/fee rights before enabling migration. |
-| Token compatibility | Raydium AMM v4 accepts classic SPL Token mints; Beam's curve also retains restricted Token-2022 support. A safe graduation plan for those launches is unresolved. |
-| Enforced and disclosed fees | Beam's proposed allocation is not wired into trades. Decide creator funding, vault authority, community distribution, migration charges and all-in quote behavior. |
+| Verified AMM v4 migration and liquidity | [PR #38](https://github.com/shawkkkkk/beam/pull/38) is local-validator evidence for the pinned processor, not a Beam migration entrypoint. LP is locked permanently. Migration stays disabled. |
+| Token compatibility | Token-2022 trades on the curve. Raydium AMM v4 accepts classic SPL Token mints, so migration rejects Token-2022 until a safe plan lands. |
+| Enforced and disclosed fees | The curve policy is 0.50% all-in, split 42/5/3. Collection is not wired. The creator basis-point count, community distribution, vaults, and any post-graduation Beam fee are unset in [open decisions](docs/OPEN_DECISIONS.md). |
 | Complete client and services | Regenerate the Beam IDL; add authenticated indexer, wallet/client and authorized creator, charity, callout and media integrations. Sample data and mocks cannot be presented as live observations. |
 | Release evidence and authorization | Complete SBF/local-validator tests with real permitted program dependencies, independent security review and maintainer-controlled deployment decisions. This repository deploys nothing. |
 
@@ -111,12 +111,11 @@ performance.
 | Founder | 0.03% | 6% |
 | **Total** | **0.50%** | **100%** |
 
-Treasury plus founder are 8 basis points under platform control. Creator
-payout behavior and creator-selected wallet support remain requirements.
-Whether creator payouts come **from** the 0.42% community share or add to the
-trade charge is undecided, so 0.50% is **not** an all-in quote. A 50/50
-holder-reward/buyback split is only a test assumption; beneficiaries, custody
-and spending rules are not approved. Draft [#23](https://github.com/shawkkkkk/beam/pull/23)
+Treasury plus founder are 8 basis points under platform control. The 0.50%
+curve fee is all-in. Creator payouts and creator-selected wallets are paid
+out of the 0.42% community share. `$BEAM` is the flagship. Every unset owner
+value is only in [open decisions](docs/OPEN_DECISIONS.md).
+Draft [#23](https://github.com/shawkkkkk/beam/pull/23)
 corrects dust caps, but no live Beam collection is wired. Raydium pool and
 retained migration fees are separate. See [economics](docs/ECONOMICS.md).
 
@@ -156,7 +155,7 @@ migration entrypoint.
 - `scripts/check_fork.py`: source provenance and declared-difference check.
 - `sdk/`: local native-SOL ABI fixtures and decoder/builder drafts.
 - `web/`: Beam-branded sample-data preview.
-- `docs/`: economics, feature matrix, status, validation and contributor tasks.
+- `docs/`: open owner decisions, economics, feature matrix, upstream attribution, status, validation, and contributor tasks.
 - `.github/workflows/`: current hosted checks; verify which changed tests each workflow actually runs.
 
 ## Open priorities and contribution
@@ -169,7 +168,8 @@ paused; this list does not reopen them. See [task ownership](docs/TASKS.md)
 before taking a lane.
 
 Start with [CONTRIBUTING.md](CONTRIBUTING.md),
-[AGENTS.md](AGENTS.md), [status](docs/STATUS.md),
+[AGENTS.md](AGENTS.md), [open decisions](docs/OPEN_DECISIONS.md),
+[status](docs/STATUS.md),
 [validation](docs/VALIDATION.md), and [economics](docs/ECONOMICS.md).
 Use the [maintainer review checklist](CONTRIBUTING.md#maintainer-review-and-merge)
 for stacked PRs and exact-head CI. Suspected exploitable issues belong in the

@@ -64,6 +64,9 @@ From this directory, with Rust 1.99.1:
 cargo test --locked -- --test-threads=1
 ```
 
-Migration remains disabled. LP custody, post-graduation fee rights, and a
-Token-2022 graduation plan are still open. An SBF build of this source pin and
+Migration remains disabled. LP is locked permanently as policy; this harness
+does not implement that lock or a Beam migration instruction. Any
+post-graduation Beam fee is unset
+([open owner decisions](../../docs/OPEN_DECISIONS.md)). Token-2022 migration
+stays rejected until a safe plan lands. An SBF build of this source pin and
 a `solana-test-validator` run were not produced here.

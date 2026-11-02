@@ -28,8 +28,10 @@ rollback, replay, or real account substitution.
 After the user's AMM v4 choice, the superseded CPMM `set_enabled(true)` and
 `migrate_raydium` handlers were made fail closed under default and experimental
 builds. The proposed Beam component arithmetic was updated to 42/5/3 nominal
-basis points for community/treasury/founder. Creator payout funding is
-undecided; the inherited source currently calculates creator fees separately.
+basis points for community/treasury/founder. The curve fee is 0.50% all-in.
+Creator payouts are paid from the 42 bps community share; the basis-point
+count is unset ([open decisions](OPEN_DECISIONS.md)). The inherited source
+currently calculates creator fees separately.
 Host tests cover arithmetic and compilation, not fee collection or an AMM v4
 CPI. The [feature ledger](FEATURES.md) tracks the missing integration and
 product behavior.

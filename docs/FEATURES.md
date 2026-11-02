@@ -14,23 +14,26 @@ programs; copying them into `upstream/` does not deploy or integrate them.
 | Livestreaming | No explicit livestream instruction or field identified in the pinned on-chain programs. | PR #6 saves a local stream-URL plan; no broadcast, player service or usable stream client. | Define moderation, media provider, authorization, storage and UI; test locally. No live stream activation now. |
 | Graduation venue | Archived PumpSwap path is blocked; the Beam [CPMM adapter](../programs/beam/src/beam_raydium.rs) is retained as superseded source. | Host checks cover selected accounts/math. Activation and execution of CPMM now fail closed under every build feature. [PR #9](https://github.com/shawkkkkk/beam/pull/9) merged a **source-only AMM v4 ABI guard**, not an executable adapter. | Build a CPI adapter around the [official AMM v4 `Initialize2` ABI](https://github.com/raydium-io/raydium-amm/blob/91739d8d9f5cf347e0ce14ebe4d2bb7069fb31b6/program/src/processor.rs#L549-L621), verify mint owners, fee/custody policy and runtime behavior. OpenBook is [no longer required](https://docs.raydium.io/products/amm-v4/overview). |
 | Mayhem | [Beam policy](../programs/beam/src/beam_policy.rs) rejects creation/enablement while retaining inert ABI fields. | Host policy checks. | Keep excluded and test every relevant handler/runtime path. |
-| Beam 42/5/3 fee component | [Arithmetic](../programs/beam/src/beam_economics.rs) allocates 50 bps among community, treasury and founder. | Unit tests only; no Beam-controlled fee collection or vaults. Creator payout funding from the community share versus an extra charge is undecided; Raydium pool fees and migration charges require separate disclosure. | Enforce authorized config and recipients, preserve creator payout routing, verify exact quotes/accounting and test custody after the funding choice. Community holder/buyback 50/50 is provisional. |
+| Beam 42/5/3 fee component | [Arithmetic](../programs/beam/src/beam_economics.rs) allocates 50 bps among community, treasury and founder. The curve fee is 0.50% all-in. Creators are paid from the 42 bps community share. | Unit tests only; no Beam-controlled fee collection or vaults. Unset owner values are only in [open decisions](OPEN_DECISIONS.md). Raydium pool fees and migration charges require separate disclosure. | Keep unset values admin-configurable, disabled or unset by default, and failing closed. Preserve creator payout routing. Verify exact quotes and custody after an admin sets the parameters. |
 | Market charts, wallet, social UI | On-chain events and metadata URI can be inputs, but are not a website or indexer. | [PR #7](https://github.com/shawkkkkk/beam/pull/7) merged local ABI fixtures; [PR #6](https://github.com/shawkkkkk/beam/pull/6) has a sample-data Beam-branded web preview. Neither is a live client for the canonical contract. The competing Anchor prototype in closed PR #3 was not adopted. | Independently implement indexer, freshness/verification, wallet client and UX. Never present fixtures as live data or merge the alternate program wholesale. |
 
-Only Raydium AMM v4, removal of Mayhem, and the specified Beam fee policy are
-intentional product differences requested so far. They require changes to the
-program binary and account/instruction behavior, so whole-program byte identity
-is impossible. For every other feature, seek observable behavior and interface
-compatibility, document unknowns, preserve licenses, and test each change.
+Intentional product differences include Raydium AMM v4 graduation, removal of
+Mayhem, removal of PumpSwap, the 0.50% all-in 42/5/3 curve fee with creators
+paid from the 42 bps community share, a permanent LP lock, and `$BEAM` as the
+flagship. They require changes to the program binary and account/instruction
+behavior, so whole-program byte identity is impossible. For every other
+feature, seek observable behavior and interface compatibility, keep unset
+owner values in [open decisions](OPEN_DECISIONS.md), preserve licenses, and
+test each change.
 
 Raydium's current [AMM v4 fee documentation](https://docs.raydium.io/products/amm-v4/fees)
 describes an LP fee realized through LP withdrawal. Beam cannot set that pool's
 fee or its protocol recipient; the [official program source](https://github.com/raydium-io/raydium-amm/tree/91739d8d9f5cf347e0ce14ebe4d2bb7069fb31b6)
 is an ABI reference, not proof of deployed-bytecode identity. AMM v4 does not
 support Token-2022 or [Raydium Burn & Earn](https://docs.raydium.io/user-flows/burn-and-earn).
-Burning all LP cannot fund continuing post-graduation buybacks or creator fees.
-Those features need a separate, reviewed fee-rights design. Beam's retained
-curve supports a restricted Token-2022 subset, but AMM v4 does not accept that
-mint program. This is an unresolved compatibility conflict, **not** an approved
-removal of Token-2022 launches; their graduation must remain unavailable until
-an explicit compatible plan is reviewed.
+LP is locked permanently. A locked or burned position cannot fund continuing
+post-graduation buybacks or creator fees. Any post-graduation Beam fee is
+unset ([open decisions](OPEN_DECISIONS.md)). Beam's retained curve supports a
+restricted Token-2022 subset. Token-2022 trades on the curve. AMM v4 does not
+accept that mint program, so migration rejects Token-2022 until a safe plan
+lands.
