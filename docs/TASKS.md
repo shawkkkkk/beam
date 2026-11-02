@@ -26,10 +26,10 @@ feature work from this ledger. See [contribution status](STATUS.md#contribution-
 | [Charity backend, PR #14](https://github.com/shawkkkkk/beam/pull/14), open draft | Disabled local registry and donation mock under `backend/charity/`. | No authorized provider, settlement or real donation. |
 | [Callouts backend, PR #15](https://github.com/shawkkkkk/beam/pull/15), open draft | Local moderation service with mock adapters under `backend/callouts/`. | No live callout provider or payment. |
 | [Fixture indexer, PR #16](https://github.com/shawkkkkk/beam/pull/16), open draft | Synthetic block replay and bounded queries under `backend/indexer/`. | No live chain feed; reconcile its schema with PR #17 before integration. |
-| [Read-only web adapter, PR #17](https://github.com/shawkkkkk/beam/pull/17), open draft | Unverified data boundary under `web/src/indexerAdapter.ts` and local tests. | Separate from PR #16's backend; agree on schema/freshness semantics before integration. |
-| [CreateV2 SDK, PR #18](https://github.com/shawkkkkk/beam/pull/18), open draft | Local CreateV2 encoder and account builder in `sdk/beam-native.mjs`. | No RPC, signing or live CreateV2; PR #20 owns raw Create/Trade event decoding. |
+| [Read-only web adapter, PR #17](https://github.com/shawkkkkk/beam/pull/17), merged at `c707f3022f947572b20f730ccae11a8ccb8da52a` | Unverified data boundary under `web/src/indexerAdapter.ts` and local tests. | Separate from PR #16's backend; agree on schema/freshness semantics before connecting a live feed. |
+| [CreateV2 SDK, PR #18](https://github.com/shawkkkkk/beam/pull/18), merged at `243eb20d817bdf899c8e4a643084bb27aca28ea3` | Local CreateV2 encoder and account builder in `sdk/beam-native.mjs`. | No RPC, signing or live CreateV2; merged PR #20 separately owns raw Create/Trade event decoding. |
 | [Progress docs, PR #19](https://github.com/shawkkkkk/beam/pull/19), merged as `7dab121` | README, CONTRIBUTING, STATUS and TASKS contributor progress sync, integrated with PR #40's upstream attribution. | Documentation only; it does not activate draft features. |
-| [Raw event SDK, PR #20](https://github.com/shawkkkkk/beam/pull/20), open draft | Strict CreateEvent and TradeEvent decoders under `sdk/beam-events.mjs`. | No live indexer or client state; coordinate event schema with PR #16. |
+| [Raw event SDK, PR #20](https://github.com/shawkkkkk/beam/pull/20), merged at `f5c472b777c4074f64878991218f78a9e3172881` | Strict CreateEvent and TradeEvent decoders under `sdk/beam-events.mjs`; SDK workflow discovers matching local tests. | No authenticated chain event, live indexer or client state; coordinate event schema with PR #16. |
 | [Livestream backend, PR #21](https://github.com/shawkkkkk/beam/pull/21), open draft | Local authorization, moderation and retention lifecycle under `backend/livestream/` with mock provider. | No media provider, playable stream, live account, durable moderation or website player. |
 
 PR ownership and touched paths at this snapshot:
@@ -59,13 +59,13 @@ PR ownership and touched paths at this snapshot:
   `backend/callouts/` local service only.
 - Open PR #16 — `@shawkkkkk`, `codex/beam-indexer-20261101`:
   `backend/indexer/` fixture replay and API only.
-- Open PR #17 — `@shawkkkkk`, `codex/beam-indexer-readonly`:
+- Merged PR #17 — `@shawkkkkk`, `codex/beam-indexer-readonly`:
   `web/src/indexerAdapter.ts` and its web test. Coordinate schema with PR #16.
-- Open PR #18 — `@shawkkkkk`, `codex/beam-sdk-create-v2`:
+- Merged PR #18 — `@shawkkkkk`, `codex/beam-sdk-create-v2`:
   `sdk/beam-native.mjs`, CreateV2 fixture and tests; no raw event decoder.
 - Merged PR #19 — `@shawkkkkk`, `codex/beam-progress-docs`:
   README, CONTRIBUTING and contributor progress documentation only.
-- Open PR #20 — `@shawkkkkk`, `codex/beam-sdk-events-20261101`:
+- Merged PR #20 — `@shawkkkkk`, `codex/beam-sdk-events-20261101`:
   `sdk/beam-events.mjs`, raw Create/Trade fixtures, tests and SDK CI.
 - Open PR #21 — `@shawkkkkk`, `codex/beam-livestream-20261101`:
   `backend/livestream/` local lifecycle and tests only; no playable stream.
@@ -91,7 +91,7 @@ not an edit to the retained Pump source archive.
 | [#24 disabled fee policy](https://github.com/shawkkkkk/beam/pull/24) `d578111b75b705948cbcc4a34bef2183f2440603` | `main`; `programs/beam/src/beam_fee_policy_v1.rs`, `programs/beam/src/lib.rs`, `upstream/manifest.json`. | Local default/experimental: 19 unit + 4 compatibility each, no-default/provenance reported passed. Initializer stores Disabled/Undecided and zero credited fees; no quote, collect, update, withdrawal or trade wiring. #23 is a prerequisite before fee activation. |
 | [#25 synthetic retired-gate harness](https://github.com/shawkkkkk/beam/pull/25) `4706d59ddb479d3b32c8c369fc342712ff89b023` | `main`; `.github/workflows/runtime-harness.yml`, `tests/runtime-harness/{Cargo.toml,Cargo.lock,src/lib.rs,tests/migration_runtime.rs}`. | Local ProgramTest 3/3 in default and experimental modes reported passed. Tests retired CPMM gates with synthetic programs, not real Raydium CPI or AMM v4 migration. |
 | [#26 fee policy local-bank test](https://github.com/shawkkkkk/beam/pull/26) `43ca5500d8046c6b7fc4125b300e16b28699a8ce` | **Stacked on #24**, also incorporates #25; `.github/workflows/runtime-harness.yml`, `tests/runtime-harness/{Cargo.toml,Cargo.lock,src/lib.rs,tests/fee_policy_runtime.rs,tests/migration_runtime.rs}` relative to #24. | New synthetic initializer test reported passed in default/experimental modes: authority, atomic failure, duplicate init, rent and uncredited unsolicited SOL. Review integrated #24+#25 diff. No live fee routing; #23 remains necessary before activation. |
-| [#27 V2 trade ABI fixtures](https://github.com/shawkkkkk/beam/pull/27) `5832a12516c0b91751925da5c033a4de678dc531` | `main`; `sdk/V2_TRADES.md`, `sdk/beam-v2-trades.{mjs,test.mjs}`, `sdk/fixtures/v2-trades*`, `sdk/tools/generate-v2-trade-fixtures.rs`. | Local Node tests 10/10 reported passed for BuyV2/SellV2 fixture encodings. Draft #20's SDK workflow is needed to discover these tests in hosted CI. No account discovery, RPC, signing or trade execution. |
+| [#27 V2 trade ABI fixtures](https://github.com/shawkkkkk/beam/pull/27) `5832a12516c0b91751925da5c033a4de678dc531` | `main`; `sdk/V2_TRADES.md`, `sdk/beam-v2-trades.{mjs,test.mjs}`, `sdk/fixtures/v2-trades*`, `sdk/tools/generate-v2-trade-fixtures.rs`. | Local Node tests 10/10 reported passed for BuyV2/SellV2 fixture encodings. Merged #20's workflow now discovers these tests when the draft lands; rerun against the combined tree. No account discovery, RPC, signing or trade execution. |
 | [#28 local feature status](https://github.com/shawkkkkk/beam/pull/28) `290f9a6566ff44d8d4ed7699dddb14dce1826d0b` | **Stacked on #17**; `web/package.json`, `web/src/{App.tsx,localFeaturePresentation.ts}`, `web/tests/{browser.mjs,localFeaturePresentation.test.ts}`. | Local website tests (16), build, Chromium interaction, formatting and diff checks reported passed. Labels creator, charity, callout and livestream plans as local/unavailable; no provider, wallet, trade, donation or stream integration. |
 | [#29 AMM v4 source-account preflight](https://github.com/shawkkkkk/beam/pull/29) `7677a7431136a65de93828dc3344b9884d91bc94` | **Stacked on #22**; `programs/beam/src/beam_amm_v4.rs`. | Exact-head local locked default/experimental 23 unit + 4 compatibility each, no-default/provenance/diff passed. Exact-head hosted Website/Native/Contract checks completed successfully. No instruction calls the helper; no CPI, transfer, LP custody or Token-2022 graduation. |
 | [#30 disabled AMM v4 funding helper](https://github.com/shawkkkkk/beam/pull/30) `3de7f5cfc1555a340508301121eca4e383c16751` | **Targets #29**; `programs/beam/src/beam_amm_v4_funding.rs`, `programs/beam/tests/amm_v4_funding.rs`, `upstream/manifest.json` against current #29 tree. Latest commit carries the same frozen-source guard as #29, though #29's commit is not literally an ancestor. | Exact-head local default/experimental 23 unit + 7 funding + 4 compatibility each, no-default/provenance passed. Exact-head hosted Website/Native/Contract checks completed successfully. Pure accounting only; module is not exported or invoked and does not establish LP custody, creator funding or migration-fee recipient. |
@@ -110,8 +110,9 @@ Review order follows actual branch targets, not PR number alone:
 2. Fee chain: #23 and #24 are independent drafts on `main`; review both,
    then #25 and stacked #26 against their resulting combined tree. Policy
    remains disabled and creator funding Undecided.
-3. Client/UI chain: #20 is needed for #27 hosted test discovery. For web,
-   review #17 → #28 → #31 → #32. Check #6's merged preview baseline and
+3. Client/UI chain: merged #20 provides #27 hosted test discovery. For web,
+   merged #17 is the base for #28 → #31 → #32; retarget and review #28's
+   combined tree before merge. Check #6's merged preview baseline and
    avoid treating local-only cards as production service integration.
 
 At this snapshot, the maintainer verified exact-head hosted checks through the
@@ -127,8 +128,8 @@ strength of this table.
 | PR #13 owner: `sdk/beam-creator*` | Confirm final contract account/event ABI and selected creator-payout semantics; do not duplicate the active draft. | Node fixtures and exact Anchor producer receipt; reject stale or missing account observations. |
 | PR #14 / #15 owners: `backend/charity/` / `backend/callouts/` | External authorization and provider policy remain separate; no live integration from local mocks. | Mock registry/reconciliation and moderation/permission tests, including failures. |
 | PR #21 owner: `backend/livestream/` | Local authorization and moderation lifecycle only; real media integration and player UI are separate work. | Mock permission, start/stop/ban race, cleanup and retention tests; no live provider. |
-| PR #16 / #17 owners: `backend/indexer/` / `web/src/indexerAdapter.ts` | Agree on a versioned response schema, slot/finality and unavailable states before connecting them. | Replay/rollback and bounded backend queries; web stale/malformed data tests. |
-| PR #18 / #20 owners: CreateV2 builder / raw Create/Trade decoder in separate `sdk/` files | Keep fixture ownership distinct; PR #20 owns CreateEvent decoding. | Exact Anchor fixture bytes, rejection paths and Node test receipts. |
+| PR #16 owner and merged #17 baseline: `backend/indexer/` / `web/src/indexerAdapter.ts` | Agree on a versioned response schema, slot/finality and unavailable states before connecting them. | Replay/rollback and bounded backend queries; web stale/malformed data tests. |
+| Merged #18 / #20 SDK baselines | New builders/decoders should reuse these local interfaces without implying live accounts or authenticated events. | Exact Anchor fixture bytes, rejection paths and Node test receipts. |
 | Unassigned: AMM v4 execution adapter in a new `programs/beam/src/` module | Source-only ABI on main; decide SPL-only graduation, LP custody/fee rights and setup fee bounds first. Keep the retired CPMM path disabled. | Host ABI tests plus isolated local-program CPI, rollback, account substitution, donation and replay cases before activation. |
 | Unassigned: Beam fee custody and routing in dedicated contract modules | Decide creator payout funding and vault authority before editing shared trade handlers. Build on PR #12's merged `create_v2` guard without reintroducing PumpSwap reads. | Conserved total fee, creator/community allocation, rounding and unauthorized-recipient tests; local runtime evidence before live use. |
 | Unassigned: wallet integration and remaining `web/` flows | Build on merged sample preview, finalized Beam IDL/SDK and a verified API. PR #17 already owns the read-only adapter; PR #13 owns creator SDK. | Local mock flows, stale-data/error states, accessibility and transaction-construction tests; no preview fixture presented as chain data. |
@@ -196,16 +197,17 @@ precise specification and isolated adversarial tests.
 ## Website and backend contribution lanes
 
 The lanes below describe **development scope and ownership**, not working Beam
-services. PRs #14–#18 and #20–#21 already own the noted draft slices; check their
-heads before starting adjacent work. Mock wallets, APIs and providers locally;
+services. PRs #14–#16 and #21 own draft service slices; #17/#18/#20 are merged
+development baselines. Check current heads before starting adjacent work.
+Mock wallets, APIs and providers locally;
 no real financial or media actions are part of acceptance. Contribute observable
 behavior and interface tests, not recovered proprietary web/backend bytes.
 
 | Lane | Interface and dependency | Local acceptance evidence |
 | --- | --- | --- |
-| Website and UI | PR #17 owns a read-only web adapter; PR #6's `web/` remains a sample preview. Additional UI requires typed state from a verified chain data source. | Responsive create/discovery/detail flows; keyboard/modal/storage tests; visible freshness and unavailable states; no preview RPC/signature attempt. |
-| Wallet SDK and IDL | PR #13 creator, PR #18 CreateV2 and PR #20 raw events are draft owners; regenerated Beam IDL, configured ID and complete builders remain open. | Golden fixtures against Anchor; exact integer amounts; reject missing/stale accounts; construction separate from signing/sending. |
-| Read-only indexer and API | PR #16 owns local fixture backend; PR #17 owns web adapter. Agree on versioned schema, slot/finality and cursor. No trading authority. | Replay/rollback, duplicate-event and malformed-account tests; bounded queries; fixtures labeled; no fabricated market metrics. |
+| Website and UI | Merged PR #17 provides a read-only web adapter; PR #6's `web/` remains a sample preview. Additional UI requires typed state from a verified chain data source. | Responsive create/discovery/detail flows; keyboard/modal/storage tests; visible freshness and unavailable states; no preview RPC/signature attempt. |
+| Wallet SDK and IDL | PR #13 creator remains draft; PR #18 CreateV2 and PR #20 raw events are merged local baselines. Regenerated Beam IDL, configured ID and complete builders remain open. | Golden fixtures against Anchor; exact integer amounts; reject missing/stale accounts; construction separate from signing/sending. |
+| Read-only indexer and API | PR #16 owns local fixture backend; merged PR #17 supplies an unverified web adapter. Agree on versioned schema, slot/finality and cursor. No trading authority. | Replay/rollback, duplicate-event and malformed-account tests; bounded queries; fixtures labeled; no fabricated market metrics. |
 | Creator wallet and fee sharing | Curve creator, fee vault and sharing-config interfaces; retained Pump fee program is not yet rehosted for Beam. | Selection at creation, recipient/authority validation, claim preview and failure cases; local payout tests without real transfers; no implied arbitrary later wallet change. |
 | Charity registry and donation adapter | PR #14 owns local `backend/charity/` mocks; authorized Donate.gg relay/settlement and Beam fee configuration are still missing. | Registry provenance, consent and attribution tests; mocked donation/settlement/retry receipts; feature disabled without verified provider and recipient. |
 | Callouts | PR #15 owns local `backend/callouts/` service; no on-chain callout ABI or live provider is evidenced. | Authenticated mock request, abuse/error handling and accessible UI tests; no paid or live callout action. |

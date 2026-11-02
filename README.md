@@ -62,14 +62,14 @@ completion percentages or production approval.
 | Goal | State | Evidence and remaining work |
 | --- | --- | --- |
 | Beam-branded discovery and token pages | **Merged preview** | [PR #6](https://github.com/shawkkkkk/beam/pull/6) added a responsive UI with sample market data and browser-local drafts. It has no live chain feed. |
-| Create, wallet, and trade flows | **Blocked; local fixtures in draft** | [PR #7](https://github.com/shawkkkkk/beam/pull/7) merged native-SOL ABI fixtures; [#13/#18/#20/#27](docs/TASKS.md) add distinct creator, CreateV2, event and V2 trade drafts. There is no deployed Beam ID, finalized IDL, wallet signing or trade submission. |
-| Creator wallet, charity, callouts, livestream screens | **Local plans in draft** | [#17 → #28 → #31 → #32](docs/TASKS.md#draft-review-queue-prs-2234) label unverified and unavailable states. They do not provide authorized donations, calls, streams or migration. |
+| Create, wallet, and trade flows | **Local SDK merged; live flow blocked** | [#7](https://github.com/shawkkkkk/beam/pull/7), [#18](https://github.com/shawkkkkk/beam/pull/18) and [#20](https://github.com/shawkkkkk/beam/pull/20) provide native-SOL/CreateV2 fixtures and raw event decoding. Draft [#13/#27](docs/TASKS.md) cover creator and V2 trade fixtures. There is no deployed Beam ID, finalized IDL, wallet signing or trade submission. |
+| Creator wallet, charity, callouts, livestream screens | **Local plans in draft** | [#17](https://github.com/shawkkkkk/beam/pull/17) merged an unverified read-only data boundary; draft [#28 → #31 → #32](docs/TASKS.md#draft-review-queue-prs-2234) adds unavailable-state preview copy. These do not provide authorized donations, calls, streams or migration. |
 
 ### Backend and integrations
 
 | Goal | State | Evidence and remaining work |
 | --- | --- | --- |
-| Read-only market/indexer API | **Fixture drafts; live feed blocked** | [#16](https://github.com/shawkkkkk/beam/pull/16) has local replay/query fixtures; [#17](https://github.com/shawkkkkk/beam/pull/17) has a web adapter. Their schema needs reconciliation. Neither authenticates a chain feed. |
+| Read-only market/indexer API | **Web boundary merged; live feed blocked** | Draft [#16](https://github.com/shawkkkkk/beam/pull/16) has local replay/query fixtures; merged [#17](https://github.com/shawkkkkk/beam/pull/17) has an unverified web adapter. Their schema needs reconciliation. Neither authenticates a chain feed. |
 | Creator sharing and payout service | **Blocked** | Retained on-chain source has creator paths, but Beam still depends on inherited Pump fee configuration. No Beam-controlled payout integration is verified. |
 | Charity donations | **Mock draft; live use blocked** | [#14](https://github.com/shawkkkkk/beam/pull/14) provides a disabled local registry/provider mock. There is no authorized Donate.gg integration or real settlement. |
 | Callouts and livestreaming | **Mock drafts; live use blocked** | [#15](https://github.com/shawkkkkk/beam/pull/15) and [#21](https://github.com/shawkkkkk/beam/pull/21) test local moderation and lifecycle behavior; no production provider or playable live stream exists. |

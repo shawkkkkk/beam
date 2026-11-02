@@ -64,16 +64,17 @@ tests for success, failure rollback, authority checks, replay, and accounting
 before activation. Do not treat a host pass as a real program or deployed
 Raydium test.
 
-For the merged native-SOL SDK fixtures, use Node.js 22 from the repository
+For merged SDK fixtures and event decoders, use Node.js 22 from the repository
 root; `sdk/` has no package manifest:
 
 ```sh
-node --test sdk/beam-native.test.mjs
+node --test sdk/*.test.mjs
 ```
 
 For SDK drafts, also run each changed `sdk/*.test.mjs` file explicitly.
-The SDK workflow on `main` runs only `beam-native.test.mjs`; a green job
-does not prove other draft fixtures ran unless the workflow is updated.
+The merged SDK workflow runs matching `sdk/*.test.mjs` and
+`backend/*/*.test.mjs` files under Node.js 22. A green job does not prove
+unmerged draft fixtures or website browser interactions ran.
 
 For the merged website preview, use Node.js 24:
 
@@ -102,8 +103,8 @@ node --test backend/livestream/livestream.test.mjs
 
 Run only commands for paths present in your checked-out branch. These
 services do not start an authenticated production API, media provider or
-donation provider. Their tests are not included in `main` CI until a reviewed
-workflow adds them.
+donation provider. The merged SDK workflow discovers their test files once
+those draft service paths land on `main`.
 
 If `tests/runtime-harness/Cargo.toml` exists in your checked-out branch, run
 its separate locked suite from the repository root in both modes:
