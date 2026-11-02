@@ -42,8 +42,10 @@ does not include Pump's proprietary website or service backends.
 
 There is currently no repository-root license file. The licenses inside the
 upstream snapshots apply to those snapshots; they do not establish a license
-for every new Beam file. Maintainers need to clarify the project's own license
-and contribution terms before inviting substantial external submissions.
+for every new Beam file. The missing root license is an unset owner value in
+[docs/OPEN_DECISIONS.md](docs/OPEN_DECISIONS.md). Maintainers need to set the
+project's own license and contribution terms before inviting substantial
+external submissions.
 
 ## Check the change
 
@@ -118,6 +120,19 @@ synthetic accounts and valueless balances; it does not execute captured
 original Pump binaries or prove real Raydium CPI behavior. The normal
 `programs/beam` tests above do not run this separate manifest.
 
+The merged AMM v4 local-validator crate is on `main` at
+`tests/amm-v4-validator`. From that directory, with Rust 1.99.1:
+
+```sh
+cargo test --locked -- --test-threads=1
+```
+
+Hosted CI runs the same command in
+[`.github/workflows/amm-v4-validator.yml`](.github/workflows/amm-v4-validator.yml).
+The crate calls the pinned 19-account `Initialize2` processor. It does not
+add a Beam migration instruction or enable graduation. LP stays locked
+permanently. See [its readme](tests/amm-v4-validator/README.md).
+
 Host tests, mock accounts, and local simulations are welcome. Do not deploy to
 a live network, use real wallets, sign live transactions, transfer funds, or
 handle credentials as part of a normal contribution. If Beam is registered on
@@ -145,11 +160,15 @@ findings in public issues or pull requests.
    discovers the new tests. A new commit, retargeted base, dependency merge,
    conflict resolution, or changed workflow invalidates prior exact-head
    evidence; rerun affected checks and refresh review on the final tree.
-4. Keep unresolved security, fee custody, creator funding, LP rights,
-   Token-2022 graduation, authenticated indexer and live-service work in
-   draft. A disabled helper may be merged as development source only when its
-   scope and limitations are explicit and the current maintainer decision
-   allows it. Host or mock tests never authorize activation or deployment.
+4. Keep unresolved security, fee custody, Token-2022 graduation,
+   authenticated indexer and live-service work in draft. LP stays locked
+   permanently. Unset owner values, including the creator basis-point count
+   inside the 42 bps community share, live only in
+   [docs/OPEN_DECISIONS.md](docs/OPEN_DECISIONS.md). A code path that needs
+   one defaults to disabled or unset and fails closed. A disabled helper may
+   be merged as development source only when its scope and limitations are
+   explicit and the current maintainer decision allows it. Host or mock tests
+   never authorize activation or deployment.
 5. Merge only when the PR is ready, its exact reviewed head and base still
    match, required protections and formal approvals are satisfied, and the
    maintainer has authority for that scope. Do not self-approve, bypass rules,

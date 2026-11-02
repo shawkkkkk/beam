@@ -14,8 +14,10 @@ review activity can continue within the scope approved by maintainers;
 neither a Slop state change nor automatic task closure approves a GitHub PR.
 
 1. Read `README.md`, `docs/STATUS.md`, `docs/ECONOMICS.md`, `docs/TASKS.md`,
-   and `CONTRIBUTING.md`. Check the working tree, remote branches, and open
-   pull requests before choosing a task. Inspect the intended target branch.
+   `docs/OPEN_DECISIONS.md`, and `CONTRIBUTING.md`. Check the working tree,
+   remote branches, and open pull requests before choosing a task. Inspect
+   the intended target branch. `docs/OPEN_DECISIONS.md` is the only list of
+   unset owner values.
 2. Use `programs/beam` as the editable Anchor program. Its retained Pump Main
    modules, Beam policy/economics/Raydium modules, and compatibility tests are
    the contract baseline. Do not start a second launchpad implementation.
@@ -45,19 +47,22 @@ neither a Slop state change nor automatic task closure approves a GitHub PR.
   signed router, and AMM-dependent CTO handlers fail closed. Do not reconnect
   them to PumpSwap or claim that the retained quote-chain code routes through
   Raydium.
-- The existing Raydium CPMM migration is a gated, superseded candidate. The
-  user chose Raydium AMM v4; build and verify that adapter separately before
-  activation. Current LP burning does not leave Beam an LP fee claim for
-  recurring buybacks. Principal custody and fee rights remain unresolved.
+- The existing Raydium CPMM migration is a gated, superseded candidate and
+  fails closed. The user chose Raydium AMM v4
+  (`raydium-io/raydium-amm` `91739d8d9f5cf347e0ce14ebe4d2bb7069fb31b6`,
+  program `675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8`, 19-account
+  `Initialize2`). Build and verify that adapter separately before activation.
+  LP is locked permanently. That lock does not leave Beam an LP fee claim
+  for recurring buybacks. Any post-graduation Beam fee is unset; see
+  `docs/OPEN_DECISIONS.md`.
 - `beam_economics.rs` contains provisional fee-allocation arithmetic; the
-  inherited Pump fee CPI still governs real trade collection. The community
-  share's holder-reward/buyback split is a provisional test setting. Holder
-  eligibility, the flagship mint, vaults, and distribution rules are open.
-  The user's Beam fee split is 42/5/3 nominal basis points for community,
-  treasury and founder. Preserve the creator payout and creator-selected
-  wallet system. Whether its fee comes from the community share or an
-  additional charge remains undecided; do not assume either. Disclose each
-  applicable curve, creator, migration, and Raydium pool fee; never promise returns.
+  inherited Pump fee CPI still governs real trade collection. The curve fee
+  is 0.50% all-in, split 42/5/3 nominal basis points for community, treasury
+  and founder. Preserve the creator payout and creator-selected wallet
+  system. Creator payouts are paid out of the 42 bps community share. The
+  creator basis-point count and every other unset owner value are only in
+  `docs/OPEN_DECISIONS.md`. `$BEAM` is the flagship. Disclose each applicable
+  curve, creator, migration, and Raydium pool fee; never promise returns.
 - On-chain reconstruction does not provide Pump's website, streaming, callout,
   or charity service backends. Treat those as independent feature work with
   authorized providers; never imply their behavior is byte-identical. The
