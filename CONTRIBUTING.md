@@ -52,6 +52,31 @@ before activation. Check CI on the exact pull-request head and obtain any
 required formal approvals before merging. Do not self-approve, bypass branch
 protections, or merge unresolved work.
 
+For the merged native-SOL SDK fixtures, use Node.js 22 from the repository
+root; `sdk/` has no package manifest:
+
+```sh
+node --test sdk/beam-native.test.mjs
+```
+
+For the merged website preview, use Node.js 24:
+
+```sh
+cd web
+npm ci
+npm run build
+npm run test:unit
+npm run format:check
+```
+
+The website's browser suite needs built output and Chromium in an isolated
+test environment because its runner uses `--no-sandbox`. Website CI currently
+checks build, unit tests and format; it does not run that browser suite.
+Draft backend services have local fixture tests only and are not part of main.
+An isolated local-bank harness, if used, exercises Beam with synthetic accounts
+and valueless balances; it does not execute captured original Pump binaries or
+prove real Raydium CPI behavior.
+
 Host tests, mock accounts, and local simulations are welcome. Do not deploy to
 a live network, use real wallets, sign live transactions, transfer funds, or
 handle credentials as part of a normal contribution. If Beam is registered on

@@ -14,13 +14,20 @@
 - Inherited Global migration-fee behavior retained. Test-only Beam curve-fee arithmetic now reflects the requested 42/5/3 bps community/treasury/founder split; it does not rewrite inherited creator or migration fees or enforce a live rate.
 - Source-only [AMM v4 ABI guards](../programs/beam/src/beam_amm_v4.rs) encode the pinned 19-account `Initialize2` path and reject Token-2022 mint owners. They are not called by a Beam instruction and do not migrate a token.
 - Fee-allocation arithmetic and selected host differential tests.
+- [PR #7](https://github.com/shawkkkkk/beam/pull/7) merged native-SOL create/buy/sell ABI fixtures and local encoders. They do not resolve live accounts, sign or submit transactions. Draft [PR #13](https://github.com/shawkkkkk/beam/pull/13) owns legacy creator-fee fixtures, [PR #18](https://github.com/shawkkkkk/beam/pull/18) owns CreateV2 construction, and [PR #20](https://github.com/shawkkkkk/beam/pull/20) owns raw Create/Trade event decoding; these are not part of this main-branch snapshot.
+- [PR #6](https://github.com/shawkkkkk/beam/pull/6) merged a Beam-branded website preview with sample market data and browser-local drafts. It has no wallet, chain feed, metadata upload, donation, callout or livestream service.
+
+Separate draft [PR #21](https://github.com/shawkkkkk/beam/pull/21) owns a
+local mock livestream authorization and moderation lifecycle under
+`backend/livestream/`. It is not on main and has no media provider or playable
+stream; the [task ledger](TASKS.md) records adjacent draft backend scopes.
 
 ## Outstanding before use
 
 1. Beam-controlled fee configuration and vaults. Pump's inherited fee-program namespaces/authority assumptions must be replaced or rehosted. Source compatibility does not establish that Pump's deployed fee program accepts Beam's ID.
 2. Replace the superseded CPMM candidate with an independently verified Raydium AMM v4 adapter. AMM v4 accepts classic SPL Token mints only, while Beam's retained curve also supports restricted Token-2022 mints; do not silently delete those launches or route them to an unsupported pool. Design principal-lock/fee-rights integration for recurring community buybacks and post-graduation creator claims; current candidate burns LP. Keep migration gated until the final venue, policy and tests are implemented.
-3. Non-SOL migration, Raydium AMM v4 quote-chain routing, AMM-dependent creator/sharing/CTO operations, and compatible donation creation/collection. Remove all active PumpSwap runtime, PDA and ownership assumptions outside the immutable upstream archive; fail-closed handlers are interim gaps, not the finished behavior.
-4. Regenerated Beam IDL, wallet builders, real indexer and production UI. Retained dependency IDLs are reference interfaces, not a finalized Beam client API.
+3. Non-SOL migration, Raydium AMM v4 quote-chain routing, AMM-dependent creator/sharing/CTO operations, and compatible donation creation/collection. [Merged PR #12](https://github.com/shawkkkkk/beam/pull/12) makes a nested graduated `create_v2` PumpSwap quote fail closed; it does not quote AMM v4. Remove all active PumpSwap runtime, PDA and ownership assumptions outside the immutable upstream archive; fail-closed handlers are interim gaps, not the finished behavior.
+4. Regenerated Beam IDL, complete wallet builders, real indexer and production UI. The merged native-SOL fixture encoder is only a local construction layer; retained dependency IDLs are reference interfaces, not a finalized Beam client API.
    Preserve creator-fee recipient selection and build independent, authorized services for donation choices, callouts, and livestreaming. The pinned on-chain source does not supply those off-chain products. See the [feature matrix](FEATURES.md).
 5. SBF build and local-validator differential tests: every retained instruction, actual Raydium CPIs, rollback, authority checks, rent, extensions, replay rejection and LP treatment.
 6. Deployment-key assignment, independent review and devnet end-to-end validation. This branch deploys nothing.
@@ -31,15 +38,34 @@ post-completion quote accounting, fee/rent liability protection, and
 account-alias guards to the development branch. Those host-tested guards do
 not establish CPI success or fee-sweep/rollback safety.
 [The separate root-model PR #3](https://github.com/shawkkkkk/beam/pull/3)
-was closed because its contract and fee policy conflict with the current
-`programs/beam` baseline. Its sample-data website is carried separately in
-[PR #6](https://github.com/shawkkkkk/beam/pull/6).
+was closed unmerged because its contract and fee policy conflict with the
+current `programs/beam` baseline. Its reviewed sample-data website was
+carried into merged [PR #6](https://github.com/shawkkkkk/beam/pull/6).
+
+Creator payouts and creator-selected wallet behavior remain requirements,
+while funding from the community share versus an additional charge is
+undecided. The ordinary proposed allocation is 42/5/3 basis points for
+community/treasury/founder: 50 basis points total, including 8 basis points
+under platform control. The optional disabled, three-second buy-side quote
+prototype models an initial 99% fee of gross buyer debit. A 99% fee on net
+base would be about 49.75% of gross (0.99 / 1.99), so it is not the same rule.
+Its launch surcharge is separate from ordinary allocation, with no recipient
+or withdrawal path in the prototype. There is no enabled contract path, live
+trade, sell-handler change or promised outcome.
+
+Beam's [Slop listing](https://slop.cash/projects/beam) was paused with a
+security scan queued at the last maintainer check. Clearance and reward terms
+have not been established in this repository.
 
 ## Meaning of checks
 
 Host compilation checks Rust/Anchor types. Differential tests cover selected quote/fee functions, decoding/serialization boundaries and retained instruction encodings, including semantic errors and source line numbers. Build-directory prefixes are normalized because the reference is compiled from another directory.
 
 These checks do not establish full instruction execution parity, SBF byte identity, CPI success, current-chain behavior or security. Source equality is separate from program-binary equality.
+
+Any isolated local-bank harness uses synthetic accounts and valueless balances
+to exercise Beam code. It does not execute captured original Pump binaries,
+prove Raydium CPI behavior or submit a transaction to a live network.
 
 Upstream declares the reconstruction complete and removed captured binaries and its research toolchain. This branch pins the final source; it does not independently re-prove the historical reconstruction claim.
 
